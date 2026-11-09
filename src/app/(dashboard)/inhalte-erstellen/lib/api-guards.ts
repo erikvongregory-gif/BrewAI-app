@@ -17,6 +17,11 @@ export type ApiGuardResult =
       response: NextResponse;
     };
 
+/** Schlüssel für kontobezogene Kostenlimits (unabhängig von der Client-IP). */
+export function costLimitIdentifier(userId: string): string {
+  return `user:${userId}`;
+}
+
 export async function requireImageGenerationUser(req: Request, keyPrefix: string): Promise<ApiGuardResult> {
   const originError = enforceSameOrigin(req);
   if (originError) return { ok: false, response: originError };
@@ -36,17 +41,20 @@ export async function requireImageGenerationUser(req: Request, keyPrefix: string
 
   if (!(await hasPassedTwoFactor(user))) return { ok: false, response: NextResponse.json({ error: "Zwei-Faktor-Prüfung erforderlich.", code: "two_factor_required" }, { status: 403 }) };
 
+  // Kostenbremse pro Konto: bewusst ohne IP im Schlüssel. Mit IP|User (identifierParts)
+  // bekäme jede neue IP (z. B. wechselnde IPv6-Adressen) ein frisches Stunden-/Tageskontingent.
+  const costIdentifier = costLimitIdentifier(user.id);
   const hourly = await enforceRateLimitPersistent(
     req,
     { keyPrefix: `${keyPrefix}:hour`, limit: 30, windowMs: 60 * 60 * 1000 },
-    { identifierParts: [user.id] },
+    { identifier: costIdentifier },
   );
   if (hourly) return { ok: false, response: hourly };
 
   const daily = await enforceRateLimitPersistent(
     req,
     { keyPrefix: `${keyPrefix}:day`, limit: 100, windowMs: 24 * 60 * 60 * 1000 },
-    { identifierParts: [user.id] },
+    { identifier: costIdentifier },
   );
   if (daily) return { ok: false, response: daily };
 

@@ -1322,9 +1322,9 @@
     animation: none !important;
   }
 }
-/* BrewAI Studio â€” Sudbuch, Teil 2
-   ErgÃ¤nzung fÃ¼r Dashboard, Team, Einstellungen, Abonnement, Markenprofil.
-   ANS ENDE von studio-tokens.css anhÃ¤ngen. Setzt die Tokens aus Teil 1 voraus. */
+/* BrewAI Studio — Sudbuch, Teil 2
+   Ergänzung für Dashboard, Team, Einstellungen, Abonnement, Markenprofil.
+   ANS ENDE von studio-tokens.css anhängen. Setzt die Tokens aus Teil 1 voraus. */
 
 /* â”€â”€ MESSREIHE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Ersetzt das Kachelraster auf dem Dashboard. Kennzahlen stehen nebeneinander
@@ -1360,7 +1360,7 @@
 }
 
 /* â”€â”€ ABSCHNITT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   Ãœberschrift links, Nebenaktion rechts, auf einer Linie. */
+   Überschrift links, Nebenaktion rechts, auf einer Linie. */
 
 .evg-sec { margin: var(--sp-10) var(--sp-8) 0; }
 .evg-sec__head {
@@ -1382,7 +1382,7 @@
 @media (max-width: 1100px) { .evg-sec__cols { grid-template-columns: minmax(0, 1fr); gap: var(--sp-8); } }
 
 /* â”€â”€ EINTRAGSZEILE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   FÃ¼r AktivitÃ¤t, Team, Abbuchungen, Schnellstart. Keine Karten.
+   Für Aktivität, Team, Abbuchungen, Schnellstart. Keine Karten.
    Symbol, Text, rechts die Kennung. */
 
 .evg-entry {
@@ -1411,7 +1411,7 @@ button.evg-entry:hover .evg-entry__ico { color: var(--acc); }
 }
 
 /* â”€â”€ HINWEISLEISTE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   FÃ¼r â€žMarkenprofil anlegen". Eine Zeile, Aktion rechts, kein Kasten mit FlÃ¤che. */
+   Für „Markenprofil anlegen". Eine Zeile, Aktion rechts, kein Kasten mit Fläche. */
 
 .evg-callout {
   margin: var(--sp-8) var(--sp-8) 0;
@@ -1455,7 +1455,7 @@ button.evg-entry:hover .evg-entry__ico { color: var(--acc); }
 .evg-swatch { flex: 1; height: 44px; border-right: 1px solid var(--line); }
 .evg-swatch:last-child { border-right: 0; }
 
-/* Auswahl mit Radios â€” Brand-Lock */
+/* Auswahl mit Radios — Brand-Lock */
 .evg-choice {
   display: grid; grid-template-columns: 14px minmax(0, 1fr);
   gap: var(--sp-5); align-items: start;

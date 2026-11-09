@@ -137,6 +137,11 @@ export function formatPlanImageEstimate(monthlyTokens: number): string {
   return `ca. ${min.toLocaleString("de-DE")}–${max.toLocaleString("de-DE")} Bilder`;
 }
 
+/**
+ * Spanne für die Tarifkarte (720p, mit Audio): Obergrenze = kurzer Clip (5 s) mit Seedance 2,
+ * Untergrenze = langer Clip (12 s) mit dem beworbenen Seedance 2.5 (Faktor 1,5). So passt die
+ * Angabe zur tatsächlichen Abrechnung in `calculateSeedanceVideoTokenCost`.
+ */
 export function formatPlanVideoEstimate(monthlyTokens: number): string {
   const standardCost = calculateSeedanceVideoTokenCost({
     resolution: "720p",
@@ -147,6 +152,7 @@ export function formatPlanVideoEstimate(monthlyTokens: number): string {
     resolution: "720p",
     duration: 12,
     generateAudio: true,
+    modelId: "seedance-2.5",
   });
   const maxVideos = Math.max(1, Math.floor(monthlyTokens / standardCost));
   const minVideos = Math.max(1, Math.floor(monthlyTokens / longCost));

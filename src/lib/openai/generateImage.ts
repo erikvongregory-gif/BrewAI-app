@@ -40,6 +40,89 @@ function parseOpenAiBase64(payload: unknown): string | null {
   return typeof b64 === "string" && b64.length > 0 ? b64 : null;
 }
 
+/**
+ * OpenAI nennt bis zu 2 Minuten fuer komplexe Prompts; 4K/xhigh mit mehreren
+ * Referenzen braucht Luft darueber. Ohne Limit haengt ein toter Socket bis zum
+ * undici-Default (300 s) und damit bis zum harten Funktionsende.
+ */
+const DEFAULT_IMAGE_TIMEOUT_MS = 180_000;
+
+export function resolveOpenAiImageTimeoutMs(raw = process.env.OPENAI_IMAGE_TIMEOUT_MS): number {
+  const parsed = Number.parseInt(raw ?? "", 10);
+  if (!Number.isFinite(parsed) || parsed < 10_000) return DEFAULT_IMAGE_TIMEOUT_MS;
+  return Math.min(parsed, 290_000);
+}
+
+export type OpenAiImageUsage = {
+  inputTokens: number | null;
+  outputTokens: number | null;
+  imageInputTokens: number | null;
+  textInputTokens: number | null;
+};
+
+function readTokenCount(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
+}
+
+/** Liest das `usage`-Feld der Images API (GPT-Image-Modelle liefern Tokenzahlen mit). */
+export function parseOpenAiImageUsage(payload: unknown): OpenAiImageUsage | null {
+  if (!payload || typeof payload !== "object") return null;
+  const usage = (payload as Record<string, unknown>).usage;
+  if (!usage || typeof usage !== "object") return null;
+  const record = usage as Record<string, unknown>;
+  const details = (record.input_tokens_details ?? {}) as Record<string, unknown>;
+  const parsed: OpenAiImageUsage = {
+    inputTokens: readTokenCount(record.input_tokens),
+    outputTokens: readTokenCount(record.output_tokens),
+    imageInputTokens: readTokenCount(details.image_tokens),
+    textInputTokens: readTokenCount(details.text_tokens),
+  };
+  return Object.values(parsed).some((value) => value !== null) ? parsed : null;
+}
+
+/**
+ * Listenpreise GPT Image 2 / 2.5 (USD je 1 Mio. Tokens, Standard, nicht Batch),
+ * Quelle: developers.openai.com/api/docs/pricing, abgerufen 2026-11-09.
+ * Text-Input 5, Bild-Input 8, Bild-Output 30. Nur Schaetzwert fuer Logs.
+ */
+const USD_PER_TOKEN = { textInput: 5 / 1_000_000, imageInput: 8 / 1_000_000, imageOutput: 30 / 1_000_000 };
+
+export function estimateOpenAiImageCostUsd(usage: OpenAiImageUsage): number | null {
+  if (usage.outputTokens === null) return null;
+  const imageIn = usage.imageInputTokens ?? 0;
+  const textIn =
+    usage.textInputTokens ?? Math.max((usage.inputTokens ?? 0) - imageIn, 0);
+  const cost =
+    textIn * USD_PER_TOKEN.textInput + imageIn * USD_PER_TOKEN.imageInput + usage.outputTokens * USD_PER_TOKEN.imageOutput;
+  return Math.round(cost * 10_000) / 10_000;
+}
+
+/** Eine strukturierte Zeile je Bild, ohne Prompt und ohne Nutzerdaten. */
+function logImageUsage(record: {
+  model: string;
+  size: string;
+  quality?: string;
+  referenceCount: number;
+  durationMs: number;
+  usage: OpenAiImageUsage | null;
+}) {
+  console.info(
+    JSON.stringify({
+      ts: new Date().toISOString(),
+      domain: "ai-cost",
+      provider: "openai",
+      operation: record.referenceCount > 0 ? "images.edits" : "images.generations",
+      model: record.model,
+      size: record.size,
+      quality: record.quality ?? "auto",
+      referenceCount: record.referenceCount,
+      durationMs: record.durationMs,
+      ...(record.usage ?? {}),
+      estimatedUsd: record.usage ? estimateOpenAiImageCostUsd(record.usage) : null,
+    }),
+  );
+}
+
 function referenceToFile(reference: OpenAiReferenceImage, index: number): File {
   const buffer = Buffer.from(reference.base64, "base64");
   const mime = reference.mime.toLowerCase().includes("jpeg") ? "image/jpeg" : reference.mime;
@@ -56,6 +139,11 @@ function referenceToFile(reference: OpenAiReferenceImage, index: number): File {
  * - Ohne Referenz → `images/generations`.
  * WICHTIG: `response_format` wird NICHT gesendet — GPT-Image-Modelle lehnen es ab
  * und liefern immer base64. Gibt den Bild-Buffer zurueck.
+ *
+ * Kostenschutz: Jeder Aufruf ist kostenpflichtig und nicht idempotent. Daher
+ * Retry-Policy `paid` (kein zweiter Lauf nach Timeout/Abbruch), Zeitlimit je
+ * Versuch und optional ein Gesamtbudget (`budgetMs`), damit kein Versuch mehr
+ * startet, den die Serverfunktion nicht mehr zu Ende bringen kann.
  */
 export async function generateOpenAiImage(args: {
   apiKey: string;
@@ -66,6 +154,11 @@ export async function generateOpenAiImage(args: {
   quality?: OpenAiImageQuality;
   referenceImage?: OpenAiReferenceImage | null;
   referenceImages?: OpenAiReferenceImage[] | null;
+  /** Zeitlimit je HTTP-Versuch; Standard 180 s bzw. OPENAI_IMAGE_TIMEOUT_MS. */
+  timeoutMs?: number;
+  /** Verbleibendes Zeitbudget der Serverfunktion fuer diesen Aufruf. */
+  budgetMs?: number;
+  signal?: AbortSignal;
 }): Promise<Buffer> {
   const { apiKey, model, prompt, size, outputFormat, quality, referenceImage, referenceImages } = args;
   const outputFmt = outputFormat === "jpg" ? "jpeg" : "png";
@@ -77,7 +170,8 @@ export async function generateOpenAiImage(args: {
   // wiederverwendbar.
   return withProviderRetry(
     "openai",
-    async () => {
+    async (signal) => {
+      const startedAt = Date.now();
       let res: Response;
       if (refs.length > 0) {
         const form = new FormData();
@@ -92,6 +186,7 @@ export async function generateOpenAiImage(args: {
           method: "POST",
           headers: { Authorization: `Bearer ${apiKey}` },
           body: form,
+          signal,
         });
       } else {
         res = await fetch("https://api.openai.com/v1/images/generations", {
@@ -107,6 +202,7 @@ export async function generateOpenAiImage(args: {
             output_format: outputFmt,
             ...(quality ? { quality } : {}),
           }),
+          signal,
         });
       }
 
@@ -117,12 +213,29 @@ export async function generateOpenAiImage(args: {
 
       const base64 = parseOpenAiBase64(payload);
       if (!base64) {
-        throw new ProviderError(
-          classifyProviderResponse("openai", { status: 502 }, { error: { message: "OpenAI lieferte kein Bild." } }),
-        );
+        // 200 ohne Bild ist bereits berechnet: nicht als 5xx wiederholen.
+        throw new ProviderError({
+          ...classifyProviderResponse("openai", { status: 502 }, { error: { message: "OpenAI lieferte kein Bild." } }),
+          code: "provider_unknown",
+          providerStatus: res.status,
+        });
       }
+      logImageUsage({
+        model,
+        size,
+        quality,
+        referenceCount: refs.length,
+        durationMs: Date.now() - startedAt,
+        usage: parseOpenAiImageUsage(payload),
+      });
       return Buffer.from(base64, "base64");
     },
-    { label: `images:${model}` },
+    {
+      label: `images:${model}`,
+      policy: "paid",
+      attemptTimeoutMs: args.timeoutMs ?? resolveOpenAiImageTimeoutMs(),
+      budgetMs: args.budgetMs,
+      signal: args.signal,
+    },
   );
 }

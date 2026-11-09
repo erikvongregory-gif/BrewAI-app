@@ -2,9 +2,15 @@ name: Release checks
 on: [push, pull_request]
 permissions:
   contents: read
+# Neuer Push auf denselben Branch bricht den veralteten Lauf ab (spart Minuten, schnelleres Feedback).
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   checks:
     runs-on: ubuntu-latest
+    # Schutz gegen hängende Tests/Builds (Standard wäre 6 Stunden).
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -12,8 +18,9 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      # Schnelle Prüfungen zuerst, der teure Build zuletzt.
       - run: npm run lint
-      - run: npm test
       - run: npx tsc --noEmit
-      - run: npm run build
+      - run: npm test
       - run: npm audit --omit=dev --audit-level=high
+      - run: npm run build

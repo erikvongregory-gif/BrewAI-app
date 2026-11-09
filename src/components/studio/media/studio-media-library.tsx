@@ -754,7 +754,7 @@ export function StudioMediaLibrary({
   const freshJobPrefixes = useMemo(() => jobs.map((job) => `gen-${job.jobId}-`), [jobs]);
 
   const createHref = !canWriteMedia ? null : hasActivePlan ? "/inhalte-erstellen" : "/dashboard/pricing";
-  const createLabel = !canWriteMedia ? "Nur Lesen" : hasActivePlan ? "Motiv generieren" : "Tarif wählen";
+  const createLabel = !canWriteMedia ? "Nur Lesen" : hasActivePlan ? "Bild erstellen" : "Tarif wählen";
 
   return (
     <div data-content-padding="false" className="flex min-h-[calc(100dvh-var(--dashboard-header-height,3rem))] flex-col">
@@ -850,9 +850,7 @@ export function StudioMediaLibrary({
                     </PopoverContent>
                   </Popover>
                 ) : null}
-                <Button variant="outline" asChild>
-                  <Link href="/inhalte-erstellen">Zur Einstiegsseite</Link>
-                </Button>
+                {/* Früher zusätzlich „Zur Einstiegsseite“ — führte auf dieselbe Seite wie der Hauptbutton. */}
                 {createHref ? (
                   <Button asChild>
                     <Link href={createHref}>
@@ -964,7 +962,7 @@ export function StudioMediaLibrary({
               <CardHeader>
                 <CardTitle>Noch keine Motive in der Mediathek</CardTitle>
                 <CardDescription>
-                  Wähle Sortiment und Anlass und generiere dein erstes Motiv — es landet automatisch hier.
+                  Wähle Sorte und Anlass und erstelle dein erstes Motiv — es landet automatisch hier.
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-wrap gap-2">

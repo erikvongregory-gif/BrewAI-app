@@ -320,7 +320,9 @@ export const OCCASION_TEMPLATES: OccasionTemplate[] = [
       shotType: "F",
       extras: ["Wiesenblumen dezent"],
       aspectRatio: "4:5",
-      promptNote: "Father's Day outing tradition, friends on a countryside walk with a handcart, relaxed celebration",
+      // Maßvoller Genuss statt Bollerwagen-Gelage (Werberat 1.1/2.2) — Fachkorrektur Audit 05.
+      promptNote:
+        "Father's Day outing, adult friends (clearly 30+) on a relaxed countryside walk with a picnic, one beer each, moderate enjoyment, no crates on a handcart, no drunkenness",
     },
   },
   {

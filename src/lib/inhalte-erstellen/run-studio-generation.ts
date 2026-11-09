@@ -16,7 +16,7 @@ import { ensureBillingRow, getEffectiveBillingRow } from "@/lib/billing/store";
 import { requireActiveSubscription } from "@/lib/billing/access";
 import { validateBriefForGeneration } from "@/lib/prompts/prompt-compiler/validate";
 import { composeSocialTextOverlay, parsePrimaryBrandColor } from "@/lib/social/text-overlay";
-import { applyAiWatermark } from "@/lib/openai/aiWatermark";
+import { applyAiProvenanceMetadata, applyAiWatermark } from "@/lib/openai/aiWatermark";
 import {
   cropImageBufferToAspectRatio,
   generateOpenAiImage,
@@ -67,6 +67,31 @@ const OUTPUT_FORMAT = "png" as const;
 const DEFAULT_IMAGE_MODEL = "gpt-image-2.5-sunburst";
 const DEFAULT_VARIANT_COUNT = 3;
 
+/**
+ * Zeitbudget der Serverfunktion: create-task und social-post laufen mit
+ * `maxDuration = 300`; die Arbeit in `after()` zählt mit. 270 s lassen Luft
+ * für das harte Ende. Ein Bildaufruf, der danach noch läuft, wird von der
+ * Plattform abgeschossen: Der Anbieter berechnet das Bild trotzdem, der Job
+ * bleibt bis zum Reconcile hängen und der Nutzer wartet umsonst.
+ */
+export const STUDIO_FUNCTION_BUDGET_MS = 270_000;
+/** Reserve für Zuschnitt, Wasserzeichen, Upload und Abschlussbuchung. */
+export const STUDIO_PERSIST_RESERVE_MS = 25_000;
+/** Darunter startet keine weitere Variante mehr (OpenAI nennt bis zu 2 min je Bild). */
+export const STUDIO_MIN_VARIANT_WINDOW_MS = 60_000;
+
+/** Wie viel Zeit ein Bildaufruf noch bekommen darf; null = keine weitere Variante starten. */
+export function remainingVariantBudgetMs(args: {
+  deadlineAt: number;
+  now: number;
+  variantIndex: number;
+}): number | null {
+  const remaining = args.deadlineAt - args.now - STUDIO_PERSIST_RESERVE_MS;
+  // Die erste Variante läuft immer (mit dem Restbudget), sonst bekäme der Nutzer nichts.
+  if (args.variantIndex > 0 && remaining < STUDIO_MIN_VARIANT_WINDOW_MS) return null;
+  return Math.max(remaining, 1_000);
+}
+
 type StudioInput = HyperrealisticInput | SocialPostInput;
 
 type PreparedGeneration = {
@@ -94,6 +119,7 @@ type PreparedGeneration = {
 };
 
 export async function handleStudioGenerationRequest(req: Request, mode: StudioMode): Promise<NextResponse> {
+  const deadlineAt = Date.now() + STUDIO_FUNCTION_BUDGET_MS;
   try {
     const guard = await requireImageGenerationUser(
       req,
@@ -148,6 +174,7 @@ export async function handleStudioGenerationRequest(req: Request, mode: StudioMo
       prepared,
       mode,
       userId: guard.userId,
+      deadlineAt,
     }).catch(async (error) => {
       if (isProviderError(error)) return;
       const message = error instanceof Error ? error.message : "Bildgenerierung fehlgeschlagen.";
@@ -480,8 +507,11 @@ async function executeStudioGeneration(args: {
   prepared: PreparedGeneration;
   mode: StudioMode;
   userId: string;
+  /** Zeitpunkt (ms), bis zu dem die Arbeit sicher abgeschlossen sein muss. */
+  deadlineAt?: number;
 }): Promise<void> {
   const { job, prepared, mode } = args;
+  const deadlineAt = args.deadlineAt ?? Date.now() + STUDIO_FUNCTION_BUDGET_MS;
   await saveGenerationProgress(job, { phase: "generating", snapshot: prepared.snapshot });
 
   const images: string[] = [];
@@ -506,7 +536,7 @@ async function executeStudioGeneration(args: {
     });
   };
 
-  const renderOne = async (variant: number): Promise<void> => {
+  const renderOne = async (variant: number, budgetMs: number): Promise<void> => {
     const references = prepared.referenceSets[variant] ?? prepared.referenceImages;
     console.info("[studio-image-request]", {
       jobId: job.id,
@@ -523,6 +553,7 @@ async function executeStudioGeneration(args: {
           references,
           aspectRatio: prepared.aspectRatio,
           resolution: prepared.billingResolution,
+          budgetMs,
           onTaskId: async (taskId) => {
             if (linkedProvider) return;
             linkedProvider = true;
@@ -537,6 +568,7 @@ async function executeStudioGeneration(args: {
           outputFormat: OUTPUT_FORMAT,
           quality: prepared.openAiQuality,
           referenceImages: references,
+          budgetMs,
         });
 
     const cropped = prepared.useCharacterIdentity
@@ -566,9 +598,10 @@ async function executeStudioGeneration(args: {
           ctaBackground: prepared.brandAccent,
         },
       });
+      // Ohne sichtbares Label trotzdem maschinenlesbar als KI-generiert kennzeichnen (Art. 50 Abs. 2 KI-VO).
       const finalBuffer = prepared.input.aiWatermark
         ? await applyAiWatermark(composited, OUTPUT_FORMAT)
-        : composited;
+        : await applyAiProvenanceMetadata(composited, OUTPUT_FORMAT);
       const uploaded = await uploadGeneratedImageWithThumb({
         userId: args.userId,
         buffer: finalBuffer,
@@ -578,7 +611,9 @@ async function executeStudioGeneration(args: {
       return;
     }
 
-    const finalBuffer = prepared.input.aiWatermark ? await applyAiWatermark(cropped, OUTPUT_FORMAT) : cropped;
+    const finalBuffer = prepared.input.aiWatermark
+      ? await applyAiWatermark(cropped, OUTPUT_FORMAT)
+      : await applyAiProvenanceMetadata(cropped, OUTPUT_FORMAT);
     const uploaded = await uploadGeneratedImageWithThumb({
       userId: args.userId,
       buffer: finalBuffer,
@@ -588,8 +623,20 @@ async function executeStudioGeneration(args: {
   };
 
   for (let index = 0; index < prepared.variantsToCreate; index += 1) {
+    const budgetMs = remainingVariantBudgetMs({ deadlineAt, now: Date.now(), variantIndex: index });
+    if (budgetMs === null) {
+      // Nicht gestartete Varianten kosten weder uns noch den Nutzer etwas
+      // (abgerechnet wird je fertigem Bild).
+      errors.push(
+        `Variante ${index + 1}${index + 1 < prepared.variantsToCreate ? ` bis ${prepared.variantsToCreate}` : ""}: Zeitlimit erreicht, nicht erstellt und nicht berechnet.`,
+      );
+      console.warn(
+        JSON.stringify({ domain: "studio-generation", event: "variants_skipped_deadline", jobId: job.id, skipped: prepared.variantsToCreate - index }),
+      );
+      break;
+    }
     try {
-      await renderOne(index);
+      await renderOne(index, budgetMs);
     } catch (reason) {
       if (isProviderError(reason)) {
         providerFailures.push(reason);

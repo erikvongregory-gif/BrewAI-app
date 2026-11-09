@@ -52,6 +52,8 @@ async function uploadRefsToKie(apiKey: string, refs: OpenAiReferenceImage[]): Pr
         uploadPath: "brewai/character-refs",
         fileName: `character-ref-${Date.now()}-${index + 1}.${ext}`,
       }),
+      // Ohne Limit blockiert ein toter Socket die ganze Serverfunktion.
+      signal: AbortSignal.timeout(30_000),
     });
     const uploadData = (await uploadRes.json()) as Record<string, unknown>;
     if (!uploadRes.ok) {
@@ -70,8 +72,10 @@ async function uploadRefsToKie(apiKey: string, refs: OpenAiReferenceImage[]): Pr
   return uploaded;
 }
 
-async function pollKieImageUrl(apiKey: string, baseUrl: string, taskId: string): Promise<string> {
-  const deadline = Date.now() + 180_000;
+const KIE_POLL_MAX_MS = 180_000;
+
+async function pollKieImageUrl(apiKey: string, baseUrl: string, taskId: string, maxWaitMs = KIE_POLL_MAX_MS): Promise<string> {
+  const deadline = Date.now() + Math.min(Math.max(maxWaitMs, 5_000), KIE_POLL_MAX_MS);
   let lastState = "unknown";
   while (Date.now() < deadline) {
     await new Promise((r) => setTimeout(r, 2500));
@@ -158,6 +162,8 @@ export async function generateCharacterIdentityImage(args: {
   aspectRatio: string;
   resolution?: "1K" | "2K" | "4K";
   onTaskId?: (taskId: string) => void | Promise<void>;
+  /** Restbudget der Serverfunktion; begrenzt das Warten auf das Ergebnis (max. 180 s). */
+  budgetMs?: number;
 }): Promise<Buffer> {
   const apiKey = process.env.KIE_API_KEY?.trim();
   if (!apiKey) throw new Error("KIE_API_KEY fehlt — Charakter-Identität braucht Nano Banana.");
@@ -187,6 +193,8 @@ export async function generateCharacterIdentityImage(args: {
         nsfw_checker: false,
       },
     }),
+    // Nur das Anlegen des Tasks; das Ergebnis kommt per Polling mit eigenem Limit.
+    signal: AbortSignal.timeout(45_000),
   });
   const data = (await upstream.json()) as Record<string, unknown>;
   if (!upstream.ok) {
@@ -200,7 +208,7 @@ export async function generateCharacterIdentityImage(args: {
   if (!taskId) throw new Error("Kein taskId von Nano Banana erhalten.");
   await args.onTaskId?.(taskId);
 
-  const resultUrl = await pollKieImageUrl(apiKey, baseUrl, taskId);
+  const resultUrl = await pollKieImageUrl(apiKey, baseUrl, taskId, args.budgetMs);
   const downloaded = await publicFetch(resultUrl, { maxBytes: 25 * 1024 * 1024 });
   if (downloaded.status !== 200 || downloaded.body.byteLength < 32) {
     throw new Error("Nano Banana Ergebnisbild konnte nicht geladen werden.");

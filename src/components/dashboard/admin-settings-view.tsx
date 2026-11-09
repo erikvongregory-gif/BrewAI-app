@@ -20,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { getInitials } from "@/lib/utils";
 
 export type AdminSettingsPayload = {
@@ -64,8 +63,71 @@ export function AdminSettingsView({
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [exportBusy, setExportBusy] = useState(false);
+  const [accountError, setAccountError] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const draft = value;
+
+  /** Datenexport (Art. 15/20 DSGVO) als JSON-Download. */
+  const exportAccountData = async () => {
+    setExportBusy(true);
+    setAccountError(null);
+    try {
+      const res = await fetch("/api/account/export", { credentials: "include", cache: "no-store" });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string; code?: string } | null;
+        throw new Error(
+          body?.code === "two_factor_required"
+            ? "Bitte melde dich neu an und bestätige den E-Mail-Code. Danach klappt der Export."
+            : body?.error || "Der Export hat nicht geklappt. Bitte versuche es später erneut.",
+        );
+      }
+      const blob = await res.blob();
+      const fileName =
+        /filename="([^"]+)"/.exec(res.headers.get("Content-Disposition") ?? "")?.[1] ?? "brewai-datenexport.json";
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (exportError) {
+      setAccountError(exportError instanceof Error ? exportError.message : "Der Export hat nicht geklappt.");
+    } finally {
+      setExportBusy(false);
+    }
+  };
+
+  const deleteAccountNow = async () => {
+    setDeleteBusy(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch("/api/account/delete", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmation: deleteConfirmation.trim() }),
+      });
+      const body = (await res.json().catch(() => null)) as { ok?: boolean; error?: string; code?: string } | null;
+      if (!res.ok || !body?.ok) {
+        throw new Error(
+          body?.code === "two_factor_required"
+            ? "Bitte melde dich neu an und bestätige den E-Mail-Code. Danach kannst du das Konto löschen."
+            : body?.error || "Das Konto konnte nicht gelöscht werden. Bitte versuche es später erneut.",
+        );
+      }
+      await signOutAndRedirect("/anmelden");
+    } catch (deleteFailure) {
+      setDeleteError(deleteFailure instanceof Error ? deleteFailure.message : "Das Konto konnte nicht gelöscht werden.");
+      setDeleteBusy(false);
+    }
+  };
 
   const setField = <K extends keyof AdminSettingsPayload>(key: K, next: AdminSettingsPayload[K]) => {
     if (!draft) return;
@@ -213,7 +275,7 @@ export function AdminSettingsView({
                 <CardTitle>Markenprofil</CardTitle>
                 <CardDescription>
                   {brandProfileComplete && draft.brandProfileMode !== "skip"
-                    ? `${draft.brandWebsiteUrl ? formatDomain(draft.brandWebsiteUrl) : draft.breweryName || "Marke"} · Brand-Lock „${brandLockLabel(draft.brandLockLevel)}“`
+                    ? `${draft.brandWebsiteUrl ? formatDomain(draft.brandWebsiteUrl) : draft.breweryName || "Marke"} · Markentreue „${brandLockLabel(draft.brandLockLevel)}“`
                     : draft.brandProfileMode === "skip"
                       ? "Du nutzt BrewAI ohne Markenprofil."
                       : "Website-Link eingeben, KI wertet Stil und Vorgaben aus."}
@@ -321,30 +383,8 @@ export function AdminSettingsView({
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Benachrichtigungen</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-0.5">
-                  <p className="text-sm font-medium">E-Mail-Benachrichtigungen</p>
-                  <p className="text-muted-foreground text-xs">Status zu Generierungen, Einladungen und Sicherheit.</p>
-                </div>
-                <Switch
-                  checked={draft.emailNotifications}
-                  onCheckedChange={(v) => setField("emailNotifications", v)}
-                />
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-0.5">
-                  <p className="text-sm font-medium">Wochenzusammenfassung</p>
-                  <p className="text-muted-foreground text-xs">Jeden Montag eine kurze E-Mail mit Highlights.</p>
-                </div>
-                <Switch checked={draft.weeklySummary} onCheckedChange={(v) => setField("weeklySummary", v)} />
-              </div>
-            </CardContent>
-          </Card>
+          {/* „Benachrichtigungen“ (E-Mail-Status, Wochenzusammenfassung) ausgeblendet: Die Schalter wurden
+              nur gespeichert, kein Versand wertet sie aus. Werte bleiben im Payload erhalten. */}
 
           <div className="flex flex-wrap items-center gap-3">
             <Button disabled={saving} onClick={() => void save()}>
@@ -358,7 +398,7 @@ export function AdminSettingsView({
             <CardHeader className="flex flex-row items-center justify-between gap-4">
               <div className="space-y-1">
                 <CardTitle>Konto</CardTitle>
-                <CardDescription>Sitzung auf diesem Gerät beenden</CardDescription>
+                <CardDescription>Sitzung beenden, deine Daten herunterladen oder das Konto löschen</CardDescription>
               </div>
               <Button
                 variant="outline"
@@ -372,7 +412,78 @@ export function AdminSettingsView({
                 {signingOut ? "Abmelden …" : "Abmelden"}
               </Button>
             </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <Button variant="outline" size="sm" disabled={exportBusy} onClick={() => void exportAccountData()}>
+                  {exportBusy ? "Export wird erstellt …" : "Meine Daten exportieren"}
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    setDeleteConfirmation("");
+                    setDeleteError(null);
+                    setDeleteOpen(true);
+                  }}
+                >
+                  Konto löschen
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Der Export enthält deine Konto-, Marken- und Mediendaten als JSON-Datei.
+              </p>
+              {accountError ? (
+                <p role="alert" className="text-sm text-destructive">
+                  {accountError}
+                </p>
+              ) : null}
+            </CardContent>
           </Card>
+
+          <AlertDialog
+            open={deleteOpen}
+            onOpenChange={(open) => {
+              if (!deleteBusy) setDeleteOpen(open);
+            }}
+          >
+            <AlertDialogContent size="default">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Konto endgültig löschen?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Konto, Markenprofil, Sortiment, Bilder und Teamzugänge werden gelöscht, laufende Abos werden gekündigt.
+                  Rechnungen bleiben aus gesetzlichen Gründen beim Zahlungsdienstleister gespeichert. Das lässt sich
+                  nicht rückgängig machen. Lade vorher bei Bedarf deine Daten herunter.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div className="space-y-2">
+                <Label htmlFor="delete-account-confirmation">
+                  Zur Bestätigung <span className="font-semibold">KONTO LÖSCHEN</span> eingeben
+                </Label>
+                <Input
+                  id="delete-account-confirmation"
+                  autoComplete="off"
+                  value={deleteConfirmation}
+                  disabled={deleteBusy}
+                  onChange={(event) => setDeleteConfirmation(event.target.value)}
+                />
+                {deleteError ? (
+                  <p role="alert" className="text-sm text-destructive">
+                    {deleteError}
+                  </p>
+                ) : null}
+              </div>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={deleteBusy}>Abbrechen</AlertDialogCancel>
+                <Button
+                  variant="destructive"
+                  disabled={deleteBusy || deleteConfirmation.trim() !== "KONTO LÖSCHEN"}
+                  onClick={() => void deleteAccountNow()}
+                >
+                  {deleteBusy ? "Konto wird gelöscht …" : "Endgültig löschen"}
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           <AlertDialog open={resetConfirmOpen} onOpenChange={setResetConfirmOpen}>
             <AlertDialogContent size="default">

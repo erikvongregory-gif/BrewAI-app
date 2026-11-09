@@ -6,6 +6,7 @@ import { logProviderFailure, providerErrorResponse } from "@/lib/ai/providerRequ
 import { requireBillableImageGenerationUser } from "@/app/(dashboard)/inhalte-erstellen/lib/api-guards";
 import { socialPostZielSchema } from "@/app/(dashboard)/inhalte-erstellen/lib/schemas";
 import { buildBrandProfilePromptContext, getBrandProfileFromMetadata } from "@/lib/dashboard/brandProfile";
+import { checkAdCompliance } from "@/lib/compliance";
 
 export const runtime = "nodejs";
 
@@ -85,6 +86,7 @@ export async function POST(req: Request) {
             "Antworte NUR als JSON:",
             '{"headline":"max 60 Zeichen","subline":"optional max 120 Zeichen","ctaText":"optional max 30 Zeichen"}',
             "Regeln: natürliches Deutsch, korrekte Umlaute, kein Hashtag-Zeug, Headline prägnant, CTA handlungsorientiert.",
+            "Alkoholwerbung (Verhaltensregeln des Deutschen Werberats): keine Gesundheits- oder Wirkungsversprechen (auch nicht „bekömmlich“), keine Aufforderung zu viel oder schnellem Trinken, keine Ansprache Minderjähriger, kein Bezug zu Autofahren, sportlicher Leistung oder sozialem/sexuellem Erfolg, Alkoholgehalt nicht als Kaufgrund.",
           ]
             .filter(Boolean)
             .join("\n"),
@@ -99,7 +101,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Copy-Vorschlag konnte nicht gelesen werden." }, { status: 502 });
     }
 
-    return NextResponse.json(copy);
+    // Automatische Hinweise auf riskante Aussagen (keine Freigabe, keine Sperre). Zusätzliches Feld,
+    // bestehende Clients lesen weiter nur headline/subline/ctaText.
+    const compliance = checkAdCompliance({
+      text: [copy.headline, copy.subline, copy.ctaText].filter(Boolean).join("\n"),
+      kind: "werbetext",
+      beverage: { alcoholFree: /alkoholfrei|alkoholreduziert|0[,.]0\s*%?/i.test(beerName ?? "") },
+    });
+
+    return NextResponse.json({ ...copy, compliance });
   } catch (error) {
     const classified = classifyThrownProviderError("anthropic", error);
     logProviderFailure(classified, { label: "inhalte-erstellen-suggest-copy" });

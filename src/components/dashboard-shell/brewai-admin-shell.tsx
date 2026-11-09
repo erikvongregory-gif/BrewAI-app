@@ -22,7 +22,6 @@ import { SearchDialog } from "@/components/dashboard-shell/header/search-dialog"
 import { ThemeSwitcher } from "@/components/dashboard-shell/header/theme-switcher";
 import { NavMain } from "@/components/dashboard-shell/sidebar/nav-main";
 import { NavUser } from "@/components/dashboard-shell/sidebar/nav-user";
-import { SupportCard } from "@/components/dashboard-shell/sidebar/support-card";
 import LumaBar from "@/components/ui/futuristic-nav";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -104,7 +103,7 @@ function BrewAiSidebar({
         <NavMain items={sidebarItems} />
       </SidebarContent>
       <SidebarFooter>
-        <SupportCard />
+        {/* Keine Werbekarte mehr im Footer: „Neu erstellen“ oben deckt denselben Weg ab. */}
         <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>

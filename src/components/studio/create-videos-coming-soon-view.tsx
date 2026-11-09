@@ -31,7 +31,7 @@ export function CreateVideosComingSoonView() {
         </Badge>
         <div className="space-y-2">
           <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-            Videos Erstellen
+            Videos erstellen
           </h1>
           <p className="max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
             KI-Videos im Markenstil — Reels, Stories und Werbeclips aus deinem Markenprofil.
@@ -43,8 +43,8 @@ export function CreateVideosComingSoonView() {
         <CardHeader className="gap-2 border-b border-border/60 pb-5">
           <CardTitle className="text-base font-semibold">In Arbeit</CardTitle>
           <CardDescription className="text-sm leading-relaxed">
-            „Videos Erstellen“ wird gerade vorbereitet. Den Bereich siehst du schon in der Navigation —
-            sobald die Funktion live ist, kannst du hier kurze Marken-Videos generieren.
+            „Videos erstellen“ wird gerade vorbereitet. Sobald die Funktion freigeschaltet ist, erscheint sie
+            in der Navigation und du kannst hier kurze Marken-Videos erstellen.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
@@ -66,7 +66,7 @@ export function CreateVideosComingSoonView() {
             <Button asChild>
               <Link href="/inhalte-erstellen">
                 <StudioIcon name="spark" size={16} />
-                Bilder Erstellen
+                Bilder erstellen
               </Link>
             </Button>
             <Button asChild variant="outline">

@@ -34,8 +34,8 @@ function Command({
 }
 
 function CommandDialog({
-  title = "Command Palette",
-  description = "Search for a command to run...",
+  title = "Schnellsuche",
+  description = "Bereich suchen und direkt öffnen",
   children,
   className,
   showCloseButton = false,

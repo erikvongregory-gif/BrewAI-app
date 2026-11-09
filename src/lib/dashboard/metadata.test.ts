@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAX_MY_BEERS, hasUsableBeerEtikett, sanitizeDashboardBeers } from "./metadata";
+import { MAX_MY_BEERS, hasUsableBeerEtikett, markUserEditedBeers, sanitizeDashboardBeers } from "./metadata";
 
 describe("sanitizeDashboardBeers", () => {
   it("liefert leere Liste fuer ungueltige Eingaben", () => {
@@ -66,5 +66,45 @@ describe("hasUsableBeerEtikett", () => {
     expect(hasUsableBeerEtikett("https://foo.tempfile.ai/x.png")).toBe(false);
     expect(hasUsableBeerEtikett("")).toBe(false);
     expect(hasUsableBeerEtikett("data:image/jpeg;base64,aaa")).toBe(false);
+  });
+});
+
+describe("Scan-Belege und Nutzerbestätigung im Sortiment", () => {
+  const scannedBeer = {
+    id: "beer-1",
+    name: "Lang Bräu Helles",
+    bierstil: "helles",
+    flaschenTyp: "nrw_500",
+    flaschenfarbe: "braun" as const,
+    etikettUrl: "https://lang.example/helles.jpg",
+    createdAt: "2026-01-01T00:00:00.000Z",
+    nachweisStatus: "belegt" as const,
+    bierstilBelegt: false,
+  };
+
+  it("sanitizeDashboardBeers behält nur gültige Beleg-Felder", () => {
+    const [beer] = sanitizeDashboardBeers([{ ...scannedBeer, nutzerBestaetigt: "ja", nachweisStatus: "vielleicht" }]);
+    expect(beer?.bierstilBelegt).toBe(false);
+    expect(beer).not.toHaveProperty("nachweisStatus");
+    expect(beer).not.toHaveProperty("nutzerBestaetigt");
+  });
+
+  it("markUserEditedBeers: unverändert behält Scan-Belege, geändert wird bestätigt, neu ist bestätigt", () => {
+    const stored = sanitizeDashboardBeers([scannedBeer]);
+    // Das API-Schema kennt die Beleg-Felder nicht: eingehende Sorten kommen ohne sie an.
+    const { nachweisStatus: _n, bierstilBelegt: _b, ...incomingSame } = scannedBeer;
+    void _n;
+    void _b;
+    const [same] = markUserEditedBeers([incomingSame], stored);
+    expect(same?.nachweisStatus).toBe("belegt");
+    expect(same?.bierstilBelegt).toBe(false);
+    expect(same).not.toHaveProperty("nutzerBestaetigt");
+
+    const [edited] = markUserEditedBeers([{ ...incomingSame, bierstil: "dunkel" }], stored);
+    expect(edited?.nutzerBestaetigt).toBe(true);
+    expect(edited?.bierstil).toBe("dunkel");
+
+    const [created] = markUserEditedBeers([{ ...incomingSame, id: "beer-neu", name: "Festbier" }], stored);
+    expect(created?.nutzerBestaetigt).toBe(true);
   });
 });

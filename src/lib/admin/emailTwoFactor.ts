@@ -61,11 +61,19 @@ function encodeSigned<T extends object>(payload: T) {
   return `${raw}.${signature}`;
 }
 
+/** Zeitkonstanter Vergleich der Signatur (kein Abbruch beim ersten abweichenden Zeichen). */
+function signatureMatches(expected: string, actual: string): boolean {
+  const left = Buffer.from(expected);
+  const right = Buffer.from(actual);
+  if (left.length !== right.length) return false;
+  return crypto.timingSafeEqual(left, right);
+}
+
 function decodeSigned<T extends object>(token?: string | null): T | null {
   if (!token) return null;
   const [raw, signature] = token.split(".");
   if (!raw || !signature) return null;
-  if (sign(raw) !== signature) return null;
+  if (!signatureMatches(sign(raw), signature)) return null;
   try {
     return JSON.parse(Buffer.from(raw, "base64url").toString("utf8")) as T;
   } catch {

@@ -13,6 +13,7 @@ import {
   type PersistBrandProfileResult,
 } from "@/lib/brand/save-brand-profile";
 import { MAX_MY_BEERS } from "@/lib/dashboard/metadata";
+import { parseBrandFieldStatus } from "@/lib/dashboard/brandProfile";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -54,6 +55,11 @@ const bodySchema = z.object({
     )
     .max(MAX_MY_BEERS)
     .optional(),
+  // Tolerant: ungültige Werte werden verworfen statt die Aktivierung abzulehnen (alte/neue Clients).
+  brandFieldStatus: z
+    .unknown()
+    .optional()
+    .transform((value) => parseBrandFieldStatus(value)),
 });
 
 export async function POST(req: Request) {

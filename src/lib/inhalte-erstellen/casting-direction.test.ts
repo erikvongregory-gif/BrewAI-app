@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { hyperrealisticSchema } from "@/app/(dashboard)/inhalte-erstellen/lib/schemas";
-import { buildCastingDirection } from "./casting-direction";
+import { ADULT_APPEARANCE_GUARD, buildCastingDirection } from "./casting-direction";
 
 const randomIndex = vi.hoisted(() => vi.fn<(max: number) => number>());
 vi.mock("node:crypto", () => ({ randomInt: randomIndex }));
@@ -18,8 +18,16 @@ describe("anonymous casting", () => {
     expect(first).not.toBe(next);
     expect(first).toContain("broad oval face");
     expect(first).toContain("angular face");
-    expect(first).toContain("Keep requested gender, age, clothing and appearance");
+    expect(first).toContain("Keep requested gender, adult age, clothing and appearance");
     expect(first).toContain("do not add people");
+  });
+
+  it("always demands a clearly adult appearance for people in beer advertising", () => {
+    randomIndex.mockReturnValueOnce(1).mockReturnValueOnce(2);
+    const direction = buildCastingDirection({ ...args, input: { ...args.input, zusatzWunsch: "Zwei junge Frauen stoßen an" } });
+    expect(direction).toContain(ADULT_APPEARANCE_GUARD);
+    expect(ADULT_APPEARANCE_GUARD).toMatch(/clearly look adult, well over 18/);
+    expect(ADULT_APPEARANCE_GUARD).toMatch(/never teenage, childlike/);
   });
 
   it("preserves selected character identities", () => {

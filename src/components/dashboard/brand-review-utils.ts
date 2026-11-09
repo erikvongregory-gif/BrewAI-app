@@ -2,6 +2,7 @@ import type { BrandReferenceImagePayload, BrandScanSuggestion } from "./BrandPro
 
 export {
   computeProfileStrength,
+  describeFieldEvidence,
   formatConfidenceLabel,
   parseHexSwatches,
   parseRuleSentences,

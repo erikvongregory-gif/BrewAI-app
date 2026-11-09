@@ -22,7 +22,8 @@ import {
 } from "@/lib/brand/website-intake";
 import { ingestBrandFontFromHtml } from "@/lib/brand/extract-brand-fonts";
 import { crawlProductCatalog } from "@/lib/brand/product-catalog-crawl";
-import { detectCatalogWithAi } from "@/lib/brand/catalog-ai";
+import { annotateBeersWithEvidence, detectCatalogWithAi } from "@/lib/brand/catalog-ai";
+import { assessBrandEvidence, extractCssColorEvidence } from "@/lib/brand/brand-evidence";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -242,6 +243,8 @@ async function analyzeBrandUrl(req: Request, progress: ProgressFn): Promise<Next
     const brandLabelReferenceUrl = analysisPackshots[0]?.url ?? "";
     const analysisImages = [...analysisScenes, ...analysisPackshots].slice(0, 6);
     const analysisPackshotCount = analysisImages.filter((image) => image.isPackshot).length;
+    // Belegte Farben aus Inline-CSS/theme-color — Anker für die KI und Beleg im Prüfschritt.
+    const cssColors = extractCssColorEvidence([...new Set([fetched.html, ...Object.values(rawHtmlByUrl)])]);
 
     let scan;
     try {
@@ -254,6 +257,7 @@ async function analyzeBrandUrl(req: Request, progress: ProgressFn): Promise<Next
           mediaType: image.mediaType,
         })),
         packshotImageCount: analysisPackshotCount,
+        cssColors,
       });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "KI-Analyse fehlgeschlagen.";
@@ -283,17 +287,20 @@ async function analyzeBrandUrl(req: Request, progress: ProgressFn): Promise<Next
     const detectedBeers =
       catalogMethod === "ai"
         ? aiBeers
-        : extractBeerVarietiesFromIntake({
-            pages: [
-              homepage,
-              ...subpages,
-              ...Object.entries(catalogResult?.catalogHtml ?? {}).map(([url, html]) => parseWebsiteHtml(html, url)),
-            ],
-            downloadedImages,
-            imageCandidates: intake.imageCandidates,
-            breweryName: scan.breweryName,
-            rawHtmlByUrl: { ...rawHtmlByUrl, ...(catalogResult?.catalogHtml ?? {}) },
-          });
+        : annotateBeersWithEvidence(
+            extractBeerVarietiesFromIntake({
+              pages: [
+                homepage,
+                ...subpages,
+                ...Object.entries(catalogResult?.catalogHtml ?? {}).map(([url, html]) => parseWebsiteHtml(html, url)),
+              ],
+              downloadedImages,
+              imageCandidates: intake.imageCandidates,
+              breweryName: scan.breweryName,
+              rawHtmlByUrl: { ...rawHtmlByUrl, ...(catalogResult?.catalogHtml ?? {}) },
+            }),
+            { ...rawHtmlByUrl, ...(catalogResult?.catalogHtml ?? {}) },
+          );
 
     // Sortenbilder sofort freistellen und in den eigenen Storage legen — Fremd-URLs brechen,
     // sobald die Brauerei ihre Website umbaut; 404-Bilder fallen dabei raus statt kaputt angezeigt zu werden.
@@ -335,6 +342,29 @@ async function analyzeBrandUrl(req: Request, progress: ProgressFn): Promise<Next
         `${packagingReviewCount} Sorte${packagingReviewCount === 1 ? "" : "n"}: Verpackung prüfen`,
       );
     }
+    // Belegprüfung: KI-Sortennamen, die nicht im Website-Text stehen, und geratene Bierstile sichtbar machen.
+    const unconfirmedBeerCount = suggestedBeers.filter((beer) => beer.nachweis?.status === "unbestaetigt").length;
+    if (unconfirmedBeerCount > 0) {
+      assessment.reviewHints.unshift(
+        `${unconfirmedBeerCount} Sorte${unconfirmedBeerCount === 1 ? "" : "n"}: Name nicht auf der Website gefunden — prüfen oder entfernen`,
+      );
+    }
+    const styleReviewCount = suggestedBeers.filter((beer) => beer.bierstilBelegt === false).length;
+    if (styleReviewCount > 0) {
+      assessment.reviewHints.push(
+        `${styleReviewCount} Sorte${styleReviewCount === 1 ? "" : "n"}: Bierstil nicht angegeben — bitte auswählen`,
+      );
+    }
+    const evidence = assessBrandEvidence({
+      scan,
+      websiteUrl: fetched.finalUrl,
+      textExcerpt: intake.textExcerpt,
+      pageTitle: intake.title,
+      cssColors,
+      sceneCount: analysisScenes.length,
+      packshotCount: analysisPackshotCount,
+      labelReferenceUrl: brandLabelReferenceUrl,
+    });
 
     let brandHeadlineFontName = "";
     let brandFontFileUrl = "";
@@ -393,6 +423,8 @@ async function analyzeBrandUrl(req: Request, progress: ProgressFn): Promise<Next
         imageSelection,
         beersDetected: suggestedBeers.length,
         beersWithImage: suggestedBeers.filter((beer) => beer.etikettUrl).length,
+        beersUnconfirmed: unconfirmedBeerCount,
+        evidence,
         catalogMethod,
         siteKind,
         suggestedUrl,

@@ -52,7 +52,7 @@ Vor dem Go-live zwingend prüfen:
 ## 1b) Betreiber-Konto (Owner)
 
 Owner-Konten haben unbegrenzte Tokens und brauchen kein Stripe-Abo. Erkennung über
-`OWNER_EMAILS` oder `user_metadata.role = "owner"` in Supabase.
+`OWNER_EMAILS` oder `app_metadata.role = "owner"` in Supabase (serverseitig, nicht vom Nutzer änderbar).
 
 ```bash
 npm run setup:owner                        # Rolle setzen bzw. Konto anlegen
