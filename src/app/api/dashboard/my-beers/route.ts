@@ -14,7 +14,7 @@ import {
 } from "@/lib/dashboard/beer-store";
 import {
   MAX_MY_BEERS,
-  sanitizeDashboardBeers,
+  markUserEditedBeers,
   sanitizeProduktKategorie,
   type DashboardBeer,
 } from "@/lib/dashboard/metadata";
@@ -178,7 +178,8 @@ export async function POST(req: Request) {
   const beer = await beerFromParsed(auth.user.id, parsed.data.beer);
   if (beer instanceof NextResponse) return beer;
   try {
-    const saved = await upsertDashboardBeer(auth.user.id, beer);
+    // Über die Sortimentsverwaltung angelegt bzw. bearbeitet: ein Neuscan derselben Marke überschreibt sie nicht.
+    const saved = await upsertDashboardBeer(auth.user.id, { ...beer, nutzerBestaetigt: true });
     return NextResponse.json({ ok: true, beers: saved, revision: beersRevision(saved) });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Sortiment konnte nicht gespeichert werden.";
@@ -212,7 +213,14 @@ export async function PUT(req: Request) {
     beers.push(beer);
   }
 
-  const sanitized = sanitizeDashboardBeers(beers);
+  let stored: DashboardBeer[] = [];
+  try {
+    stored = await readDashboardBeers(auth.user.id);
+  } catch {
+    return NextResponse.json({ error: "Sortiment konnte nicht geladen werden." }, { status: 500 });
+  }
+  // Scan-Belege bleiben erhalten; neue oder geänderte Sorten gelten als vom Nutzer bestätigt.
+  const sanitized = markUserEditedBeers(beers, stored);
   try {
     const saved = await replaceDashboardBeers(auth.user.id, sanitized, {
       expectedRevision: parsed.data.expectedRevision,

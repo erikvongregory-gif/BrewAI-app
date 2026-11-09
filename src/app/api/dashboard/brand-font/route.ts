@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { enforceRateLimitPersistent, enforceSameOrigin } from "@/lib/security/requestGuards";
 import { uploadBrandFontToStorage } from "@/lib/supabase/storage";
+import { matchesFontExtension } from "@/lib/security/fileSignature";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -63,6 +64,10 @@ export async function POST(req: Request) {
   const buffer = Buffer.from(await file.arrayBuffer());
   if (buffer.byteLength === 0 || buffer.byteLength > MAX_FONT_BYTES) {
     return NextResponse.json({ error: "Schriftdatei ist leer oder zu groß (max. 2 MB)." }, { status: 400 });
+  }
+  // Dateiendung ist frei wählbar: Inhalt per Signatur gegenprüfen (wOF2, wOFF, TrueType, OTTO).
+  if (!matchesFontExtension(ext, buffer)) {
+    return NextResponse.json({ error: "Die Datei ist keine gültige Schriftdatei." }, { status: 400 });
   }
 
   const fontNameRaw = formData.get("fontName");

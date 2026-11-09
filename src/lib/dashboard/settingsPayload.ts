@@ -1,3 +1,4 @@
+import { parseBrandFieldStatus, type BrandFieldStatusMap } from "@/lib/dashboard/brandProfile";
 import type { DashboardSettings } from "@/lib/dashboard/metadata";
 
 /** Client/API-Hilfsfeld — nicht in user_metadata speichern. */
@@ -82,6 +83,7 @@ export function sanitizeDashboardSettings(input: unknown): DashboardSettings {
   }
 
   const analyzedAt = asString(cleaned.brandAnalyzedAt);
+  const brandFieldStatus = parseBrandFieldStatus(cleaned.brandFieldStatus);
 
   return {
     profileName: asString(cleaned.profileName),
@@ -105,12 +107,41 @@ export function sanitizeDashboardSettings(input: unknown): DashboardSettings {
     brandFontFileUrl: asString(cleaned.brandFontFileUrl).trim(),
     brandFontWeight: asString(cleaned.brandFontWeight) || "700",
     ...(analyzedAt ? { brandAnalyzedAt: analyzedAt } : {}),
+    ...(brandFieldStatus ? { brandFieldStatus } : {}),
   };
+}
+
+const BRAND_TEXT_FIELDS = ["breweryName", "brandTone", "brandColors", "brandDos", "brandDonts"] as const;
+type BrandTextField = (typeof BRAND_TEXT_FIELDS)[number];
+
+/**
+ * Ein vom Nutzer geänderter Markentext gilt als bestätigt und wirkt damit in der Generierung als harte
+ * Vorgabe (geleert: „fehlt“). Ohne gespeicherten Belegstatus (Altbestand) bleibt alles wie bisher.
+ */
+export function confirmEditedBrandFields(
+  previous: Partial<Pick<DashboardSettings, BrandTextField | "brandFieldStatus">>,
+  next: Partial<Pick<DashboardSettings, BrandTextField>>,
+): BrandFieldStatusMap | undefined {
+  const current = parseBrandFieldStatus(previous.brandFieldStatus);
+  if (!current) return undefined;
+  const updated: BrandFieldStatusMap = { ...current };
+  for (const field of BRAND_TEXT_FIELDS) {
+    const value = next[field];
+    if (typeof value !== "string") continue;
+    if (value.trim() === (previous[field] ?? "").trim()) continue;
+    updated[field] = value.trim() ? "bestaetigt" : "fehlt";
+  }
+  return updated;
 }
 
 export function mergeDashboardSettings(
   base: DashboardSettings,
   patch: Partial<DashboardSettings>,
 ): DashboardSettings {
-  return sanitizeDashboardSettings(clampBrandSettingsFields({ ...base, ...patch }));
+  const merged: Partial<DashboardSettings> = { ...base, ...patch };
+  if (!("brandFieldStatus" in patch)) {
+    const brandFieldStatus = confirmEditedBrandFields(base, patch);
+    if (brandFieldStatus) merged.brandFieldStatus = brandFieldStatus;
+  }
+  return sanitizeDashboardSettings(clampBrandSettingsFields(merged));
 }

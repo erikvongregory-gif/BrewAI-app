@@ -60,10 +60,11 @@ const NAME_STYLE_HINTS: Array<{ pattern: RegExp; bierstil: string }> = [
   { pattern: /maibock|heller bock/, bierstil: "maibock" },
   { pattern: /doppelbock|salvator|maximator|triumphator|celebrator|optimator|animator|delicator/, bierstil: "doppelbock" },
   { pattern: /bock/, bierstil: "bock" },
+  // Radler vor Pils: „Pils-Radler“ ist ein Radler; norddeutsch „Alster(wasser)“ (Fachkorrektur Audit 05).
+  { pattern: /radler|alster/, bierstil: "radler" },
   { pattern: /pils/, bierstil: "pils" },
   { pattern: /koelsch|kölsch/, bierstil: "koelsch" },
   { pattern: /altbier/, bierstil: "altbier" },
-  { pattern: /radler/, bierstil: "radler" },
   { pattern: /oktoberfest|festbier|wiesn/, bierstil: "festbier" },
   { pattern: /maerzen|märzen/, bierstil: "maerzen" },
   { pattern: /zwickel|landbier/, bierstil: "zwickel" },
@@ -80,17 +81,26 @@ const NAME_STYLE_HINTS: Array<{ pattern: RegExp; bierstil: string }> = [
 ];
 
 export function inferBierstilFromName(name: string): string {
+  return inferBierstilFromNameDetailed(name).bierstil;
+}
+
+/**
+ * Wie `inferBierstilFromName`, sagt aber, ob der Stil wirklich im Namen steht.
+ * `matched: false` = Fantasiename ohne Stilhinweis — „helles“ ist dann nur der Standard,
+ * kein Beleg (der Scanner markiert die Sorte zur Prüfung).
+ */
+export function inferBierstilFromNameDetailed(name: string): { bierstil: string; matched: boolean } {
   const normalized = name.toLowerCase();
   for (const hint of NAME_STYLE_HINTS) {
-    if (hint.pattern.test(normalized)) return hint.bierstil;
+    if (hint.pattern.test(normalized)) return { bierstil: hint.bierstil, matched: true };
   }
   for (const option of BEER_STYLE_OPTIONS) {
     const label = option.label.toLowerCase();
     if (normalized.includes(label) || normalized.includes(option.bierstil.replace(/_/g, " "))) {
-      return option.bierstil;
+      return { bierstil: option.bierstil, matched: true };
     }
   }
-  return "helles";
+  return { bierstil: "helles", matched: false };
 }
 
 /**

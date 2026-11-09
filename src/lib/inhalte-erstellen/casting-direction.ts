@@ -21,5 +21,13 @@ export function buildCastingDirection(args: ImagePromptV3Args): string {
   if (!hasPeople) return "";
   const first = randomInt(FEATURES.length);
   const second = (first + 1 + randomInt(FEATURES.length - 1)) % FEATURES.length;
-  return `New faces, unrelated to style images: where unspecified, ${FEATURES[first]}; another existing person: ${FEATURES[second]}. Keep requested gender, age, clothing and appearance; do not add people.`;
+  return `New faces, unrelated to style images: where unspecified, ${FEATURES[first]}; another existing person: ${FEATURES[second]}. Keep requested gender, adult age, clothing and appearance; do not add people. ${ADULT_APPEARANCE_GUARD}`;
 }
+
+/**
+ * Beer advertising: depicted people must be at least 18 and look it (Deutscher Werberat,
+ * Verhaltensregeln alkoholhaltige Getränke, Ziff. 2). Requests for younger-looking people
+ * are overridden instead of being kept.
+ */
+export const ADULT_APPEARANCE_GUARD =
+  "Everyone shown must clearly look adult, well over 18; never teenage, childlike or school-age features or styling.";

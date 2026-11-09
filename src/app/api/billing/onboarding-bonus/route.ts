@@ -34,25 +34,34 @@ async function markOnboardingBonusClaimed(supabase: SupabaseClient, alreadyClaim
   return { error };
 }
 
-/** Tokens gutschreiben — kein Fake-Start-Abo. */
-async function grantOnboardingBonusLegacy(userId: string, amount: number) {
+/**
+ * Tokens gutschreiben — kein Fake-Start-Abo. Nur Fallback, wenn die RPC fehlt.
+ * Maßgeblich ist die serverseitige Spalte `onboarding_bonus_granted`, nicht
+ * `user_metadata.onboarding_bonus_claimed_at` (das kann jeder Nutzer selbst löschen).
+ */
+async function grantOnboardingBonusLegacy(userId: string, amount: number): Promise<boolean> {
   const admin = createAdminClient();
   const { data: row, error: readError } = await admin
     .from("billing_subscriptions")
-    .select("monthly_tokens,used_tokens")
+    .select("monthly_tokens,used_tokens,onboarding_bonus_granted,stripe_subscription_id")
     .eq("user_id", userId)
     .maybeSingle();
   if (readError) throw new Error(readError.message);
-  const current = Math.max((row?.monthly_tokens ?? 0) - (row?.used_tokens ?? 0), 0);
-  const { error } = await admin
+  if (!row || row.onboarding_bonus_granted === true || row.stripe_subscription_id) return false;
+  const current = Math.max((row.monthly_tokens ?? 0) - (row.used_tokens ?? 0), 0);
+  const { data: updated, error } = await admin
     .from("billing_subscriptions")
     .update({
       monthly_tokens: current + amount,
       used_tokens: 0,
       onboarding_bonus_granted: true,
     })
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    // Bedingte Aktualisierung: parallele Requests können den Bonus nicht doppelt buchen.
+    .eq("onboarding_bonus_granted", false)
+    .select("user_id");
   if (error) throw new Error(error.message);
+  return Array.isArray(updated) && updated.length > 0;
 }
 
 export async function POST(req: Request) {
@@ -153,8 +162,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Bonus konnte nicht gespeichert werden." }, { status: 500 });
       }
       try {
-        await grantOnboardingBonusLegacy(user.id, ONBOARDING_BONUS_TOKENS);
-        bonusGranted = true;
+        bonusGranted = await grantOnboardingBonusLegacy(user.id, ONBOARDING_BONUS_TOKENS);
       } catch {
         return NextResponse.json({ error: "Bonus konnte nicht gespeichert werden." }, { status: 500 });
       }

@@ -54,7 +54,7 @@ export interface AuthCardProps {
   forgotPasswordHref?: string;
 }
 
-function marketingLegalUrl(path: "agb" | "datenschutz") {
+function marketingLegalUrl(path: "agb" | "datenschutz" | "impressum") {
   try {
     const host = new URL(MARKETING_SITE_URL).hostname;
     if (host === "localhost" || host === "127.0.0.1") return `https://brewai.de/${path}`;
@@ -179,7 +179,7 @@ export function AuthCard({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     if (isSignup && !acceptedTerms) {
       event.preventDefault();
-      setLocalError("Bitte AGB und Datenschutz bestätigen.");
+      setLocalError("Bitte die AGB akzeptieren.");
       return;
     }
     if (isSignup && inviteBlocked) {
@@ -435,25 +435,29 @@ export function AuthCard({
                         />
                         <div className="space-y-1">
                           <Label htmlFor={`${reactId}-terms`} className="text-sm leading-snug font-normal">
-                            Ich akzeptiere die{" "}
-                            <a
-                              href={termsHref}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="underline underline-offset-4"
-                            >
-                              AGB
-                            </a>{" "}
-                            und{" "}
-                            <a
-                              href={privacyHref}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="underline underline-offset-4"
-                            >
-                              Datenschutz
-                            </a>
-                            .
+                            {/* Datenschutzhinweise sind Information (Art. 13 DSGVO), keine Einwilligung.
+                                Ein umschließendes span hält den Satz im Fließtext (Label ist ein Flex-Container). */}
+                            <span>
+                              Ich akzeptiere die{" "}
+                              <a
+                                href={termsHref}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline underline-offset-4"
+                              >
+                                AGB
+                              </a>
+                              . Die{" "}
+                              <a
+                                href={privacyHref}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline underline-offset-4"
+                              >
+                                Datenschutzhinweise
+                              </a>{" "}
+                              habe ich zur Kenntnis genommen.
+                            </span>
                           </Label>
                         </div>
                       </div>
@@ -556,7 +560,19 @@ export function AuthCard({
           </div>
         </div>
 
-        <p className="mt-6 text-center text-muted-foreground text-xs">app.brewai.de · Studio</p>
+        <nav aria-label="Rechtliches" className="mt-6 flex justify-center gap-3 text-muted-foreground text-xs">
+          <a href={marketingLegalUrl("impressum")} target="_blank" rel="noopener noreferrer" className="hover:underline">
+            Impressum
+          </a>
+          <span aria-hidden="true">·</span>
+          <a href={privacyHref} target="_blank" rel="noopener noreferrer" className="hover:underline">
+            Datenschutz
+          </a>
+          <span aria-hidden="true">·</span>
+          <a href={termsHref} target="_blank" rel="noopener noreferrer" className="hover:underline">
+            AGB
+          </a>
+        </nav>
       </div>
     </div>
   );

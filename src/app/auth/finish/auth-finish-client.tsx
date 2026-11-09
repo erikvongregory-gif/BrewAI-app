@@ -2,7 +2,6 @@
 
 import { AuthTransition } from "@/components/ui/auth-transition";
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import {
   needsFullOnboardingFlow,
   sanitizeStudioOnboardingState,
@@ -62,32 +61,12 @@ export function AuthFinishClient({ initialNext = "/dashboard" }: { initialNext?:
           return;
         }
 
-        try {
-          if (attempt === 2 || attempt === 8) {
-            await fetch("/api/auth/repair-session", {
-              method: "POST",
-              credentials: "same-origin",
-              cache: "no-store",
-            }).catch(() => undefined);
-          }
-          const supabase = createClient();
-          if (attempt === 0 || attempt % 5 === 0) {
-            await supabase.auth.refreshSession().catch(() => undefined);
-          }
-          const {
-            data: { session },
-          } = await supabase.auth.getSession();
-          if (session) {
-            const recheck = await serverAuthReady();
-            const next = recheck.admin2faRequired
-              ? "/dashboard/2fa-email"
-              : await resolveEntry(preferred);
-            if (cancelled) return;
-            window.location.replace(next);
-            return;
-          }
-        } catch {
-          /* Browser-Client optional — Server-Check ist maßgeblich */
+        if (attempt === 2 || attempt === 8) {
+          await fetch("/api/auth/repair-session", {
+            method: "POST",
+            credentials: "same-origin",
+            cache: "no-store",
+          }).catch(() => undefined);
         }
 
         await new Promise((resolve) => setTimeout(resolve, delayMs(attempt)));

@@ -2,6 +2,16 @@
 
 import { useState } from "react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -70,6 +80,8 @@ export function AdminTeamView({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  /** Entfernen erst nach Bestätigung — ein Fehlklick nimmt sonst sofort den Zugriff. */
+  const [confirmRemove, setConfirmRemove] = useState<AdminTeamMember | null>(null);
   const [updatingRoleId, setUpdatingRoleId] = useState<string | null>(null);
 
   async function sendInvite() {
@@ -336,7 +348,8 @@ export function AdminTeamView({
                                 variant="ghost"
                                 size="sm"
                                 disabled={removingId === m.id}
-                                onClick={() => void removeMember(m.id)}
+                                aria-label={`${label} entfernen`}
+                                onClick={() => setConfirmRemove(m)}
                               >
                                 {removingId === m.id ? "Entferne …" : "Entfernen"}
                               </Button>
@@ -355,6 +368,39 @@ export function AdminTeamView({
           {!canManage && error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
         </CardContent>
       </Card>
+
+      <AlertDialog
+        open={confirmRemove !== null}
+        onOpenChange={(open) => {
+          if (!open) setConfirmRemove(null);
+        }}
+      >
+        <AlertDialogContent size="default">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirmRemove?.status === "invited" ? "Einladung zurückziehen?" : "Mitglied entfernen?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmRemove
+                ? `${confirmRemove.name || confirmRemove.email} wird aus eurem Team entfernt. Du kannst die Person später erneut einladen.`
+                : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => {
+                const target = confirmRemove;
+                setConfirmRemove(null);
+                if (target) void removeMember(target.id);
+              }}
+            >
+              Entfernen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
