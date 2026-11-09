@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AuthTransition } from "@/components/ui/auth-transition";
 import { resolveAuthCallbackRedirect } from "@/lib/supabase/authEntryRedirect";
-import { createClient } from "@/lib/supabase/client";
+import { persistHashSession } from "@/lib/supabase/persistHashSession";
 
 function hasRecoveryHash(hash: string): boolean {
   if (!hash || hash.length < 2) return false;
@@ -12,18 +12,8 @@ function hasRecoveryHash(hash: string): boolean {
 }
 
 async function bootstrapRecoveryFromHash(): Promise<boolean> {
-  if (typeof window === "undefined") return false;
   if (!hasRecoveryHash(window.location.hash)) return false;
-
-  try {
-    const supabase = createClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    return Boolean(session);
-  } catch {
-    return false;
-  }
+  return persistHashSession();
 }
 
 export function AuthLandingRouter({

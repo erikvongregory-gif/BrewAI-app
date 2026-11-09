@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
-import { createClient } from "@/lib/supabase/client";
+import { submitSignOut } from "@/lib/auth/submitSignOut";
 import { getInitials } from "@/lib/utils";
 
 export function NavUser({
@@ -34,11 +34,8 @@ export function NavUser({
   const router = useRouter();
   const [restartingOnboarding, setRestartingOnboarding] = useState(false);
 
-  async function logout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.replace("/anmelden");
-    router.refresh();
+  function logout() {
+    submitSignOut();
   }
 
   async function restartOnboarding() {

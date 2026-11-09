@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { SITE } from "@/lib/siteConfig";
 import { fontVars } from "@/lib/fonts/registry";
 import { PREFERENCE_DEFAULTS } from "@/lib/preferences/preferences-config";
+import { nonceFromRequest } from "@/lib/security/contentSecurityPolicy";
 import { ThemeBootScript } from "@/scripts/admin/theme-boot";
 import "./globals.css";
 
@@ -54,11 +56,13 @@ export const viewport = {
   themeColor: "#ffffff",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headerList = await headers();
+  const nonce = nonceFromRequest({ headers: headerList });
   const { theme_mode, theme_preset, content_layout, navbar_style, sidebar_variant, sidebar_collapsible, font } =
     PREFERENCE_DEFAULTS;
   return (
@@ -75,7 +79,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <ThemeBootScript />
+        <ThemeBootScript nonce={nonce} />
       </head>
       <body className="min-h-[100dvh] bg-background text-foreground antialiased">{children}</body>
     </html>

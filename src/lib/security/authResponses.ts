@@ -1,6 +1,7 @@
 import { authTransitionBody, authTransitionCss } from "@/lib/auth/transition-design";
 import { NextResponse } from "next/server";
 import { withRequestHeaders } from "@/lib/security/authObservability";
+import { scriptOpenTag } from "@/lib/security/contentSecurityPolicy";
 
 const DEFAULT_REDIRECT_PATH = "/dashboard";
 const SAFE_PATH_BASE = "https://brewai.invalid";
@@ -96,10 +97,11 @@ export function createRecoveryHashForwardHtml(opts: {
   targetUrl: string;
   fallbackUrl: string;
   requestId: string;
+  nonce?: string;
 }): NextResponse {
   const target = jsonForHtmlScript(opts.targetUrl);
   const fallback = jsonForHtmlScript(opts.fallbackUrl);
-  const html = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"/><title>Passwort zurücksetzen</title></head><body><p style="font-family:system-ui,sans-serif;color:#c4bdb3;background:#131211;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center">Passwort-Reset wird vorbereitet …</p><script>
+  const html = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"/><title>Passwort zurücksetzen</title></head><body><p style="font-family:system-ui,sans-serif;color:#c4bdb3;background:#131211;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center">Passwort-Reset wird vorbereitet …</p>${scriptOpenTag(opts.nonce)}
 (function(){var target=${target},fallback=${fallback},hash=location.hash||"",search=location.search||"";
 if(hash.indexOf("access_token")>=0){location.replace(target+hash);return}
 if(search.indexOf("code=")>=0||search.indexOf("token_hash=")>=0){location.replace("/auth/callback"+search+hash);return}
@@ -121,8 +123,9 @@ export function createHtmlRedirect(
   url: string,
   requestId: string,
   cookieSource?: NextResponse,
+  nonce?: string,
 ): NextResponse {
-  const html = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>BrewAI · Anmeldung</title><style>html,body{margin:0;background:#131211}${authTransitionCss}</style></head><body>${authTransitionBody}<script>location.replace(${jsonForHtmlScript(url)})</script></body></html>`;
+  const html = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>BrewAI · Anmeldung</title><style>html,body{margin:0;background:#131211}${authTransitionCss}</style></head><body>${authTransitionBody}${scriptOpenTag(nonce)}location.replace(${jsonForHtmlScript(url)})</script></body></html>`;
   const response = new NextResponse(html, {
     status: 200,
     headers: {
@@ -141,12 +144,12 @@ export function createHtmlRedirect(
  * Wichtig bei doppeltem OAuth-Callback — verhindert Browser-Timeouts.
  */
 export function createOAuthSessionPollerHtml(
-  opts: { successUrl: string; fallbackUrl: string; requestId: string },
+  opts: { successUrl: string; fallbackUrl: string; requestId: string; nonce?: string },
   cookieSource?: NextResponse,
 ): NextResponse {
   const success = jsonForHtmlScript(opts.successUrl);
   const fallback = jsonForHtmlScript(opts.fallbackUrl);
-  const html = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>BrewAI</title><style>html,body{margin:0;background:#131211}${authTransitionCss}</style></head><body>${authTransitionBody}<script>
+  const html = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>BrewAI</title><style>html,body{margin:0;background:#131211}${authTransitionCss}</style></head><body>${authTransitionBody}${scriptOpenTag(opts.nonce)}
 (function(){var ok=${success},fb=${fallback},n=0,max=120;
 function go(u){location.replace(u)}
 function repair(){return fetch("/api/auth/repair-session",{method:"POST",credentials:"same-origin",cache:"no-store"}).catch(function(){})}

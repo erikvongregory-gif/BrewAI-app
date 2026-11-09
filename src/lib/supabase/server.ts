@@ -11,14 +11,14 @@ function supabaseCookieOptions() {
     path: "/" as const,
     sameSite: "lax" as const,
     secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
     ...(domain ? { domain } : {}),
   };
 }
 
-function withSharedCookieDomain<T extends { domain?: string }>(options: T): T {
+function withSharedCookieDomain<T extends { domain?: string; httpOnly?: boolean }>(options: T): T & { httpOnly: true } {
   const domain = getSharedCookieDomain();
-  if (!domain) return options;
-  return { ...options, domain };
+  return { ...options, ...(domain ? { domain } : {}), httpOnly: true };
 }
 
 export async function createClient() {
