@@ -8,7 +8,7 @@
  * - Owner-Konten reservieren 0 Tokens (generationJobs.reserveGeneration) und
  *   haben damit gar keine Obergrenze.
  * - Ein kompromittiertes Konto oder ein Skript leert sonst ein Enterprise-
- *   Guthaben (20.000 Tokens) in Minuten; der Deckel begrenzt den Schaden pro Tag.
+ *   Guthaben (12.000 Tokens) in Minuten; der Deckel begrenzt den Schaden pro Tag.
  *
  * Reine Bibliothek: `evaluateCostGuard` entscheidet, `loadCostGuardUsage` liest
  * die Tagesnutzung aus `generation_jobs`. Die Einbindung vor `generation_reserve`
@@ -56,13 +56,13 @@ export type CostGuardDecision =
 /**
  * Standardwerte je Tarif. Bewusst großzügig: Ein normaler Arbeitstag einer
  * Brauerei liegt weit darunter (Tokens/Tag = 40 % des Monatskontingents).
- * Monatliche Tokens laut src/lib/billing/tokenState.ts: 1200/3000/7500/20000.
+ * Monatliche Tokens laut src/lib/billing/tokenState.ts: 400/1500/4500/12000.
  */
 const PLAN_DEFAULTS: Record<CostGuardPlan, CostGuardLimits> = {
-  start: { maxJobsPerDay: 60, maxFailedJobsPerDay: 20, maxTokensPerDay: 480 },
-  growth: { maxJobsPerDay: 120, maxFailedJobsPerDay: 25, maxTokensPerDay: 1200 },
-  pro: { maxJobsPerDay: 250, maxFailedJobsPerDay: 40, maxTokensPerDay: 3000 },
-  enterprise: { maxJobsPerDay: 500, maxFailedJobsPerDay: 60, maxTokensPerDay: 8000 },
+  start: { maxJobsPerDay: 60, maxFailedJobsPerDay: 20, maxTokensPerDay: 160 },
+  growth: { maxJobsPerDay: 120, maxFailedJobsPerDay: 25, maxTokensPerDay: 600 },
+  pro: { maxJobsPerDay: 250, maxFailedJobsPerDay: 40, maxTokensPerDay: 1800 },
+  enterprise: { maxJobsPerDay: 500, maxFailedJobsPerDay: 60, maxTokensPerDay: 4800 },
   owner: { maxJobsPerDay: 300, maxFailedJobsPerDay: 60, maxTokensPerDay: Number.POSITIVE_INFINITY },
 };
 

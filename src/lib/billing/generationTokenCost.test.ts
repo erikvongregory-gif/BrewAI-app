@@ -123,37 +123,37 @@ describe("generationTokenCost", () => {
   });
 
   it("Video: Dauer × Auflösung (Seedance 2, ohne Audio)", () => {
-    expect(calculateSeedanceVideoTokenCost({ resolution: "480p", duration: 4 })).toBe(32);
-    expect(calculateSeedanceVideoTokenCost({ resolution: "480p", duration: 5 })).toBe(40);
-    expect(calculateSeedanceVideoTokenCost({ resolution: "480p", duration: 6 })).toBe(48);
-    expect(calculateSeedanceVideoTokenCost({ resolution: "720p", duration: 4 })).toBe(64);
-    expect(calculateSeedanceVideoTokenCost({ resolution: "720p", duration: 5 })).toBe(80);
-    expect(calculateSeedanceVideoTokenCost({ resolution: "720p", duration: 6 })).toBe(96);
-    expect(calculateSeedanceVideoTokenCost({ resolution: "1080p", duration: 5 })).toBe(200);
+    expect(calculateSeedanceVideoTokenCost({ resolution: "480p", duration: 4 })).toBe(20);
+    expect(calculateSeedanceVideoTokenCost({ resolution: "480p", duration: 5 })).toBe(25);
+    expect(calculateSeedanceVideoTokenCost({ resolution: "480p", duration: 6 })).toBe(30);
+    expect(calculateSeedanceVideoTokenCost({ resolution: "720p", duration: 4 })).toBe(40);
+    expect(calculateSeedanceVideoTokenCost({ resolution: "720p", duration: 5 })).toBe(50);
+    expect(calculateSeedanceVideoTokenCost({ resolution: "720p", duration: 6 })).toBe(60);
+    expect(calculateSeedanceVideoTokenCost({ resolution: "1080p", duration: 5 })).toBe(120);
   });
 
-  it("Video: Audio +25 %, Modell-Multiplikator, Varianten 1:1", () => {
+  it("Video: Audio ohne Aufschlag, Modell-Multiplikator, Varianten 1:1", () => {
     expect(
       calculateSeedanceVideoTokenCost({
         resolution: "720p",
         duration: 5,
         generateAudio: true,
       }),
-    ).toBe(100);
+    ).toBe(50);
     expect(
       calculateSeedanceVideoTokenCost({
         resolution: "720p",
         duration: 5,
         modelId: "seedance-2-mini",
       }),
-    ).toBe(44);
+    ).toBe(28);
     expect(
       calculateSeedanceVideoTokenCost({
         resolution: "720p",
         duration: 5,
         modelId: "seedance-2.5",
       }),
-    ).toBe(120);
+    ).toBe(75);
     expect(
       calculateSeedanceVideoTokenCost({
         resolution: "720p",
@@ -161,7 +161,7 @@ describe("generationTokenCost", () => {
         generateAudio: true,
         variantCount: 4,
       }),
-    ).toBe(400);
+    ).toBe(200);
   });
 
   it("Client-Vorschau medium entspricht Request-Qualitaet ohne Produktfoto", () => {
@@ -191,21 +191,21 @@ describe("Preisangaben Video passen zur Abrechnung", () => {
   beforeEach(() => vi.stubEnv("KIE_SEEDANCE_TOKEN_COST", ""));
   afterEach(() => vi.unstubAllEnvs());
 
-  it("Seedance 2.5 kostet im Standardfall 150, Seedance 2 100 Tokens", () => {
+  it("Seedance 2.5 kostet im Standardfall 75, Seedance 2 50 Tokens", () => {
     const base = { resolution: "720p" as const, duration: 5, generateAudio: true };
-    expect(calculateSeedanceVideoTokenCost({ ...base, modelId: "seedance-2" })).toBe(100);
-    expect(calculateSeedanceVideoTokenCost({ ...base, modelId: "seedance-2.5" })).toBe(150);
+    expect(calculateSeedanceVideoTokenCost({ ...base, modelId: "seedance-2" })).toBe(50);
+    expect(calculateSeedanceVideoTokenCost({ ...base, modelId: "seedance-2.5" })).toBe(75);
   });
 
   it("Hinweistext nennt beide tatsächlich berechneten Werte", async () => {
     const { SEEDANCE_VIDEO_TOKEN_HINT } = await import("./planCatalog");
-    expect(SEEDANCE_VIDEO_TOKEN_HINT).toContain("Seedance 2 100 Tokens");
-    expect(SEEDANCE_VIDEO_TOKEN_HINT).toContain("Seedance 2.5 150 Tokens");
+    expect(SEEDANCE_VIDEO_TOKEN_HINT).toContain("Seedance 2 50 Tokens");
+    expect(SEEDANCE_VIDEO_TOKEN_HINT).toContain("Seedance 2.5 75 Tokens");
   });
 
-  it("Tarifspanne rechnet die Untergrenze mit Seedance 2.5 (Start: 1.200 Tokens)", async () => {
+  it("Tarifspanne rechnet die Untergrenze mit Seedance 2.5 (Start: 400 Tokens)", async () => {
     const { formatPlanVideoEstimate } = await import("./generationTokenCost");
-    // 1200 / 360 (12 s, 2.5) = 3 · 1200 / 100 (5 s, Seedance 2) = 12
-    expect(formatPlanVideoEstimate(1200)).toBe("ca. 3–12 Videos");
+    // 400 / 180 (12 s, 2.5) = 2 · 400 / 50 (5 s, Seedance 2) = 8
+    expect(formatPlanVideoEstimate(400)).toBe("ca. 2–8 Videos");
   });
 });

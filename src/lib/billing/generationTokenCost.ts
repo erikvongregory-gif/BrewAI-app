@@ -82,13 +82,13 @@ export function estimateStudioImageTokenCost(args: {
 }
 
 /**
- * Tokens/Sekunde · Seedance-2-Liste (~4,5× BytePlus-COGS bei ~0,04 €/Token).
- * 480p ≈ 8 · 720p ≈ 16 · 1080p ≈ 40
+ * Tokens/Sekunde für Seedance 2 (BytePlus-Liste 24.11.2026: 720p 5 s = 0,76 $, 2.5 = 1,16 $).
+ * Gemessene Kosten ~0,007 €/Token; bei 0,035–0,07 €/Token Erlös bleiben 66–80 % Marge.
  */
 const VIDEO_TOKENS_PER_SEC: Record<SeedanceResolution, number> = {
-  "480p": 8,
-  "720p": 16,
-  "1080p": 40,
+  "480p": 5,
+  "720p": 10,
+  "1080p": 24,
 };
 
 /** Modell-Aufschlag relativ zu Seedance 2 Standard. */
@@ -101,7 +101,7 @@ export function resolveVideoModelMultiplier(modelId?: string | null): number {
 }
 
 /**
- * Video-Tokenkosten: Dauer × Auflösung × Modell × Audio × Varianten.
+ * Video-Tokenkosten: Dauer × Auflösung × Modell × Varianten (Audio ohne Aufschlag).
  * Jede Variante / jeder Batch-Lauf kostet voll (kein Mengenrabatt).
  */
 export function calculateSeedanceVideoTokenCost(args: {
@@ -120,8 +120,8 @@ export function calculateSeedanceVideoTokenCost(args: {
   const resolution = args.resolution ?? "720p";
   const perSec = VIDEO_TOKENS_PER_SEC[resolution] ?? VIDEO_TOKENS_PER_SEC["720p"];
   const model = resolveVideoModelMultiplier(args.modelId);
-  const audio = args.generateAudio ? 1.25 : 1;
-  const perClip = Math.max(1, Math.ceil(duration * perSec * model * audio));
+  // Audio kostet bei Seedance nichts extra (BytePlus rechnet nur Pixel × Zeit).
+  const perClip = Math.max(1, Math.ceil(duration * perSec * model));
   return perClip * Math.max(1, args.variantCount ?? 1);
 }
 

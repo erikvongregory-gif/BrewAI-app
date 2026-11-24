@@ -7,30 +7,33 @@ const STRIPE_PRICE_FALLBACKS: Record<
   "test" | "live",
   Record<BillingInterval, Partial<Record<SubscriptionPlanKey, string>>>
 > = {
+  // Preisstufe 2026-11 (Endpreise, § 19 UStG ohne USt.): 29/79/199/499 monatlich, 24/65/165/415 × 12 jährlich
   test: {
     monthly: {
-      start: "price_1TfFkpRsiwg9bLFF2V7TTEFO",
-      growth: "price_1TfFkqRsiwg9bLFFV0mTiqm9",
-      pro: "price_1TfFkqRsiwg9bLFFCmDTMwiI",
-      enterprise: "price_1UJ8GURsiwg9bLFFElVYqASH",
+      start: "price_1UfO0wRsiwg9bLFF2uLeRMiK",
+      growth: "price_1UfO1ERsiwg9bLFFCg4otiys",
+      pro: "price_1UfO1GRsiwg9bLFFfMMf7iB4",
+      enterprise: "price_1UfO1IRsiwg9bLFFwX6PRMUB",
     },
     yearly: {
-      start: "price_1TfFkpRsiwg9bLFFvXQzd8om",
-      growth: "price_1TfFkqRsiwg9bLFFqiaPfndl",
-      pro: "price_1TfFkqRsiwg9bLFFMQE8YRs7",
-      enterprise: "price_1UJ8GURsiwg9bLFF4PCCTDeb",
+      start: "price_1UfO1DRsiwg9bLFFP74WzcDX",
+      growth: "price_1UfO1FRsiwg9bLFFj7ZKruCY",
+      pro: "price_1UfO1HRsiwg9bLFFeUY9xdL5",
+      enterprise: "price_1UfO1JRsiwg9bLFFyusXIPln",
     },
   },
   live: {
     monthly: {
-      start: "price_1TUMhBRojElHlMEe7nvvFwyM",
-      growth: "price_1TUMhBRojElHlMEeZhNWLsnq",
-      pro: "price_1TUMh8RojElHlMEerxH4kFLp",
+      start: "price_1UfO1oRojElHlMEeFGZ6Aoge",
+      growth: "price_1UfO1qRojElHlMEeTbWQlZqq",
+      pro: "price_1UfO1sRojElHlMEeshEFMpak",
+      enterprise: "price_1UfO1uRojElHlMEeMkBbVlac",
     },
     yearly: {
-      start: "price_1TeElhRojElHlMEeaOShHJry",
-      growth: "price_1TeElhRojElHlMEeRMLLZnUy",
-      pro: "price_1TeElhRojElHlMEeOuZHA68v",
+      start: "price_1UfO1pRojElHlMEeloXkYDjD",
+      growth: "price_1UfO1rRojElHlMEeJYiG57KJ",
+      pro: "price_1UfO1tRojElHlMEeen5gGTSp",
+      enterprise: "price_1UfO1vRojElHlMEetcj2uwVq",
     },
   },
 };
@@ -47,6 +50,15 @@ const LEGACY_STRIPE_PRICE_TO_PLAN: Record<string, SubscriptionPlanKey> = {
   price_1TeEoBRsiwg9bLFFpIv3vznP: "start",
   price_1TeEoBRsiwg9bLFFGkV9sJMW: "growth",
   price_1TeEoCRsiwg9bLFFVoOX8v8r: "pro",
+  // Test — 100/200/400/799 monatlich, 79/149/299/599 × 12 jährlich (bis 2026-11)
+  price_1TfFkpRsiwg9bLFF2V7TTEFO: "start",
+  price_1TfFkqRsiwg9bLFFV0mTiqm9: "growth",
+  price_1TfFkqRsiwg9bLFFCmDTMwiI: "pro",
+  price_1UJ8GURsiwg9bLFFElVYqASH: "enterprise",
+  price_1TfFkpRsiwg9bLFFvXQzd8om: "start",
+  price_1TfFkqRsiwg9bLFFqiaPfndl: "growth",
+  price_1TfFkqRsiwg9bLFFMQE8YRs7: "pro",
+  price_1UJ8GURsiwg9bLFF4PCCTDeb: "enterprise",
   // Live — alt
   price_1TUMhBRojElHlMEe7nvvFwyM: "start",
   price_1TUMhBRojElHlMEeZhNWLsnq: "growth",

@@ -85,7 +85,7 @@ export function buildTokenUsage(days: number) {
 }
 
 export const SUMMARY_FULL: DashboardHomeSummary = {
-  tokens: { monthly: 7500, used: 1680, remaining: 5820 },
+  tokens: { monthly: 4500, used: 1680, remaining: 2820 },
   periodEnd: new Date(Date.now() + 1000 * 60 * 60 * 24 * 25).toISOString(),
   postsThisMonth: 47,
   chargesTotal: 128,
