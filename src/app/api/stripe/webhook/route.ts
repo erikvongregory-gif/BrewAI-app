@@ -4,13 +4,14 @@ import {
   activatePlanForUser,
   grantTokenPackSession,
   getByStripeCustomerId,
+  getByStripeSubscriptionId,
+  hasBillingRow,
   claimStripeWebhookEvent,
   markStripeWebhookEventProcessed,
   releaseStripeWebhookEvent,
   renewBillingPeriodTokens,
   cancelBillingSubscription,
 } from "@/lib/billing/store";
-import { type SubscriptionPlanKey } from "@/lib/billing/tokenState";
 import { mapPriceIdToPlan } from "@/lib/billing/stripePrices";
 import { getStripeClient } from "@/lib/billing/stripeServer";
 
@@ -66,6 +67,8 @@ export async function POST(req: Request) {
         if (!userId || !Number.isSafeInteger(tokens) || tokens <= 0) {
           throw new Error("Token-Kauf-Metadaten ungültig.");
         }
+        // Stripe-Konto wird mit EvGlab geteilt (gleiche Metadaten-Felder): fremde Nutzer ignorieren.
+        if (!(await hasBillingRow(userId))) return NextResponse.json({ received: true, ignored: true });
         await grantTokenPackSession({
           sessionId: session.id, userId, tokens,
           packId: session.metadata.pack_id ?? session.metadata.pack ?? "tokens",
@@ -83,15 +86,17 @@ export async function POST(req: Request) {
       if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.user_id;
-        const plan = (session.metadata?.plan as SubscriptionPlanKey | undefined) ?? null;
         const subscriptionId =
           typeof session.subscription === "string" ? session.subscription : session.subscription?.id;
         const customerId = typeof session.customer === "string" ? session.customer : session.customer?.id;
-        if (userId && plan && subscriptionId && customerId) {
-          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        const subscription = userId && subscriptionId && customerId
+          ? await stripe.subscriptions.retrieve(subscriptionId) : null;
+        // Nur BrewAI-Preise: EvGlab-Checkouts tragen dieselben Metadaten (user_id, plan).
+        const plan = mapPriceIdToPlan(subscription?.items.data[0]?.price.id);
+        if (userId && subscription && plan && subscriptionId && customerId) {
           await activatePlanForUser({
             userId,
-            plan: mapPriceIdToPlan(subscription.items.data[0]?.price.id) ?? plan,
+            plan,
             subscriptionStatus:
               (subscription.status as "active" | "trialing" | "past_due" | "canceled" | "incomplete" | "unpaid") ?? "active",
             stripeCustomerId: customerId,
@@ -107,11 +112,11 @@ export async function POST(req: Request) {
         const customerId = typeof subscription.customer === "string" ? subscription.customer : null;
         const priceId = subscription.items.data[0]?.price?.id ?? null;
         const mappedPlan = mapPriceIdToPlan(priceId);
-        if (customerId) {
+        // Kunden werden mit EvGlab geteilt: nur Abos mit BrewAI-Preis übernehmen.
+        if (customerId && mappedPlan) {
           const row = await getByStripeCustomerId(customerId);
           if (row) {
-            const plan = mappedPlan ?? row.plan;
-            if (!plan) throw new Error("Unbekannter Subscription-Plan.");
+            const plan = mappedPlan;
             await activatePlanForUser({
               userId: row.user_id, plan,
               subscriptionStatus: subscription.status === "paused" || subscription.status === "incomplete_expired"
@@ -134,7 +139,8 @@ export async function POST(req: Request) {
         const billingReason = invoice.billing_reason;
         if (billingReason === "subscription_cycle") {
           const subscriptionId = getInvoiceSubscriptionId(invoice);
-          if (subscriptionId) {
+          // Unbekanntes Abo = EvGlab; sonst würde die RPC werfen und Stripe endlos wiederholen.
+          if (subscriptionId && (await getByStripeSubscriptionId(subscriptionId))) {
             const periodEnd = invoice.lines.data.find((line) => {
               const details = line.parent?.subscription_item_details;
               const lineSubscription = details?.subscription ??
