@@ -1,4 +1,4 @@
-import sharp from "sharp";
+import sharp, { type Sharp } from "sharp";
 
 export type AiWatermarkCorner = "bottom-right" | "bottom-left";
 
@@ -46,7 +46,55 @@ export function buildAiWatermarkOverlay(width: number, height: number, corner: A
   return { svg: Buffer.from(svg), boxWidth, boxHeight, x, y, fontSize };
 }
 
-/** Sichtbares AI-Label + maschinenlesbare Metadaten (EXIF-Beschreibung). */
+/** IPTC-Vokabular „Created using Generative AI“ (cv.iptc.org/newscodes/digitalsourcetype). */
+export const AI_DIGITAL_SOURCE_TYPE = "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia";
+
+/**
+ * XMP-Paket mit IPTC DigitalSourceType – das Feld, das u. a. Plattformen zur Erkennung
+ * KI-generierter Bilder auswerten. Ergänzt die EXIF-Beschreibung um einen Standardwert.
+ */
+export function buildAiProvenanceXmp(): string {
+  return [
+    '<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>',
+    '<x:xmpmeta xmlns:x="adobe:ns:meta/">',
+    '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">',
+    '<rdf:Description rdf:about="" xmlns:Iptc4xmpExt="http://iptc.org/std/Iptc4xmpExt/2008-02-29/" xmlns:dc="http://purl.org/dc/elements/1.1/">',
+    `<Iptc4xmpExt:DigitalSourceType>${AI_DIGITAL_SOURCE_TYPE}</Iptc4xmpExt:DigitalSourceType>`,
+    `<dc:description><rdf:Alt><rdf:li xml:lang="x-default">${METADATA_DESCRIPTION}</rdf:li></rdf:Alt></dc:description>`,
+    "</rdf:Description>",
+    "</rdf:RDF>",
+    "</x:xmpmeta>",
+    '<?xpacket end="w"?>',
+  ].join("");
+}
+
+function withAiProvenance(image: Sharp): Sharp {
+  return image
+    .withMetadata({
+      exif: {
+        IFD0: {
+          ImageDescription: METADATA_DESCRIPTION,
+          Copyright: "AI-generated",
+        },
+      },
+    })
+    .withXmp(buildAiProvenanceXmp());
+}
+
+function encode(pipeline: Sharp, outputFormat: "png" | "jpg"): Promise<Buffer> {
+  return outputFormat === "jpg" ? pipeline.jpeg({ quality: 92 }).toBuffer() : pipeline.png().toBuffer();
+}
+
+/**
+ * Nur maschinenlesbare KI-Kennzeichnung (EXIF + XMP), ohne sichtbares Label.
+ * Für Bilder ohne sichtbares „AI“-Badge gedacht, damit die Kennzeichnung nicht vom
+ * Nutzerschalter abhängt (vgl. Art. 50 Abs. 2 KI-VO).
+ */
+export async function applyAiProvenanceMetadata(buffer: Buffer, outputFormat: "png" | "jpg" = "png"): Promise<Buffer> {
+  return encode(withAiProvenance(sharp(buffer)), outputFormat);
+}
+
+/** Sichtbares AI-Label + maschinenlesbare Metadaten (EXIF-Beschreibung und IPTC-XMP). */
 export async function applyAiWatermark(
   buffer: Buffer,
   outputFormat: "png" | "jpg" = "png",
@@ -60,16 +108,7 @@ export async function applyAiWatermark(
 
   const badgePng = await sharp(overlay.svg).png().toBuffer();
 
-  const pipeline = image
-    .composite([{ input: badgePng, top: overlay.y, left: overlay.x }])
-    .withMetadata({
-      exif: {
-        IFD0: {
-          ImageDescription: METADATA_DESCRIPTION,
-          Copyright: "AI-generated",
-        },
-      },
-    });
+  const pipeline = withAiProvenance(image.composite([{ input: badgePng, top: overlay.y, left: overlay.x }]));
 
-  return outputFormat === "jpg" ? pipeline.jpeg({ quality: 92 }).toBuffer() : pipeline.png().toBuffer();
+  return encode(pipeline, outputFormat);
 }

@@ -10,6 +10,7 @@ import {
   Settings2,
   Users,
 } from "lucide-react";
+import { isVideosCreateEnabled } from "@/lib/featureFlags";
 
 export type NavBadge = "new" | "soon";
 
@@ -73,12 +74,18 @@ export const sidebarItems: NavGroup[] = [
         url: "/inhalte-erstellen",
         icon: ImagePlus,
       },
-      {
-        id: "create-videos",
-        title: "Videos erstellen",
-        url: "/videos-erstellen",
-        icon: Clapperboard,
-      },
+      // Solange Videos per Feature-Flag gesperrt sind, führt der Eintrag nur auf eine
+      // „Demnächst“-Seite — dann gar nicht erst in der Navigation anbieten.
+      ...(isVideosCreateEnabled()
+        ? [
+            {
+              id: "create-videos",
+              title: "Videos erstellen",
+              url: "/videos-erstellen",
+              icon: Clapperboard,
+            },
+          ]
+        : []),
       {
         id: "media",
         title: "Mediathek",

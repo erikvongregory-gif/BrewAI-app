@@ -32,11 +32,19 @@ function encodeSigned<T extends object>(payload: T) {
   return `${raw}.${sign(raw)}`;
 }
 
+/** Zeitkonstanter Vergleich der Signatur (kein Abbruch beim ersten abweichenden Zeichen). */
+function signatureMatches(expected: string, actual: string): boolean {
+  const left = Buffer.from(expected);
+  const right = Buffer.from(actual);
+  if (left.length !== right.length) return false;
+  return crypto.timingSafeEqual(left, right);
+}
+
 function decodeSigned<T extends object>(token?: string | null): T | null {
   if (!token) return null;
   const [raw, signature] = token.split(".");
   if (!raw || !signature) return null;
-  if (sign(raw) !== signature) return null;
+  if (!signatureMatches(sign(raw), signature)) return null;
   try {
     return JSON.parse(Buffer.from(raw, "base64url").toString("utf8")) as T;
   } catch {
@@ -66,12 +74,22 @@ export function isValidPasswordRecoveryToken(token: string | null | undefined, u
   return true;
 }
 
-/** password_epoch in user_metadata — erhöht sich bei Passwortwechsel und entwertet Trusted Devices. */
-export function readPasswordEpoch(user: { user_metadata?: Record<string, unknown> } | null | undefined): number {
-  const raw = user?.user_metadata?.password_epoch;
+function parseEpoch(raw: unknown): number | null {
   if (typeof raw === "number" && Number.isFinite(raw) && raw >= 0) return Math.floor(raw);
   if (typeof raw === "string" && /^\d+$/.test(raw)) return Number(raw);
-  return 0;
+  return null;
+}
+
+/**
+ * password_epoch — erhöht sich bei Passwortwechsel und entwertet Trusted Devices.
+ * Maßgeblich ist `app_metadata` (nur serverseitig schreibbar). `user_metadata` kann jeder angemeldete
+ * Nutzer mit dem öffentlichen Anon-Key selbst ändern und dient nur noch als Altwert für Konten, deren
+ * Passwort seit der Umstellung nicht geändert wurde.
+ */
+export function readPasswordEpoch(
+  user: { app_metadata?: Record<string, unknown>; user_metadata?: Record<string, unknown> } | null | undefined,
+): number {
+  return parseEpoch(user?.app_metadata?.password_epoch) ?? parseEpoch(user?.user_metadata?.password_epoch) ?? 0;
 }
 
 export function nextPasswordEpoch(): number {

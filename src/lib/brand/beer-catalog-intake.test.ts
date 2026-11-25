@@ -456,3 +456,68 @@ describe("beer-catalog-intake", () => {
     expect(replaced.some((beer) => beer.name === "Abk Beer")).toBe(false);
   });
 });
+
+describe("replaceSuggestedBeers bei Neuscan derselben Marke", () => {
+  const userBeer = {
+    id: "beer-eigen",
+    name: "Lang Bräu Festbier",
+    bierstil: "festbier",
+    flaschenTyp: "euro_500",
+    flaschenfarbe: "braun" as const,
+    etikettUrl: "",
+    createdAt: "2026-01-01T00:00:00.000Z",
+    nutzerBestaetigt: true,
+  };
+  const correctedBeer = {
+    id: "beer-helles",
+    name: "Lang Bräu Helles",
+    bierstil: "helles",
+    flaschenTyp: "steinie_500",
+    flaschenfarbe: "gruen" as const,
+    glasTyp: "masskrug",
+    etikettUrl: "https://lang.example/helles.jpg",
+    createdAt: "2026-01-01T00:00:00.000Z",
+    nutzerBestaetigt: true,
+  };
+  const scan = [
+    {
+      name: "Lang Bräu Helles",
+      bierstil: "helles",
+      flaschenTyp: "nrw_500",
+      flaschenfarbe: "braun" as const,
+      glasTyp: "willibecher",
+      etikettUrl: "https://lang.example/neu.jpg",
+      nachweis: { status: "belegt" as const },
+      bierstilBelegt: true,
+    },
+    {
+      name: "Lang Bräu Pils",
+      bierstil: "pils",
+      flaschenTyp: "nrw_500",
+      flaschenfarbe: "gruen" as const,
+      glasTyp: "pilstulpe",
+      etikettUrl: "",
+      nachweis: { status: "unbestaetigt" as const },
+      bierstilBelegt: false,
+    },
+  ];
+
+  it("behält vom Nutzer angelegte Sorten und seine Korrekturen", () => {
+    const replaced = replaceSuggestedBeers([userBeer, correctedBeer], scan, { keepUserConfirmed: true });
+    const helles = replaced.find((beer) => beer.id === "beer-helles");
+    expect(helles?.flaschenTyp).toBe("steinie_500");
+    expect(helles?.glasTyp).toBe("masskrug");
+    expect(helles?.etikettUrl).toBe("https://lang.example/helles.jpg");
+    expect(helles?.nachweisStatus).toBe("belegt");
+    expect(replaced.some((beer) => beer.id === "beer-eigen")).toBe(true);
+    const pils = replaced.find((beer) => beer.name === "Lang Bräu Pils");
+    expect(pils?.nachweisStatus).toBe("unbestaetigt");
+    expect(pils?.bierstilBelegt).toBe(false);
+  });
+
+  it("ohne Option (Markenwechsel) bleibt das bisherige Verhalten: Scan ersetzt das Sortiment", () => {
+    const replaced = replaceSuggestedBeers([userBeer, correctedBeer], scan);
+    expect(replaced.some((beer) => beer.id === "beer-eigen")).toBe(false);
+    expect(replaced.find((beer) => beer.id === "beer-helles")?.flaschenTyp).toBe("nrw_500");
+  });
+});

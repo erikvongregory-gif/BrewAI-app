@@ -15,7 +15,7 @@ import { InhalteErstellenMoonChatPage } from "@/components/ui/inhalte-erstellen-
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: {
-    absolute: "BrewAI - Bilder Erstellen",
+    absolute: "BrewAI - Bilder erstellen",
   },
   robots: {
     index: false,
@@ -28,7 +28,7 @@ export default async function InhalteErstellenPage() {
   if (!isSupabaseConfigured()) {
     return (
       <main className="relative z-10 mx-auto max-w-lg px-4 py-16">
-        <h1 className="font-display text-2xl font-semibold text-zinc-900">Bilder Erstellen</h1>
+        <h1 className="font-display text-2xl font-semibold text-zinc-900">Bilder erstellen</h1>
         <p className="mt-4 text-zinc-600">Supabase ist noch nicht konfiguriert.</p>
         <a href={MARKETING_SITE_URL} className="mt-6 inline-block text-sm font-medium text-[#c65a20] hover:underline">
           Zur Startseite

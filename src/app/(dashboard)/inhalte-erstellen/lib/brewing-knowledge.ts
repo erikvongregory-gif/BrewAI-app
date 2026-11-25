@@ -85,7 +85,7 @@ export const FLASCHEN_TYPEN = {
     promptDescription:
       "a 0.5 litre Ale long-neck beer bottle (English / international 'Longneck' style, typical for Pale Ale and craft beer, ~27 cm tall): a comparatively FULLER, slightly more rounded cylindrical body carrying a long slim neck that meets the body at a MORE PRONOUNCED, clearly ROUNDED SHOULDER, sealed with a 26 mm metal crown cap — its shoulder is more defined and its body rounder/fuller than on the smooth, slim German NRW returnable",
     forbidden:
-      "NOT a German NRW returnable (the NRW is taller, slimmer and has a SMOOTH gradual sloping shoulder with a long slender nearly-straight body), NOT a short stocky Euroflasche, NOT a short stubby Steinie/Stubbi, NOT a small 0.33 L bottle, NOT a swing-top bottle, NOT an aluminium can — it MUST be the Ale long-neck with a more pronounced rounded shoulder",
+      "NOT a German NRW returnable (the NRW is about 1 cm shorter, with a shorter, thicker neck and a SMOOTH gradual sloping shoulder), NOT a short stocky Euroflasche, NOT a short stubby Steinie/Stubbi, NOT a small 0.33 L bottle, NOT a swing-top bottle, NOT an aluminium can — it MUST be the Ale long-neck (about 27 cm) with a long slim neck and a more pronounced rounded shoulder",
     typicalColors: ["braun", "grün"],
     geometry_profile: "voller Körper, langer Hals, ausgeprägte runde Schulter, Kronkorken",
     closure: "kronkorken",
@@ -98,15 +98,16 @@ export const FLASCHEN_TYPEN = {
     forbidden:
       "NOT an American/English ale longneck (those have a longer thinner neck and a fuller rounded shoulder), NOT a short-necked stocky Euroflasche, NOT a Steinie/Stubbi, NOT a 0.33 L bottle, NOT a swing-top/Bügel bottle, NOT an aluminium can",
     typicalColors: ["braun"],
-    geometry_profile: "breiter Körper, kurze ausgeprägte Schulter, vergleichsweise kurzer Hals, Kronkorken",
+    geometry_profile: "schlanker Körper (Ø ca. 67,5 mm, Höhe ca. 26 cm), mittellanger Hals, sanfte allmähliche Schulter, Kronkorken",
     closure: "kronkorken",
     hasShapeReference: true,
   }),
+  // Schlüssel historisch „vichy_500“, gemeint ist die Euroflasche (VLB: 228 mm, Ø 70,5 mm). Nicht umbenennen (gespeicherte Sortimente).
   vichy_500: bottle({
     label: "Euroflasche 0,5 l",
     pillLabel: "Euroflasche 0,5 l",
     promptDescription:
-      "a 0.5 litre traditional German Euroflasche / Euro-Bierflasche (the classic stocky returnable beer bottle): a full-size half-litre bottle with a VERY SHORT neck, a strongly pronounced rounded shoulder and straight vertical cylindrical body walls, sealed with a 26 mm metal crown cap, total height roughly 25–26 cm — noticeably stockier and far shorter-necked than the slim NRW returnable or the long-neck",
+      "a 0.5 litre traditional German Euroflasche / Euro-Bierflasche (the classic stocky returnable beer bottle): a full-size half-litre bottle with a VERY SHORT neck, a strongly pronounced rounded shoulder and straight vertical cylindrical body walls about 7 cm wide, sealed with a 26 mm metal crown cap, total height roughly 23 cm (about 3 cm shorter than the NRW) — noticeably stockier and far shorter-necked than the slim NRW returnable or the long-neck",
     forbidden:
       "NOT a slim NRW returnable, NOT an Ale long-neck, NOT a short stubby Steinie/Stubbi, NOT a small 0.33 L bottle, NOT a swing-top bottle, NOT an aluminium can — it MUST be the stocky, very short-necked 0.5 L Euroflasche",
     typicalColors: ["braun", "grün"],
@@ -403,8 +404,9 @@ export const GLAS_TYPEN = {
 } as const;
 
 export const STUDIO_PROPS_BY_BIERSTIL = {
-  hefeweizen: ["Zitronenscheibe", "frische Weizenähren", "Bananenblätter dezent"],
-  kristallweizen: ["Zitronenscheibe", "Weizenähren"],
+  // Keine Zitronenscheibe als Standard (zerstört den Schaum, nur auf ausdrücklichen Wunsch) — Fachkorrektur Audit 05.
+  hefeweizen: ["frische Weizenähren", "Brezel"],
+  kristallweizen: ["Weizenähren", "Wassertropfen am Glas"],
   pils: ["frische Hopfendolden", "Gerstenähren", "Wassertropfen am Glas"],
   helles_lager: ["Gerstenähren", "Malzkörner verstreut"],
   helles: ["Brezel", "Gerstenähren", "Wiesenblumen dezent"],
@@ -413,9 +415,9 @@ export const STUDIO_PROPS_BY_BIERSTIL = {
   stout: ["Kaffeebohnen", "dunkle Schokolade", "geröstetes Malz"],
   porter: ["geröstetes Malz", "Kaffeebohnen"],
   bock: ["dunkles Malz", "Eichenholz", "Lederakzente"],
-  saison: ["Pfefferkörner", "Koriandersamen", "getrocknete Kräuter"],
+  saison: ["rustikales Bauernbrot", "getrocknete Wiesenkräuter", "Pfefferkörner"],
   kellerbier: ["unfiltrierte Optik", "Holzfass im Hintergrund", "Gerstenähren"],
-  rauchbier: ["geräucherte Malzkörner", "Holzkohleakzente"],
+  rauchbier: ["geräucherte Malzkörner", "Buchenholzscheite"],
 } as const;
 
 export type Bierstil = keyof typeof STUDIO_PROPS_BY_BIERSTIL;

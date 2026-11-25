@@ -281,7 +281,7 @@ export default function RuixenMoonChat() {
         setBeers(Array.isArray(beersOutcome.value.beers) ? beersOutcome.value.beers : []);
       } else {
         setBeers([]);
-        setBeersError("Sortiment nicht ladbar.");
+        setBeersError("Sortiment konnte nicht geladen werden. Bitte lade die Seite neu.");
       }
 
       if (charactersOutcome.status === "fulfilled") {
@@ -292,7 +292,7 @@ export default function RuixenMoonChat() {
         );
       } else {
         setCharacters([]);
-        setCharactersError("Charaktere nicht ladbar.");
+        setCharactersError("Charaktere konnten nicht geladen werden. Bitte lade die Seite neu.");
       }
 
       setBeersLoading(false);
@@ -407,7 +407,7 @@ export default function RuixenMoonChat() {
     if (!prompt || genBusy || runInFlight) return;
 
     if (selectedCharacter && !selectedThumb) {
-      setGenError("Charakter braucht eine Sorte mit Flaschenfoto.");
+      setGenError("Für einen Charakter brauchst du eine Sorte mit Flaschenfoto. Fotos hinterlegst du im Markenprofil unter „Sortiment“.");
       return;
     }
 

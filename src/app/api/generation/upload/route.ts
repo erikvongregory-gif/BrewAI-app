@@ -5,6 +5,7 @@ import { enforceRateLimitPersistent, enforceSameOrigin } from "@/lib/security/re
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { uploadUserImageToStorage } from "@/lib/supabase/storage";
+import { matchesDeclaredMime } from "@/lib/security/fileSignature";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -76,9 +77,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Dateityp nicht erlaubt." }, { status: 400 });
   }
 
+  if (file.size > MAX_BYTES) {
+    return NextResponse.json({ error: "Datei ist leer oder zu groß (max. 40 MB)." }, { status: 400 });
+  }
   const buffer = Buffer.from(await file.arrayBuffer());
   if (buffer.byteLength === 0 || buffer.byteLength > MAX_BYTES) {
     return NextResponse.json({ error: "Datei ist leer oder zu groß (max. 40 MB)." }, { status: 400 });
+  }
+  // Der MIME-Typ kommt vom Client: Inhalt per Signatur (Magic Bytes) gegenprüfen.
+  if (!matchesDeclaredMime(mime, buffer)) {
+    return NextResponse.json({ error: "Dateiinhalt passt nicht zum Dateityp." }, { status: 400 });
   }
 
   try {

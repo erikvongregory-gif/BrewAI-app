@@ -70,8 +70,8 @@ function formatAnalyzedLabel(iso?: string, fallbackNotice?: string): string {
 }
 
 const LOCK_OPTIONS: Array<{ id: BrandSettings["brandLockLevel"]; label: string; sub: string }> = [
-  { id: "strict", label: "Strict", sub: "Maximale Markenbindung" },
-  { id: "balanced", label: "Balanced", sub: "Stil + kreativer Spielraum" },
+  { id: "strict", label: "Streng", sub: "Maximale Markenbindung" },
+  { id: "balanced", label: "Ausgewogen", sub: "Stil + kreativer Spielraum" },
   { id: "loose", label: "Frei", sub: "Profil als lose Inspiration" },
 ];
 
@@ -456,7 +456,7 @@ export function BrandProfileView({
 
         <aside className="rounded-2xl bg-[var(--s1)] p-5 shadow-sm lg:sticky lg:top-6">
           <fieldset className="flex flex-col gap-4">
-            <legend className="text-sm font-medium leading-none text-[var(--t1)]">Brand-Lock</legend>
+            <legend className="text-sm font-medium leading-none text-[var(--t1)]">Markentreue</legend>
             <p className="text-xs leading-relaxed text-[var(--t3)]">
               Wie streng BrewAI sich an dein Markenprofil hält.
             </p>

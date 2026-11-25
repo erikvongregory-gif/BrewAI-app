@@ -6,7 +6,7 @@ import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { enforceRateLimitPersistent } from "@/lib/security/requestGuards";
+import { enforceRateLimitPersistent, enforceSameOrigin } from "@/lib/security/requestGuards";
 import { persistGeneratedMediaItems } from "@/lib/dashboard/persistGeneratedMedia";
 import {
   createModelArkClient,
@@ -76,6 +76,9 @@ export async function POST(req: Request) {
       windowMs: 60_000,
     });
     if (rateError) return rateError;
+    // POST mit Seiteneffekten (Abrechnung, Mediathek): wie alle zustandsändernden Routen nur von der eigenen Origin.
+    const originError = enforceSameOrigin(req);
+    if (originError) return originError;
 
     const userId = await requireUserId();
     if (typeof userId !== "string") return userId;

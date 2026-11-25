@@ -12,7 +12,13 @@ import { TaskSteps, type TaskStep } from "@/components/ui/task-steps";
 import { fetchWithRetry, isTransientFetchError } from "@/lib/http/fetchWithRetry";
 import { BRAND_SETTINGS_LIMITS, clampBrandSettingsFields } from "@/lib/dashboard/settingsPayload";
 import { MAX_MY_BEERS, sanitizeProduktKategorie } from "@/lib/dashboard/metadata";
-import { FALLBACK_SWATCHES, formatDomain } from "@/lib/brand/brand-profile-display";
+import { buildFieldStatusForActivation, FALLBACK_SWATCHES, formatDomain } from "@/lib/brand/brand-profile-display";
+import {
+  parseBrandEvidenceReport,
+  parseProductEvidence,
+  type BrandEvidenceReport,
+  type ProductEvidence,
+} from "@/lib/brand/brand-evidence-model";
 import { cn } from "@/lib/utils";
 
 export type BrandProfileSource = "url" | "instagram" | "manual" | "skip";
@@ -37,12 +43,18 @@ export type BrandSuggestedBeer = {
   /** Weitere Bild-Kandidaten von der Website — im Prüfschritt wählbar. */
   bildAlternativen?: string[];
   bildStatus?: "flasche" | "etikett" | "ungeprueft" | "keins";
+  /** Wo der Sortenname auf der Website steht — fehlt er, ist die Sorte unbestätigt. */
+  nachweis?: ProductEvidence;
+  /** false = Bierstil nicht angegeben (Standard geraten), true = belegt oder vom Nutzer gewählt. */
+  bierstilBelegt?: boolean;
 };
 
 export type BrandScanSourceMeta = {
   confidence?: string;
   pageTitle?: string;
   reviewHints?: string[];
+  /** Belegmodell je Feld (belegt / geschätzt / fehlt) — siehe lib/brand/brand-evidence. */
+  evidence?: BrandEvidenceReport | null;
   crawlNote?: string | null;
   /** hersteller | gastro | handel | sonstiges */
   siteKind?: string;
@@ -69,6 +81,8 @@ export type BrandScanSuggestion = {
   brandHeadlineFontName?: string;
   /** Hochgeladene Schriftdatei (signed URL), falls woff2 geladen werden konnte. */
   brandFontFileUrl?: string;
+  /** Belegstatus je Feld beim Aktivieren (nur Website-Scan mit Belegmodell). */
+  brandFieldStatus?: Partial<Record<string, "belegt" | "geschaetzt" | "fehlt" | "bestaetigt">>;
 };
 
 type Slot = {
@@ -178,6 +192,8 @@ function parseSuggestedBeers(value: unknown): BrandSuggestedBeer[] | undefined {
         item.bildStatus === "keins"
           ? item.bildStatus
           : undefined,
+      nachweis: parseProductEvidence(item.nachweis),
+      bierstilBelegt: typeof item.bierstilBelegt === "boolean" ? item.bierstilBelegt : undefined,
     });
     if (beers.length >= MAX_MY_BEERS) break;
   }
@@ -251,6 +267,7 @@ function buildActivateRequestBody(suggestion: BrandScanSuggestion): Record<strin
         ? undefined
         : referenceImagePayloads,
     ...(rest.suggestedBeers?.length ? { suggestedBeers: rest.suggestedBeers } : {}),
+    ...(rest.brandFieldStatus ? { brandFieldStatus: rest.brandFieldStatus } : {}),
   };
 }
 
@@ -464,6 +481,8 @@ export function BrandProfileSetupModal({
   const serverProgressRef = useRef(false);
   const [review, setReview] = useState<BrandScanSuggestion>(emptyReview);
   const [sourceMeta, setSourceMeta] = useState<BrandScanSourceMeta | null>(null);
+  /** Unveränderter Scan-Vorschlag — geänderte Felder gelten beim Aktivieren als „vom Nutzer bestätigt“. */
+  const [scanBaseline, setScanBaseline] = useState<BrandScanSuggestion | null>(null);
   const [handledAutoSignal, setHandledAutoSignal] = useState(0);
 
   const filledCount = slots.filter((s) => s.file).length;
@@ -580,8 +599,11 @@ export function BrandProfileSetupModal({
         brandWebsiteUrl: url,
         brandProfileSource: "url",
       });
-      setSourceMeta(data.sourceMeta ?? null);
+      setSourceMeta(
+        data.sourceMeta ? { ...data.sourceMeta, evidence: parseBrandEvidenceReport(data.sourceMeta.evidence) } : null,
+      );
       setReview(suggestion);
+      setScanBaseline(suggestion);
       setStep("review");
     } catch (e) {
       setStep("input");
@@ -675,7 +697,15 @@ export function BrandProfileSetupModal({
     setBusy(true);
     setError("");
     try {
-      await activateBrandProfile(review);
+      const brandFieldStatus =
+        review.brandProfileSource === "url"
+          ? buildFieldStatusForActivation({
+              evidence: sourceMeta?.evidence?.felder,
+              scanned: scanBaseline,
+              current: review,
+            })
+          : undefined;
+      await activateBrandProfile(brandFieldStatus ? { ...review, brandFieldStatus } : review);
     } catch (e) {
       setError(formatAnalysisError(e, "save"));
     } finally {

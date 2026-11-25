@@ -13,6 +13,7 @@ import { uploadUserImageToStorage } from "@/lib/supabase/storage";
 import { assertSafePublicUrl, BROWSER_USER_AGENT, URL_FETCH_TIMEOUT_MS } from "@/lib/brand/url-intake";
 import { publicFetch } from "@/lib/security/public-fetch";
 import { prepareProductImage, type ProductImagePart } from "@/lib/brand/product-image-prep";
+import type { ProductEvidence } from "@/lib/brand/brand-evidence";
 import {
   type DownloadedImage,
   type ImageCandidate,
@@ -37,6 +38,10 @@ export type SuggestedBeerVariety = {
   bildStatus?: "flasche" | "etikett" | "ungeprueft" | "keins";
   /** Gebinde-Variante mit gemeinsamem Foto mehrerer Flaschen: welche Flasche (nach Höhe) ausgeschnitten wird. */
   bildTeil?: ProductImagePart;
+  /** Beleg des Sortennamens im Website-Quelltext (fehlt bei Regel-Erkennung und Altbestand). */
+  nachweis?: ProductEvidence;
+  /** false = Bierstil weder im Namen noch auf der Produktseite belegt („helles“ ist dann nur Standard) — prüfen. */
+  bierstilBelegt?: boolean;
 };
 
 export type PackagingGuess = {
@@ -364,13 +369,21 @@ export function suggestedBeersToDashboard(suggested: SuggestedBeerVariety[]): Da
  * Ersetzt das Sortiment durch die Scan-Treffer.
  * Gleichnamige Einträge behalten id + vorhandenes Etikettfoto.
  * Fremde Marken-Sorten (nicht im Scan) fallen weg.
+ *
+ * `keepUserConfirmed` (Neuscan derselben Marke): Vom Nutzer angelegte oder bearbeitete Sorten
+ * (`nutzerBestaetigt`) bleiben erhalten, auch wenn der Scan sie nicht findet, und ihre Angaben zu
+ * Stil, Gebinde, Glas und Etikett gewinnen gegen den Scan. Bei einem Markenwechsel nicht setzen.
  */
 export function replaceSuggestedBeers(
   existing: DashboardBeer[],
   suggested: SuggestedBeerVariety[],
+  options: { keepUserConfirmed?: boolean } = {},
 ): DashboardBeer[] {
+  const keyOf = (kategorie: DashboardBeer["produktKategorie"], name: string) =>
+    `${sanitizeProduktKategorie(kategorie)}:${catalogIdentity(name)}`;
+  const existingBeers = sanitizeDashboardBeers(existing);
   const byName = new Map<string, DashboardBeer>(
-    sanitizeDashboardBeers(existing).map((beer) => [`${sanitizeProduktKategorie(beer.produktKategorie)}:${catalogIdentity(beer.name)}`, beer] as const),
+    existingBeers.map((beer) => [keyOf(beer.produktKategorie, beer.name), beer] as const),
   );
   const out: DashboardBeer[] = [];
   const seen = new Set<string>();
@@ -379,10 +392,23 @@ export function replaceSuggestedBeers(
     if (out.length >= MAX_MY_BEERS) break;
     const name = suggestion.name.trim();
     if (!name) continue;
-    const key = `${sanitizeProduktKategorie(suggestion.produktKategorie)}:${catalogIdentity(name)}`;
+    const key = keyOf(suggestion.produktKategorie, name);
     if (seen.has(key)) continue;
     seen.add(key);
     const prev = byName.get(key);
+    const evidence = {
+      ...(suggestion.nachweis?.status ? { nachweisStatus: suggestion.nachweis.status } : {}),
+      ...(typeof suggestion.bierstilBelegt === "boolean" ? { bierstilBelegt: suggestion.bierstilBelegt } : {}),
+    };
+    if (options.keepUserConfirmed && prev?.nutzerBestaetigt) {
+      // Nutzerkorrekturen gewinnen; der Scan ergänzt nur ein fehlendes Etikett und den Namensbeleg.
+      out.push({
+        ...prev,
+        etikettUrl: (prev.etikettUrl.trim() || suggestion.etikettUrl.trim()).slice(0, 1200),
+        ...(evidence.nachweisStatus ? { nachweisStatus: evidence.nachweisStatus } : {}),
+      });
+      continue;
+    }
     const etikettUrl = (suggestion.etikettUrl.trim() || prev?.etikettUrl || "").slice(0, 1200);
     out.push({
       id: prev?.id ?? `beer-${randomUUID()}`,
@@ -394,7 +420,19 @@ export function replaceSuggestedBeers(
       glasTyp: suggestion.glasTyp,
       etikettUrl,
       createdAt: prev?.createdAt || new Date().toISOString(),
+      ...evidence,
     });
+  }
+
+  if (options.keepUserConfirmed) {
+    for (const beer of existingBeers) {
+      if (out.length >= MAX_MY_BEERS) break;
+      if (!beer.nutzerBestaetigt) continue;
+      const key = keyOf(beer.produktKategorie, beer.name);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(beer);
+    }
   }
 
   return sanitizeDashboardBeers(out);

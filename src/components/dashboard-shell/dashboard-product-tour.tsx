@@ -19,6 +19,7 @@ import {
 import { Tour, useTour, type TourStep } from "@/components/ui/product-tour";
 import { EvglabMark } from "@/components/studio/evglab-mark";
 import { UI_TOUR_VERSION } from "@/lib/dashboard/onboarding";
+import { isVideosCreateEnabled } from "@/lib/featureFlags";
 import { patchOnboarding } from "@/components/studio/onboarding/onboarding-tour-types";
 
 
@@ -112,7 +113,8 @@ const ALL_STEPS: TourStep[] = [
 ];
 
 const INTRO_POINTS = [
-  { icon: ImagePlus, title: "Erstellen", text: "Motive & Videos" },
+  // Videos nur nennen, wenn der Bereich freigeschaltet ist (Feature-Flag), sonst kein leeres Versprechen.
+  { icon: ImagePlus, title: "Erstellen", text: isVideosCreateEnabled() ? "Motive & Videos" : "Fotorealistische Motive" },
   { icon: FolderOpen, title: "Sammeln", text: "Alles in der Mediathek" },
   { icon: Palette, title: "Steuern", text: "Deine Marke im Griff" },
 ];

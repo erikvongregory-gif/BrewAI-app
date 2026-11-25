@@ -1,6 +1,10 @@
 import type { SubscriptionPlanKey } from "@/lib/billing/tokenState";
 import { SUBSCRIPTION_PLAN_TOKENS } from "@/lib/billing/tokenState";
-import { formatPlanImageEstimate, formatPlanVideoEstimate } from "@/lib/billing/generationTokenCost";
+import {
+  calculateSeedanceVideoTokenCost,
+  formatPlanImageEstimate,
+  formatPlanVideoEstimate,
+} from "@/lib/billing/generationTokenCost";
 
 export type BillingInterval = "monthly" | "yearly";
 
@@ -134,6 +138,19 @@ export function getPlanAnnualSavingsVsList(plan: StudioPlanDefinition): number {
   return (plan.compareAtMonthly - plan.monthly) * 12;
 }
 
-/** Hinweis für UI: typischer Video-Verbrauch (720p, 5 s, mit Audio). */
+/** Hinweis für UI: typischer Video-Verbrauch (720p, 5 s, mit Audio) – Werte aus der echten Abrechnungsformel. */
+const STANDARD_VIDEO_COST_SEEDANCE_2 = calculateSeedanceVideoTokenCost({
+  resolution: "720p",
+  duration: 5,
+  generateAudio: true,
+  modelId: "seedance-2",
+});
+const STANDARD_VIDEO_COST_SEEDANCE_25 = calculateSeedanceVideoTokenCost({
+  resolution: "720p",
+  duration: 5,
+  generateAudio: true,
+  modelId: "seedance-2.5",
+});
 export const SEEDANCE_VIDEO_TOKEN_HINT =
-  "Ein Standard-Video (Seedance 2.5 · 720p · 5 s · mit Audio) kostet 100 Tokens — Varianten und längere Clips multiplizieren 1:1.";
+  `Ein Standard-Video (720p · 5 s · mit Audio) kostet mit Seedance 2 ${STANDARD_VIDEO_COST_SEEDANCE_2} Tokens, ` +
+  `mit Seedance 2.5 ${STANDARD_VIDEO_COST_SEEDANCE_25} Tokens — Varianten und längere Clips multiplizieren 1:1.`;

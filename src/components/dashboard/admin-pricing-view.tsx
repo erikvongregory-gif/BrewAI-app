@@ -18,6 +18,17 @@ import {
 } from "@/lib/billing/planCatalog";
 import { startBillingCheckout } from "@/lib/billing/checkoutClient";
 import type { SubscriptionPlanKey } from "@/lib/billing/tokenState";
+import { isVideosCreateEnabled } from "@/lib/featureFlags";
+
+/** Solange „Videos erstellen“ gesperrt ist, keine Video-Leistungen im Plan versprechen. */
+const VIDEOS_AVAILABLE = isVideosCreateEnabled();
+
+function visiblePlanFeatures(features: string[]): string[] {
+  if (VIDEOS_AVAILABLE) return features;
+  return features
+    .filter((feature) => !/^Videos erstellen\b/i.test(feature))
+    .map((feature) => feature.replace(/\s*·\s*ca\.[^·]*Videos?\s*$/i, "").trim());
+}
 
 function reveal(reduced: boolean | null, delay: number) {
   return {
@@ -50,7 +61,7 @@ function PlanCard({
   const showSavings = yearlyBilling;
 
   return (
-    <motion.article {...reveal(reducedMotion, (index + 3) * 0.4)} className={`${styles.plan} ${isRec ? styles.featured : ""}`} aria-label={plan.name}>
+    <motion.article {...reveal(reducedMotion, 0.1 + index * 0.05)} className={`${styles.plan} ${isRec ? styles.featured : ""}`} aria-label={plan.name}>
       <div className={styles.badges}>
         {isRec ? <span>Empfohlen</span> : null}
         {isCurrent ? <span>Aktueller Plan</span> : null}
@@ -68,7 +79,7 @@ function PlanCard({
       <div className={styles.includes}>
         <h3>Im Plan enthalten:</h3>
         <ul>
-          {plan.features.map((feature) => (
+          {visiblePlanFeatures(plan.features).map((feature) => (
             <li key={feature}>
               <span className={styles.check}><CheckCheck size={15} aria-hidden="true" /></span>
               <span>{feature}</span>
@@ -211,9 +222,12 @@ export function AdminPricingView({
               </span>
             ))}
           </h1>
-          <motion.p {...reveal(reducedMotion, 0)}>Der passende Plan für deine Brauerei. Erstelle Bilder und Videos mit deinem monatlichen Token-Kontingent.</motion.p>
+          <motion.p {...reveal(reducedMotion, 0)}>
+            Der passende Plan für deine Brauerei. Erstelle {VIDEOS_AVAILABLE ? "Bilder und Videos" : "Bilder"} mit
+            deinem monatlichen Token-Kontingent.
+          </motion.p>
         </div>
-        <motion.div {...reveal(reducedMotion, 0.4)} className={styles.period} role="group" aria-label="Abrechnungsintervall">
+        <motion.div {...reveal(reducedMotion, 0.05)} className={styles.period} role="group" aria-label="Abrechnungsintervall">
           <button type="button" aria-pressed={!yearlyBilling} onClick={() => setYearlyBilling(false)} disabled={checkoutPending !== null}>
             {!yearlyBilling && <motion.span aria-hidden="true" className={styles.switchHighlight} layoutId={switchId} transition={reducedMotion ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 30 }} />}
             <span className={styles.periodLabel}>Monatlich</span>
@@ -225,7 +239,7 @@ export function AdminPricingView({
         </motion.div>
       </header>
 
-      <motion.div {...reveal(reducedMotion, 0.8)} className={styles.grid}>
+      <motion.div {...reveal(reducedMotion, 0.1)} className={styles.grid}>
         {STUDIO_PLANS.map((plan, index) => (
           <PlanCard key={plan.id} index={index} plan={plan} yearlyBilling={yearlyBilling} currentPlan={currentPlan} checkoutPending={checkoutPending} onCheckout={startCheckout} />
         ))}
@@ -256,7 +270,7 @@ export function AdminPricingView({
         </Label>
       </div>
 
-      <motion.section {...reveal(reducedMotion, 1.2)} className={styles.activeSection} aria-label="Aktiver Plan">
+      <motion.section {...reveal(reducedMotion, 0.15)} className={styles.activeSection} aria-label="Aktiver Plan">
         <div className={styles.activeShell}>
           <article className={`${styles.plan} ${styles.activeCard}`}>
             <div className={styles.badges}>
@@ -300,8 +314,8 @@ export function AdminPricingView({
           <header className={styles.tokenHeader}>
             <h2>Zusätzliche Tokens</h2>
             <p>
-              Einmalige Packs für mehr Generierungen. Gekaufte Tokens bleiben bis zum Verbrauch.{" "}
-              {SEEDANCE_VIDEO_TOKEN_HINT}
+              Einmalige Packs für mehr Generierungen. Gekaufte Tokens bleiben bis zum Verbrauch.
+              {VIDEOS_AVAILABLE ? ` ${SEEDANCE_VIDEO_TOKEN_HINT}` : null}
             </p>
           </header>
           <div className={styles.tokenGrid}>
@@ -313,7 +327,7 @@ export function AdminPricingView({
             ).map((item, index) => (
               <motion.article
                 key={item.pack}
-                {...reveal(reducedMotion, (index + 1) * 0.2)}
+                {...reveal(reducedMotion, 0.05 + index * 0.05)}
                 className={styles.plan}
                 aria-label={item.tokens}
               >
@@ -329,7 +343,9 @@ export function AdminPricingView({
                 </div>
                 <p className={styles.billingNote}>{item.note}</p>
                 <h2>{item.tokens}</h2>
-                <p className={styles.description}>Sofort verfügbar für Bilder und Videos im aktuellen Zeitraum.</p>
+                <p className={styles.description}>
+                  Sofort nach dem Kauf verfügbar für {VIDEOS_AVAILABLE ? "Bilder und Videos" : "Bilder"}.
+                </p>
                 <button
                   type="button"
                   className={styles.cta}
@@ -348,8 +364,8 @@ export function AdminPricingView({
       <p className="text-muted-foreground text-xs leading-relaxed">
         Alle Preise gemäß § 19 UStG ohne Umsatzsteuer · Monatlich oder jährlich abrechenbar · Monatlich kündbar zum Ende
         des Abrechnungszeitraums · Token-Übertrag je nach Plan (Start: keiner · Wachstum: 1 Monat · Pro: 2
-        Monate · Enterprise: 3 Monate) · Separat gekaufte Token-Pakete verfallen 12 Monate nach Kauf ·
-        Videos via Seedance 2.5
+        Monate · Enterprise: 3 Monate) · Separat gekaufte Token-Pakete verfallen 12 Monate nach Kauf
+        {VIDEOS_AVAILABLE ? " · Videos via Seedance 2.5" : null}
       </p>
     </div>
   );

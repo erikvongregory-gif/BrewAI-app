@@ -1,7 +1,10 @@
 import sharp from "sharp";
+import { publicFetch } from "@/lib/security/public-fetch";
 
 const PHOTOROOM_API_KEY = process.env.PHOTOROOM_API_KEY;
 const REMOVE_BG_API_KEY = process.env.REMOVE_BG_API_KEY;
+/** generate-isolate läuft mit maxDuration = 30: 8 s Bildabruf + 20 s Freisteller. */
+const PROVIDER_TIMEOUT_MS = 20_000;
 
 export interface BgRemovalParams {
   imageUrl: string;
@@ -10,9 +13,11 @@ export interface BgRemovalParams {
 }
 
 async function imageUrlToBlob(imageUrl: string): Promise<Blob> {
-  const imgRes = await fetch(imageUrl, { cache: "no-store" });
-  if (!imgRes.ok) throw new Error(`Bild konnte nicht geladen werden: ${imgRes.status}`);
-  const imgBuf = Buffer.from(await imgRes.arrayBuffer());
+  // Nutzer-URL (generate-isolate: inputBild): nur über den SSRF-Schutz laden,
+  // nie direkt per fetch — sonst erreicht der Server interne Adressen.
+  const imgRes = await publicFetch(imageUrl, { maxBytes: 20 * 1024 * 1024, timeoutMs: 8_000 });
+  if (imgRes.status !== 200) throw new Error(`Bild konnte nicht geladen werden: ${imgRes.status}`);
+  const imgBuf = imgRes.body;
   const normalized = await sharp(imgBuf)
     .rotate()
     .resize({ width: 2048, height: 2048, fit: "inside", withoutEnlargement: true })
@@ -39,6 +44,7 @@ async function removeWithPhotoroom(params: BgRemovalParams): Promise<Buffer> {
     method: "POST",
     headers: { "x-api-key": PHOTOROOM_API_KEY },
     body: form,
+    signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
   });
 
   if (!res.ok) throw new Error(`Photoroom failed: ${res.status} ${await res.text()}`);
@@ -61,6 +67,7 @@ async function removeWithRemoveBg(params: BgRemovalParams): Promise<Buffer> {
     method: "POST",
     headers: { "X-Api-Key": REMOVE_BG_API_KEY },
     body: form,
+    signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
   });
 
   if (!res.ok) throw new Error(`remove.bg failed: ${res.status} ${await res.text()}`);

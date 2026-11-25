@@ -9,6 +9,7 @@ import { ProfileStrengthProgress } from "@/components/ui/profile-strength-progre
 import { RemovableBadges } from "@/components/ui/removable-badges";
 import {
   computeProfileStrength,
+  describeFieldEvidence,
   formatConfidenceLabel,
   parseHexSwatches,
   parseRuleSentences,
@@ -23,6 +24,7 @@ import {
   flascheForKategorie,
 } from "@/app/(dashboard)/inhalte-erstellen/lib/brewing-knowledge";
 import { formatDomain } from "@/lib/brand/brand-profile-display";
+import { BEER_STYLE_OPTIONS, findBeerStyle } from "@/app/(dashboard)/inhalte-erstellen/lib/beer-styles";
 
 type BrandReviewPanelProps = {
   review: BrandScanSuggestion;
@@ -62,6 +64,13 @@ function ReviewBeerRow({
     (url, index, list): url is string => Boolean(url) && !broken.has(url) && list.indexOf(url) === index,
   );
   const statusLabel = beer.bildStatus ? BILD_STATUS_LABEL[beer.bildStatus] : "";
+  const flags = [
+    beer.nachweis?.status === "unbestaetigt" ? "Name nicht auf der Website gefunden" : "",
+    statusLabel,
+    beer.packagingNeedsReview ? "Gebinde prüfen" : "",
+    kategorie === "bier" && beer.bierstilBelegt === false ? "Bierstil prüfen" : "",
+  ].filter(Boolean);
+  const nameTitle = beer.nachweis?.fundstelle ? `${beer.name} — gefunden: „${beer.nachweis.fundstelle}“` : beer.name;
   const flaschen = FLASCHEN_NACH_KATEGORIE[kategorie] as readonly string[];
   const markBroken = (url: string) => setBroken((current) => new Set(current).add(url));
 
@@ -97,11 +106,11 @@ function ReviewBeerRow({
           {options.length > 1 ? <span className="studio-brand-review-beer-thumb-count">{options.length}</span> : null}
         </button>
         <div className="studio-brand-review-beer-copy">
-          <div className="truncate" title={beer.name}>{beer.name}</div>
-          {statusLabel || beer.packagingNeedsReview ? (
+          <div className="truncate" title={nameTitle}>{beer.name}</div>
+          {flags.length > 0 ? (
             <p className="studio-brand-review-beer-flag">
-              {[statusLabel, beer.packagingNeedsReview ? "Gebinde prüfen" : ""].filter(Boolean).join(" · ")}
-              {options.length > 1 && beer.bildStatus !== "flasche" ? " — Bild antippen zum Wechseln" : ""}
+              {flags.join(" · ")}
+              {statusLabel && options.length > 1 && beer.bildStatus !== "flasche" ? " — Bild antippen zum Wechseln" : ""}
             </p>
           ) : null}
           <div className="studio-brand-review-beer-fields">
@@ -139,6 +148,28 @@ function ReviewBeerRow({
                 </option>
               ))}
             </select>
+            {kategorie === "bier" ? (
+              <select
+                className="studio-field"
+                value={findBeerStyle(beer.bierstil) ? beer.bierstil : "helles"}
+                disabled={busy}
+                aria-label={`Bierstil für ${beer.name}`}
+                onChange={(e) =>
+                  onUpdate({
+                    ...beer,
+                    bierstil: e.target.value,
+                    glasTyp: findBeerStyle(e.target.value)?.glasTyp ?? beer.glasTyp,
+                    bierstilBelegt: true,
+                  })
+                }
+              >
+                {BEER_STYLE_OPTIONS.map((option) => (
+                  <option key={option.bierstil} value={option.bierstil}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            ) : null}
           </div>
         </div>
         <button
@@ -250,6 +281,9 @@ export function BrandReviewPanel({
   };
 
   const sourceLabel = [review.breweryName, sourceMeta?.pageTitle].filter(Boolean).join(" · ") || review.breweryName;
+  // Herkunft je Feld (belegt / KI-Schätzung / fehlt) — nur bei Website-Scans mit Belegmodell.
+  const evidenceRows = (sourceMeta?.evidence?.felder ?? []).map(describeFieldEvidence);
+  const evidenceCheckCount = evidenceRows.filter((row) => row.ton !== "ok").length;
 
   return (
     <div className="studio-brand-review">
@@ -292,6 +326,22 @@ export function BrandReviewPanel({
               <li key={hint}>{hint}</li>
             ))}
           </ul>
+        ) : null}
+
+        {evidenceRows.length > 0 ? (
+          <details className="studio-modal-sub" style={{ marginTop: 8 }}>
+            <summary style={{ cursor: "pointer" }}>
+              Woher stammen die Angaben? {evidenceCheckCount > 0 ? `(${evidenceCheckCount} bitte prüfen)` : "(alles belegt)"}
+            </summary>
+            <ul style={{ marginTop: 6, paddingLeft: 18 }}>
+              {evidenceRows.map((row) => (
+                <li key={row.feld}>
+                  <strong>{row.label}:</strong> {row.ton === "ok" ? "✓ " : row.ton === "pruefen" ? "? " : "– "}
+                  {row.text}
+                </li>
+              ))}
+            </ul>
+          </details>
         ) : null}
 
         <div className="mt-5">

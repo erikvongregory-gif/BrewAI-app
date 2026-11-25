@@ -7,7 +7,9 @@ import { requireOpenAiImageApiKey } from "@/lib/openai/imageApiKey";
 const MODEL = "gpt-image-2.5-sunburst";
 
 function createOpenAiClient(): OpenAI {
-  return new OpenAI({ apiKey: requireOpenAiImageApiKey() });
+  // Bildaufrufe sind kostenpflichtig und nicht idempotent: keine stillen SDK-Retries
+  // (Default 2) nach Timeout/5xx, und kein 10-Minuten-Default-Timeout.
+  return new OpenAI({ apiKey: requireOpenAiImageApiKey(), maxRetries: 0, timeout: 170_000 });
 }
 
 export type ImageSize = "1024x1024" | "1024x1280" | "1024x1536" | "1024x1792" | "1792x1024" | "1280x1024";

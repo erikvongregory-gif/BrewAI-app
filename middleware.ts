@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { isPasswordResetPublicPath } from "@/lib/auth/passwordResetPaths";
 import { LOGIN_WAITLIST_ENABLED } from "@/lib/featureFlags";
+import { contentSecurityPolicy, createRequestNonce } from "@/lib/security/contentSecurityPolicy";
 import { updateSession } from "@/lib/supabase/middleware";
 
 /** Legacy App-/KI-Hosts → Canonical app.brewai.de (308 Permanent Redirect). */
@@ -21,9 +22,26 @@ function redirectLegacyAppHost(request: NextRequest): NextResponse | null {
   return NextResponse.redirect(target, 308);
 }
 
+function securityContext(request: NextRequest) {
+  const nonce = createRequestNonce();
+  const csp = contentSecurityPolicy(nonce);
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("content-security-policy", csp);
+  requestHeaders.set("x-nonce", nonce);
+  return {
+    requestHeaders,
+    stamp(response: NextResponse) {
+      // Keep restrictive document policies on media responses; multiple policies intersect.
+      response.headers.append("Content-Security-Policy", csp);
+      return response;
+    },
+  };
+}
+
 export async function middleware(request: NextRequest) {
+  const { requestHeaders, stamp } = securityContext(request);
   const legacyRedirect = redirectLegacyAppHost(request);
-  if (legacyRedirect) return legacyRedirect;
+  if (legacyRedirect) return stamp(legacyRedirect);
 
   const { pathname } = request.nextUrl;
   if (LOGIN_WAITLIST_ENABLED) {
@@ -34,6 +52,7 @@ export async function middleware(request: NextRequest) {
       "/auth/finish",
       "/auth/clear-session",
       "/auth/operator-access",
+      "/auth/adopt-session",
     ]);
     const isBlockedAuthPath =
       !passwordResetAllowed &&
@@ -49,7 +68,7 @@ export async function middleware(request: NextRequest) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/anmelden";
       redirectUrl.search = "waitlist=1";
-      return NextResponse.redirect(redirectUrl, 307);
+      return stamp(NextResponse.redirect(redirectUrl, 307));
     }
   }
 
@@ -67,10 +86,10 @@ export async function middleware(request: NextRequest) {
     pathname === "/passwort-zuruecksetzen";
 
   if (!needsAuthSession) {
-    return NextResponse.next();
+    return stamp(NextResponse.next({ request: { headers: requestHeaders } }));
   }
 
-  return await updateSession(request);
+  return stamp(await updateSession(request, requestHeaders));
 }
 
 export const config = {

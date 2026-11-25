@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   createContext,
   useCallback,
@@ -22,7 +22,6 @@ import { SearchDialog } from "@/components/dashboard-shell/header/search-dialog"
 import { ThemeSwitcher } from "@/components/dashboard-shell/header/theme-switcher";
 import { NavMain } from "@/components/dashboard-shell/sidebar/nav-main";
 import { NavUser } from "@/components/dashboard-shell/sidebar/nav-user";
-import { SupportCard } from "@/components/dashboard-shell/sidebar/support-card";
 import LumaBar from "@/components/ui/futuristic-nav";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -44,7 +43,7 @@ import { BillingCreditsProvider } from "@/components/dashboard-shell/billing-cre
 import { DashboardProductTour } from "@/components/dashboard-shell/dashboard-product-tour";
 import { cn } from "@/lib/utils";
 import { sidebarItems } from "@/navigation/sidebar/sidebar-items";
-import { createClient } from "@/lib/supabase/client";
+import { submitSignOut } from "@/lib/auth/submitSignOut";
 import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
 
 type StudioShellContextValue = {
@@ -104,7 +103,7 @@ function BrewAiSidebar({
         <NavMain items={sidebarItems} />
       </SidebarContent>
       <SidebarFooter>
-        <SupportCard />
+        {/* Keine Werbekarte mehr im Footer: „Neu erstellen“ oben deckt denselben Weg ab. */}
         <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
@@ -138,7 +137,6 @@ export function BrewAiAdminShell({
   sidebarCollapsible?: React.ComponentProps<typeof Sidebar>["collapsible"];
 }) {
   void _sidebarCollapsible;
-  const router = useRouter();
   const pathname = usePathname();
   const pathFullBleed =
     pathname === "/inhalte-erstellen" ||
@@ -223,12 +221,9 @@ export function BrewAiAdminShell({
   };
   const accountUsers = [sessionUser];
 
-  const handleLogout = useCallback(async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.replace("/anmelden");
-    router.refresh();
-  }, [router]);
+  const handleLogout = useCallback(() => {
+    submitSignOut();
+  }, []);
 
   return (
     // reducedMotion="user": alle Framer-Animationen respektieren die Systemeinstellung.

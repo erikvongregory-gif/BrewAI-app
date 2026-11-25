@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
   persist: vi.fn(),
   automaticLooks: vi.fn(() => { throw new Error("V3 must not load automatic style images"); }),
   labelWords: vi.fn<() => Promise<string[]>>(),
+  provenance: vi.fn(async (buffer: Buffer) => buffer),
 }));
 
 vi.mock("@/app/(dashboard)/inhalte-erstellen/lib/api-guards", () => ({
@@ -67,7 +68,10 @@ vi.mock("@/lib/openai/generateImage", () => ({
   mapAspectRatioToOpenAiSize: () => "1024x1536",
   cropImageBufferToAspectRatio: async (buffer: Buffer) => buffer,
 }));
-vi.mock("@/lib/openai/aiWatermark", () => ({ applyAiWatermark: async (buffer: Buffer) => buffer }));
+vi.mock("@/lib/openai/aiWatermark", () => ({
+  applyAiWatermark: async (buffer: Buffer) => buffer,
+  applyAiProvenanceMetadata: mocks.provenance,
+}));
 vi.mock("@/lib/supabase/storage", () => ({
   uploadGeneratedImageToStorage: async () => "https://cdn.example/out.png",
   uploadGeneratedImageWithThumb: async () => ({
@@ -91,6 +95,11 @@ vi.mock("next/server", async (importOriginal) => {
 
 import { POST as product } from "@/app/api/inhalte-erstellen/create-task/route";
 import { POST as social } from "@/app/api/inhalte-erstellen/social-post/route";
+import {
+  STUDIO_FUNCTION_BUDGET_MS,
+  STUDIO_PERSIST_RESERVE_MS,
+  remainingVariantBudgetMs,
+} from "@/lib/inhalte-erstellen/run-studio-generation";
 
 const characterPayload = {
   etikettBild: "https://cdn.example/beer.png",
@@ -152,6 +161,8 @@ describe("studio generation contract", () => {
     expect(request.prompt).toContain("Candid snapshot photography");
     expect(request.referenceImages).toHaveLength(2);
     expect(request.referenceImages[1].mime).toBe("image/png");
+    // Ohne sichtbares KI-Label bekommt jedes Bild trotzdem die maschinenlesbare Kennzeichnung.
+    expect(mocks.provenance).toHaveBeenCalled();
   });
   it.each([
     ["product", product, "reportage", "Candid snapshot photography"],
@@ -220,5 +231,24 @@ describe("studio generation contract", () => {
     );
     expect(response.status).toBe(200);
     expect(mocks.reserve).not.toHaveBeenCalled();
+  });
+});
+
+describe("remainingVariantBudgetMs", () => {
+  const deadlineAt = 1_000_000 + STUDIO_FUNCTION_BUDGET_MS;
+
+  it("gives the first variant the remaining budget minus the persist reserve", () => {
+    expect(remainingVariantBudgetMs({ deadlineAt, now: 1_000_000, variantIndex: 0 })).toBe(
+      STUDIO_FUNCTION_BUDGET_MS - STUDIO_PERSIST_RESERVE_MS,
+    );
+  });
+
+  it("does not start another paid variant that cannot finish before the function ends", () => {
+    expect(remainingVariantBudgetMs({ deadlineAt, now: deadlineAt - 70_000, variantIndex: 1 })).toBeNull();
+    expect(remainingVariantBudgetMs({ deadlineAt, now: deadlineAt - 120_000, variantIndex: 2 })).toBe(95_000);
+  });
+
+  it("still runs the first variant late, with a minimal budget", () => {
+    expect(remainingVariantBudgetMs({ deadlineAt, now: deadlineAt - 10_000, variantIndex: 0 })).toBe(1_000);
   });
 });

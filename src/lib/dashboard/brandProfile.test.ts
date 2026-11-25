@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   buildBrandProfilePromptContext,
   buildGenericBrandProfilePatch,
+  getBrandProfileFromMetadata,
+  parseBrandFieldStatus,
   isBrandProfileComplete,
   isBrandProfileCompleteFromSettings,
   type BrandProfile,
@@ -137,5 +139,53 @@ describe("isBrandProfileComplete alignment", () => {
         brandDonts: "d",
       }),
     ).toBe(true);
+  });
+});
+
+describe("buildBrandProfilePromptContext mit Belegstatus", () => {
+  it("ohne Belegstatus (Altbestand) bleibt die Ausgabe unverändert hart", () => {
+    const legacy = buildBrandProfilePromptContext(makeProfile());
+    expect(legacy).toContain("STRICT lock");
+    expect(legacy).not.toContain("Unconfirmed brand hints");
+  });
+
+  it("nur belegte oder bestätigte Felder sind harte Vorgaben, Schätzungen werden weiche Hinweise", () => {
+    const context = buildBrandProfilePromptContext(
+      makeProfile({
+        brandFieldStatus: {
+          breweryName: "belegt",
+          brandColors: "bestaetigt",
+          brandTone: "geschaetzt",
+          brandDos: "geschaetzt",
+          brandDonts: "geschaetzt",
+        },
+      }),
+    );
+    const [hard, soft] = context.split("Unconfirmed brand hints");
+    expect(hard).toContain("- Brand/Brewery: Brauerei Falter");
+    expect(hard).toContain("- Brand color palette: #1A3C2E, #E8B84B");
+    expect(hard).not.toContain("Brand tone & character");
+    expect(soft).toContain("- Brand tone & character: Traditionell, bodenständig");
+    expect(soft).toContain("- Visual style, always:");
+  });
+
+  it("nur Schätzungen → kein STRICT-Block, nur weiche Hinweise", () => {
+    const context = buildBrandProfilePromptContext(
+      makeProfile({ brandFieldStatus: { breweryName: "geschaetzt", brandTone: "geschaetzt", brandColors: "geschaetzt", brandDos: "geschaetzt", brandDonts: "geschaetzt" } }),
+    );
+    expect(context).not.toContain("STRICT lock");
+    expect(context.startsWith("Unconfirmed brand hints")).toBe(true);
+  });
+
+  it("liest den Belegstatus tolerant aus den Metadaten", () => {
+    expect(parseBrandFieldStatus({ brandTone: "geschaetzt", brandColors: "erfunden", fremd: "belegt" })).toEqual({
+      brandTone: "geschaetzt",
+    });
+    expect(parseBrandFieldStatus("kaputt")).toBeUndefined();
+    const profile = getBrandProfileFromMetadata({
+      dashboard: { settings: { brandProfileMode: "guided", breweryName: "X", brandFieldStatus: { breweryName: "bestaetigt" } } },
+    });
+    expect(profile.brandFieldStatus).toEqual({ breweryName: "bestaetigt" });
+    expect(getBrandProfileFromMetadata({ dashboard: { settings: { breweryName: "X" } } })).not.toHaveProperty("brandFieldStatus");
   });
 });

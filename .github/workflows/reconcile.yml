@@ -5,9 +5,14 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+# Nie zwei Abgleiche parallel: Ein langsamer Lauf (bis 300 s) soll nicht vom nächsten überholt werden.
+concurrency:
+  group: reconcile-jobs
+  cancel-in-progress: false
 jobs:
   reconcile:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Reconcile pending jobs
         env:

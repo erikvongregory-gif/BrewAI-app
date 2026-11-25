@@ -1,6 +1,7 @@
 import { getAppBaseUrlOrigin, isInviteOnlyEnabled, isSupabaseConfigured } from "@/lib/supabase/env";
 import { createRouteHandlerClient } from "@/lib/supabase/server";
 import { createHtmlRedirect, createNoStoreRedirect, normalizeNextPath, secureCookieOptions } from "@/lib/security/authResponses";
+import { nonceFromRequest, scriptOpenTag } from "@/lib/security/contentSecurityPolicy";
 import { getOrCreateRequestId } from "@/lib/security/authObservability";
 import { purgeStaleAuthSession } from "@/lib/supabase/clearAuthCookies";
 import {
@@ -12,10 +13,10 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-function createGooglePrepareHtml(nextPath: string, requestId: string, termsAccepted: boolean) {
+function createGooglePrepareHtml(nextPath: string, requestId: string, termsAccepted: boolean, nonce?: string) {
   const termsQuery = termsAccepted ? "&terms_accepted=1" : "";
   const startUrl = `/auth/google?start=1&next=${encodeURIComponent(nextPath)}${termsQuery}`;
-  const html = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"/><title>Google-Anmeldung</title></head><body><p style="font-family:system-ui,sans-serif;color:#6b6560">Anmeldung wird vorbereitet …</p><script>
+  const html = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"/><title>Google-Anmeldung</title></head><body><p style="font-family:system-ui,sans-serif;color:#6b6560">Anmeldung wird vorbereitet …</p>${scriptOpenTag(nonce)}
 (function(){var start=${JSON.stringify(startUrl)};fetch("/auth/clear-session?json=1",{credentials:"same-origin",cache:"no-store"}).catch(function(){}).finally(function(){location.replace(start)})})();</script></body></html>`;
   return new NextResponse(html, {
     status: 200,
@@ -46,7 +47,7 @@ export async function GET(request: Request) {
   }
 
   if (searchParams.get("start") !== "1") {
-    return createGooglePrepareHtml(safeNext, requestId, termsAccepted);
+    return createGooglePrepareHtml(safeNext, requestId, termsAccepted, nonceFromRequest(request));
   }
 
   const cookieJar = createNoStoreRedirect(`${appOrigin}/anmelden`, requestId);
@@ -69,5 +70,5 @@ export async function GET(request: Request) {
     return createNoStoreRedirect(`${appOrigin}/anmelden?error=google`, requestId);
   }
 
-  return createHtmlRedirect(data.url, requestId, cookieJar);
+  return createHtmlRedirect(data.url, requestId, cookieJar, nonceFromRequest(request));
 }

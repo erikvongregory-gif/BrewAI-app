@@ -98,7 +98,7 @@ const robotoSlab = Roboto_Slab({
 
 const merriweather = Merriweather({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  // Variable font (wght/opsz/wdth) — feste weight-Arrays brechen Turbopack-Font-Queries.
   variable: "--font-merriweather",
 });
 

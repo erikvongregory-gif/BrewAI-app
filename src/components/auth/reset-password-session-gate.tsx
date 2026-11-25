@@ -5,7 +5,7 @@ import {
   PasswordResetLoading,
   ResetPasswordPage,
 } from "@/components/ui/password-reset-pages";
-import { createClient } from "@/lib/supabase/client";
+import { persistHashSession } from "@/lib/supabase/persistHashSession";
 
 type Props = {
   notice?: string;
@@ -23,12 +23,6 @@ async function serverHasUser(): Promise<boolean> {
   }
 }
 
-function hasRecoveryHash(hash: string): boolean {
-  if (!hash || hash.length < 2) return false;
-  const params = new URLSearchParams(hash.replace(/^#/, ""));
-  return params.has("access_token");
-}
-
 export function ResetPasswordSessionGate({ notice, error }: Props) {
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -43,33 +37,7 @@ export function ResetPasswordSessionGate({ notice, error }: Props) {
       }
 
       try {
-        const supabase = createClient();
-
-        const {
-          data: { subscription },
-        } = supabase.auth.onAuthStateChange((event, session) => {
-          if (cancelled) return;
-          if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
-            setReady(true);
-          }
-        });
-
-        if (hasRecoveryHash(window.location.hash)) {
-          await supabase.auth.getSession();
-        }
-
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (session) {
-          if (window.location.hash) {
-            window.history.replaceState(null, "", window.location.pathname + window.location.search);
-          }
-          if (!cancelled) setReady(true);
-          subscription.unsubscribe();
-          return;
-        }
+        await persistHashSession();
 
         const search = new URLSearchParams(window.location.search);
         const code = search.get("code");
@@ -77,7 +45,6 @@ export function ResetPasswordSessionGate({ notice, error }: Props) {
           window.location.replace(
             `/auth/callback?code=${encodeURIComponent(code)}&type=recovery&next=${encodeURIComponent("/passwort-zuruecksetzen")}`,
           );
-          subscription.unsubscribe();
           return;
         }
 
@@ -85,21 +52,11 @@ export function ResetPasswordSessionGate({ notice, error }: Props) {
           if (cancelled) break;
           await new Promise((resolve) => setTimeout(resolve, 200));
           if (await serverHasUser()) {
-            setReady(true);
-            subscription.unsubscribe();
-            return;
-          }
-          const {
-            data: { session: retrySession },
-          } = await supabase.auth.getSession();
-          if (retrySession) {
-            setReady(true);
-            subscription.unsubscribe();
+            if (!cancelled) setReady(true);
             return;
           }
         }
 
-        subscription.unsubscribe();
         if (!cancelled) setFailed(true);
       } catch {
         if (!cancelled) setFailed(true);

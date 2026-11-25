@@ -28,6 +28,9 @@ export function getModelArkApiKey(): string | null {
   return key || null;
 }
 
+const MODELARK_STATUS_TIMEOUT_MS = 20_000;
+const MODELARK_SUBMIT_TIMEOUT_MS = 60_000;
+
 export function createModelArkClient(options?: { apiKey?: string; baseUrl?: string; fetch?: typeof fetch }) {
   const apiKey = options?.apiKey ?? getModelArkApiKey();
   if (!apiKey) throw new ModelArkError(500, { detail: "ARK_API_KEY fehlt." });
@@ -48,6 +51,9 @@ export function createModelArkClient(options?: { apiKey?: string; baseUrl?: stri
         ...(body ? { "Content-Type": "application/json" } : {}),
       },
       ...(body ? { body: JSON.stringify(body) } : {}),
+      // Statusabfragen laufen u. a. sequenziell im Reconcile-Cron: Ein hängender
+      // Aufruf blockierte sonst alle folgenden Jobs und Kontolöschungen dieses Laufs.
+      signal: AbortSignal.timeout(method === "GET" ? MODELARK_STATUS_TIMEOUT_MS : MODELARK_SUBMIT_TIMEOUT_MS),
     });
     const payload = await readJson(response);
     if (!response.ok) throw new ModelArkError(response.status, payload);

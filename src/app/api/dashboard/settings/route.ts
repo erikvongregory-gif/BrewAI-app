@@ -11,7 +11,11 @@ import { enforceRateLimitPersistent, enforceSameOrigin } from "@/lib/security/re
 import { getDashboardMetadata, mergeDashboardMetadata, type DashboardSettings } from "@/lib/dashboard/metadata";
 import { parseBrandReferenceIdFromUrl, repairBrandReferenceImageUrls } from "@/lib/brand/reference-image-store";
 import { normalizeWebsiteUrl } from "@/lib/brand/url-intake";
-import { clampBrandSettingsFields, sanitizeDashboardSettings } from "@/lib/dashboard/settingsPayload";
+import {
+  clampBrandSettingsFields,
+  confirmEditedBrandFields,
+  sanitizeDashboardSettings,
+} from "@/lib/dashboard/settingsPayload";
 import { hydratePrivateAssets } from "@/lib/supabase/privateAssets";
 
 const optionalHttpUrl = z
@@ -305,6 +309,8 @@ export async function PUT(req: Request) {
   const payload = parsed.data;
   const origin = new URL(req.url).origin;
   const repairedRefs = repairBrandReferenceImageUrls(workspaceMeta, origin, payload.brandReferenceImageUrls);
+  // Belegstatus kommt nie vom Client: geänderte Markentexte gelten als vom Nutzer bestätigt.
+  const brandFieldStatus = confirmEditedBrandFields(existingBrand, payload);
   const brandPayload = {
     breweryName: payload.breweryName,
     brandProfileMode: payload.brandProfileMode,
@@ -322,6 +328,7 @@ export async function PUT(req: Request) {
     brandHeadlineFontName: payload.brandHeadlineFontName,
     brandFontFileUrl: payload.brandFontFileUrl,
     brandFontWeight: payload.brandFontWeight,
+    ...(brandFieldStatus ? { brandFieldStatus } : {}),
   };
   const personalPayload = {
     profileName: payload.profileName,

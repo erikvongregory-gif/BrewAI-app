@@ -90,7 +90,7 @@ export const BEER_PHYSICS: Record<string, BeerPhysicsProfile> = {
     carbonation: "moderate fine carbonation",
   },
   schwarzbier: {
-    srm: "25–35",
+    srm: "19–30",
     hex: "#2A1408",
     liquid: "very dark brown-black Schwarzbier, still clear with a ruby edge when backlit — not opaque like a stout",
     foam: "tight tan foam",
@@ -162,9 +162,10 @@ export const BEER_PHYSICS: Record<string, BeerPhysicsProfile> = {
     carbonation: "moderate fine carbonation, clean streams",
   },
   ipa: {
-    srm: "8–14",
-    hex: "#D4843A",
-    liquid: "deep amber to copper IPA with slight haze and warm orange-amber clarity",
+    // BJCP 2021, 21A: „medium gold to light reddish-amber“, SRM 6–14 (Fachkorrektur Audit 05).
+    srm: "6–14",
+    hex: "#E0A040",
+    liquid: "medium gold to light reddish-amber IPA, clear to very slightly hazy, bright golden-orange glow when backlit",
     foam: "off-white foam with medium pores and light sticky lacing",
     head: "1–2 cm of foam",
     carbonation: "moderate effervescence with scattered bubble trails",
@@ -204,7 +205,7 @@ export const BEER_PHYSICS: Record<string, BeerPhysicsProfile> = {
   radler: {
     srm: "2–5",
     hex: "#FAE86B",
-    liquid: "hazy pale golden-lemon Radler with cloudy lemon-gold body and subtle citrus particles",
+    liquid: "pale golden-lemon Radler (beer mixed with lemon soda), clear or naturally cloudy depending on the lemonade, no fruit pulp or particles",
     foam: "light bubbly white foam, quickly fading",
     head: "a thin fast-fading cap under 1 cm",
     carbonation: "sparkling lively effervescence",

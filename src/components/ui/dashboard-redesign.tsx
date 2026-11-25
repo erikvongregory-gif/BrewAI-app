@@ -364,7 +364,7 @@ export function DashboardRedesignShell(props: {
           setMediaError("Mediathek konnte nicht geladen werden.");
         }
       } catch {
-        if (!ignore) setMediaError("Netzwerkfehler beim Laden der Mediathek.");
+        if (!ignore) setMediaError("Keine Verbindung. Prüfe deine Internetverbindung und lade die Mediathek erneut.");
       } finally {
         if (!ignore) setMediaLoaded(true);
       }
@@ -392,7 +392,7 @@ export function DashboardRedesignShell(props: {
           setSummaryError("Übersicht konnte nicht geladen werden.");
         }
       } catch {
-        if (!ignore) setSummaryError("Netzwerkfehler beim Laden der Übersicht.");
+        if (!ignore) setSummaryError("Keine Verbindung. Prüfe deine Internetverbindung und lade die Übersicht erneut.");
       } finally {
         if (!ignore) setSummaryLoaded(true);
       }
@@ -413,7 +413,7 @@ export function DashboardRedesignShell(props: {
           setTeamError("Teamdaten konnten nicht geladen werden.");
         }
       } catch {
-        if (!ignore) setTeamError("Netzwerkfehler beim Laden des Teams.");
+        if (!ignore) setTeamError("Keine Verbindung. Prüfe deine Internetverbindung und lade die Seite neu.");
       } finally {
         if (!ignore) setTeamLoaded(true);
       }
@@ -434,7 +434,7 @@ export function DashboardRedesignShell(props: {
           setSettingsError(fallback?.error ?? "Einstellungen konnten nicht geladen werden.");
         }
       } catch {
-        if (!ignore) setSettingsError("Netzwerkfehler beim Laden des Dashboards.");
+        if (!ignore) setSettingsError("Keine Verbindung. Prüfe deine Internetverbindung und lade die Seite neu.");
       } finally {
         if (!ignore) setSettingsLoaded(true);
       }
@@ -469,7 +469,7 @@ export function DashboardRedesignShell(props: {
 
     changeTab("pricing");
     setPricingCheckoutError(
-      "Bitte bestÃ¤tige unten die Widerrufs-Zustimmung und wÃ¤hle danach deinen Tarif.",
+      "Bitte bestätige unten die Widerrufs-Zustimmung und wähle danach deinen Tarif.",
     );
     clearHomepageCheckoutParams(params);
     const qs = params.toString();
@@ -543,7 +543,7 @@ export function DashboardRedesignShell(props: {
   );
 
   const handleChooseBrandProfileGuided = useCallback(() => {
-    // Wichtig: KEIN lokaler State-Wechsel vor Server-Save â€” das fuehrt sonst zu Drift,
+    // Wichtig: KEIN lokaler State-Wechsel vor Server-Save — das fuehrt sonst zu Drift,
     // wenn der User die Setup-Modal ohne Speichern schliesst. Der Modus wird erst durch
     // `applyBrandScanAndPersist` (saveProfileSettings) auf "guided" gesetzt.
     setShowBrandProfileChoice(false);
@@ -554,9 +554,9 @@ export function DashboardRedesignShell(props: {
     setShowBrandProfileChoice(false);
     try {
       await saveProfileSettings(buildGenericBrandProfilePatch());
-      setBrandProfileNotice("Markenprofil deaktiviert â€” du generierst jetzt generisch.");
+      setBrandProfileNotice("Markenprofil deaktiviert — du generierst jetzt generisch.");
     } catch {
-      setBrandProfileNotice("ZurÃ¼cksetzen konnte nicht gespeichert werden.");
+      setBrandProfileNotice("Zurücksetzen konnte nicht gespeichert werden.");
     }
   }, [saveProfileSettings]);
 
@@ -565,7 +565,7 @@ export function DashboardRedesignShell(props: {
   useEffect(() => {
     if (!settingsLoaded) return;
     if (brandProfileMode !== "undecided") return;
-    // Nur einmal pro Browser-Session anzeigen â€” wenn der User die Modal ohne
+    // Nur einmal pro Browser-Session anzeigen — wenn der User die Modal ohne
     // explizite Entscheidung schliesst, faellt er ueber die Banner zurueck und
     // wird beim naechsten Login erneut sanft erinnert.
     if (typeof window !== "undefined") {
@@ -575,6 +575,16 @@ export function DashboardRedesignShell(props: {
     }
     setShowBrandProfileChoice(true);
   }, [brandProfileMode, settingsLoaded]);
+
+  // Auswahl-Dialog per Escape schließen (wie das ×) — Tastaturnutzer kommen sonst nicht heraus.
+  useEffect(() => {
+    if (!showBrandProfileChoice) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setShowBrandProfileChoice(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [showBrandProfileChoice]);
 
   useEffect(() => {
     if (searchParams.get("openBrand") !== "1") return;
@@ -596,7 +606,7 @@ export function DashboardRedesignShell(props: {
         const json = (await res.json()) as { summary?: DashboardSummary };
         if (json.summary) setSummary(json.summary);
       })
-      .catch(() => setSummaryError("Ãœbersicht konnte nicht geladen werden."))
+      .catch(() => setSummaryError("Übersicht konnte nicht geladen werden."))
       .finally(() => setSummaryLoaded(true));
   }, []);
 
@@ -807,8 +817,8 @@ export function DashboardRedesignShell(props: {
             <button
               type="button"
               className="studio-brand-choice__close"
-              aria-label="SchlieÃŸen"
-              title="SchlieÃŸen"
+              aria-label="Schließen"
+              title="Schließen"
               onClick={() => setShowBrandProfileChoice(false)}
             >
               <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden>
@@ -839,8 +849,8 @@ export function DashboardRedesignShell(props: {
               Willst du deinen Markenstil fixieren?
             </h3>
             <p className="studio-brand-choice__lead">
-              Gib einfach die Website deiner Marke ein â€” die KI erkennt Tonality, Farben und Bildsprache und
-              erstellt dein Markenprofil. Du kannst das spÃ¤ter unter Einstellungen jederzeit Ã¤ndern.
+              Gib einfach die Website deiner Brauerei ein — BrewAI erkennt Tonalität, Farben und Bildsprache und
+              erstellt dein Markenprofil. Du kannst das später unter Einstellungen jederzeit ändern.
             </p>
 
             <div className="studio-brand-choice__actions">

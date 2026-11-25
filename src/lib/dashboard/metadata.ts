@@ -1,4 +1,5 @@
 import { correctAlcoholFreeStyle } from "@/app/(dashboard)/inhalte-erstellen/lib/beer-styles";
+import type { BrandEvidenceField, EvidenceStatus } from "@/lib/brand/brand-evidence-model";
 import { sanitizeStudioOnboardingState, type StudioOnboardingState } from "@/lib/dashboard/onboarding";
 
 export type DashboardMediaItem = {
@@ -93,6 +94,12 @@ export type DashboardBeer = {
   /** HTTPS-URL des Sorten-Etiketts (nie Base64 — JWT/Cookie-Limit). */
   etikettUrl: string;
   createdAt: string;
+  /** Beleg des Sortennamens aus dem Website-Scan. Fehlt bei Altbestand und manuell angelegten Sorten. */
+  nachweisStatus?: "belegt" | "unbestaetigt";
+  /** false = Bierstil beim Scan nicht belegt („helles“ ist dann nur Standard). Fehlt = unbekannt/Altbestand. */
+  bierstilBelegt?: boolean;
+  /** true = vom Nutzer angelegt oder bearbeitet. Ein erneuter Scan derselben Marke überschreibt die Sorte nicht. */
+  nutzerBestaetigt?: boolean;
 };
 
 /** Obergrenze pro Brauerei. Die Datensätze liegen in public.dashboard_beers. */
@@ -204,10 +211,47 @@ export function sanitizeDashboardBeers(value: unknown): DashboardBeer[] {
         item.filtrierung === "unfiltriert" || item.filtrierung === "filtriert" ? item.filtrierung : undefined,
       etikettUrl: typeof item.etikettUrl === "string" ? item.etikettUrl.trim().slice(0, 1200) : "",
       createdAt: typeof item.createdAt === "string" ? item.createdAt.slice(0, 40) : "",
+      ...(item.nachweisStatus === "belegt" || item.nachweisStatus === "unbestaetigt"
+        ? { nachweisStatus: item.nachweisStatus }
+        : {}),
+      ...(typeof item.bierstilBelegt === "boolean" ? { bierstilBelegt: item.bierstilBelegt } : {}),
+      ...(item.nutzerBestaetigt === true ? { nutzerBestaetigt: true } : {}),
     });
     if (out.length >= MAX_MY_BEERS) break;
   }
   return out;
+}
+
+/** Felder, deren Änderung durch den Nutzer eine Sorte als „vom Nutzer bestätigt“ markiert. */
+const USER_EDITABLE_BEER_FIELDS = [
+  "name",
+  "produktKategorie",
+  "bierstil",
+  "flaschenTyp",
+  "flaschenfarbe",
+  "glasTyp",
+  "filtrierung",
+  "etikettUrl",
+] as const;
+
+/**
+ * Für Schreibzugriffe aus der Sortimentsverwaltung: Neue oder geänderte Sorten gelten als vom Nutzer
+ * bestätigt. Unveränderte Sorten behalten die gespeicherten Scan-Belege (das API-Schema kennt diese
+ * Felder nicht und würde sie sonst bei jedem Speichern verwerfen).
+ */
+export function markUserEditedBeers(incoming: DashboardBeer[], stored: DashboardBeer[]): DashboardBeer[] {
+  const storedById = new Map(sanitizeDashboardBeers(stored).map((beer) => [beer.id, beer] as const));
+  return sanitizeDashboardBeers(incoming).map((beer) => {
+    const previous = storedById.get(beer.id);
+    if (!previous) return { ...beer, nutzerBestaetigt: true };
+    const changed = USER_EDITABLE_BEER_FIELDS.some((field) => (beer[field] ?? "") !== (previous[field] ?? ""));
+    return {
+      ...beer,
+      ...(previous.nachweisStatus ? { nachweisStatus: previous.nachweisStatus } : {}),
+      ...(typeof previous.bierstilBelegt === "boolean" ? { bierstilBelegt: previous.bierstilBelegt } : {}),
+      ...(changed || previous.nutzerBestaetigt ? { nutzerBestaetigt: true } : {}),
+    };
+  });
 }
 
 export type DashboardTeamRole = "owner" | "admin" | "editor" | "viewer";
@@ -249,6 +293,11 @@ export type DashboardSettings = {
   brandFontFileUrl: string;
   /** CSS font-weight für Headlines, z. B. 700. */
   brandFontWeight: string;
+  /**
+   * Belegstatus je Markenfeld (Scanner bzw. „vom Nutzer bestätigt“). Optional: Altbestand ohne Feld
+   * verhält sich wie bisher (alle Felder harte Vorgaben).
+   */
+  brandFieldStatus?: Partial<Record<BrandEvidenceField, EvidenceStatus>>;
 };
 
 export type DashboardMetadata = {

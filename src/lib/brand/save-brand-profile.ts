@@ -20,6 +20,7 @@ import {
 import { storeBrandReferenceImagesAsUrls } from "@/lib/brand/persist-reference-urls";
 import { parseBrandReferenceIdFromUrl, repairBrandReferenceImageUrls } from "@/lib/brand/reference-image-store";
 import { normalizeWebsiteUrl } from "@/lib/brand/url-intake";
+import type { BrandFieldStatusMap } from "@/lib/dashboard/brandProfile";
 
 /** Sortiment gehört zur aktiven Marke — Domain, sonst Brauereiname. */
 export function brandCatalogKey(input: { brandWebsiteUrl?: string; breweryName?: string }): string {
@@ -55,6 +56,12 @@ export type SaveBrandProfileInput = {
   brandFontFileUrl?: string;
   referenceImagePayloads?: BrandReferencePayload[];
   suggestedBeers?: SuggestedBeerVariety[];
+  /**
+   * Belegstatus je Feld aus dem Prüfschritt (Scan-Beleg bzw. „bestaetigt“ für vom Nutzer geänderte Felder).
+   * Fehlt er (manuell, Instagram, alte Clients), gilt das bisherige Verhalten. Wird erst gespeichert,
+   * wenn sanitizeDashboardSettings das Feld übernimmt (Änderungswunsch F1, Audit 03).
+   */
+  brandFieldStatus?: BrandFieldStatusMap;
 };
 
 function filterHttpUrls(urls: string[] | undefined): string[] {
@@ -147,6 +154,8 @@ export function buildActivatedBrandSettings(params: {
     brandHeadlineFontName: params.input.brandHeadlineFontName?.trim() || existing.brandHeadlineFontName || "",
     brandFontFileUrl: normalizeHttpUrlOrEmpty(params.input.brandFontFileUrl) || existing.brandFontFileUrl || "",
     brandAnalyzedAt: params.analyzedAt ?? existing.brandAnalyzedAt ?? new Date().toISOString(),
+    // Immer setzen (auch undefined): ein alter Belegstatus darf nicht an neuen Profilwerten hängen bleiben.
+    brandFieldStatus: params.input.brandFieldStatus,
   });
 
   const sanitized = sanitizeDashboardSettings(mergedInput);
@@ -229,7 +238,8 @@ export async function persistBrandProfileForUser(params: {
   if (params.input.suggestedBeers && params.input.suggestedBeers.length > 0) {
     const withLabels = await persistSuggestedBeerLabels(params.userId, params.input.suggestedBeers);
     // Beim Aktivieren ist der Scan die Quelle der Wahrheit — fremde Sorten fliegen raus.
-    myBeers = replaceSuggestedBeers(existingBeers, withLabels);
+    // Ausnahme bei derselben Marke: vom Nutzer angelegte/bearbeitete Sorten bleiben samt Korrekturen.
+    myBeers = replaceSuggestedBeers(existingBeers, withLabels, { keepUserConfirmed: !brandChanged });
   } else if (brandChanged) {
     // Neue Marke ohne Scan-Treffer: altes Sortiment der vorherigen Marke nicht stehen lassen.
     // Gleiche Marke ohne Treffer (z. B. Sorten im Review entfernt/Scan leer): Sortiment behalten.

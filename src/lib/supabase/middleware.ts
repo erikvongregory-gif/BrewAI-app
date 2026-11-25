@@ -11,6 +11,22 @@ import { normalizeNextPath } from "@/lib/security/authResponses";
 import { clearIncomingSupabaseAuthCookies } from "@/lib/supabase/clearAuthCookies";
 import { getSharedCookieDomain } from "@/lib/siteConfig";
 
+const AUTH_TOKEN_COOKIE = /^sb-[A-Za-z0-9_-]+-auth-token(?:\.\d+)?$/;
+
+function upgradeSessionCookies(request: NextRequest, response: NextResponse) {
+  const domain = getSharedCookieDomain();
+  for (const cookie of request.cookies.getAll()) {
+    if (!AUTH_TOKEN_COOKIE.test(cookie.name)) continue;
+    response.cookies.set(cookie.name, cookie.value, {
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      ...(domain ? { domain } : {}),
+    });
+  }
+}
+
 const AUTH_COOKIE_SWEEP_PATHS = new Set([
   "/anmelden",
   "/registrieren",
@@ -23,10 +39,9 @@ const AUTH_COOKIE_SWEEP_PATHS = new Set([
   "/auth/clear-session",
 ]);
 
-function withSharedCookieDomain<T extends { domain?: string }>(options: T): T {
+function withSharedCookieDomain<T extends { domain?: string; httpOnly?: boolean }>(options: T): T & { httpOnly: true } {
   const domain = getSharedCookieDomain();
-  if (!domain) return options;
-  return { ...options, domain };
+  return { ...options, ...(domain ? { domain } : {}), httpOnly: true };
 }
 
 function onboardingStateFromUser(user: { user_metadata?: Record<string, unknown> }) {
@@ -40,10 +55,10 @@ function redirectWithRequestId(url: URL, requestId: string) {
   return redirect;
 }
 
-export async function updateSession(request: NextRequest) {
+export async function updateSession(request: NextRequest, requestHeaders: Headers) {
   const requestId = getOrCreateRequestId(request);
   const pathname = request.nextUrl.pathname;
-  const supabaseResponse = NextResponse.next({ request });
+  const supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } });
   supabaseResponse.headers.set("x-request-id", requestId);
 
   if (AUTH_COOKIE_SWEEP_PATHS.has(pathname)) {
@@ -52,6 +67,8 @@ export async function updateSession(request: NextRequest) {
       preserveCodeVerifier: pathname === "/auth/callback" || pathname === "/anmelden",
       allSupabase: pathname === "/auth/clear-session",
     });
+  } else if (pathname !== "/auth/google") {
+    upgradeSessionCookies(request, supabaseResponse);
   }
 
   // Auth-Handler lesen/schreiben Session selbst — kein getUser() mit riesigen Cookie-Jars.
@@ -74,6 +91,7 @@ export async function updateSession(request: NextRequest) {
       path: "/",
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
       ...(getSharedCookieDomain() ? { domain: getSharedCookieDomain() } : {}),
     },
     cookies: {

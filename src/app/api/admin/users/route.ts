@@ -3,6 +3,7 @@ import { z } from "zod";
 import { enforceRateLimit, enforceSameOrigin } from "@/lib/security/requestGuards";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAdminSession } from "@/lib/admin/auth";
+import { isOwnerUser } from "@/lib/auth/owner";
 
 const roleSchema = z.object({
   userId: z.string().min(1),
@@ -60,10 +61,22 @@ export async function PATCH(req: Request) {
   const admin = await getAdminSession();
   if (!admin) return NextResponse.json({ error: "Kein Admin-Zugriff." }, { status: 403 });
 
-  const parsed = roleSchema.safeParse(await req.json());
+  const parsed = roleSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 400 });
+  if (parsed.data.userId === admin.userId) {
+    return NextResponse.json({ error: "Die eigene Rolle kann hier nicht geändert werden." }, { status: 403 });
+  }
 
   const client = createAdminClient();
+  // Betreiber-Konten (app_metadata.role = owner oder OWNER_EMAILS) nie über diese Route ändern:
+  // Das Überschreiben von app_metadata.role würde einem Owner still die Owner-Rechte entziehen.
+  const target = await client.auth.admin.getUserById(parsed.data.userId);
+  if (target.error || !target.data?.user) {
+    return NextResponse.json({ error: "Nutzer nicht gefunden." }, { status: 404 });
+  }
+  if (isOwnerUser(target.data.user)) {
+    return NextResponse.json({ error: "Betreiber-Konten können hier nicht geändert werden." }, { status: 403 });
+  }
   const { error } = await client.auth.admin.updateUserById(parsed.data.userId, {
     app_metadata: { role: parsed.data.role },
   });

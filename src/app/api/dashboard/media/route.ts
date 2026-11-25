@@ -14,10 +14,17 @@ import {
   deleteDashboardMedia,
 } from "@/lib/dashboard/media-store";
 
+/** Nur http(s): javascript:, data: oder file:-URLs gehören nicht in die (teamweit sichtbare) Mediathek. */
+const webUrl = z
+  .string()
+  .url()
+  .max(2000)
+  .refine((value) => /^https?:\/\//i.test(value.trim()), { message: "Nur http(s)-URLs erlaubt." });
+
 const mediaSchema = z.object({
   id: z.string().min(1).max(120),
-  imageUrl: z.string().url().max(2000),
-  thumbUrl: z.string().url().max(2000).optional(),
+  imageUrl: webUrl,
+  thumbUrl: webUrl.optional(),
   title: z.string().min(1).max(120).optional(),
   prompt: z.string().min(1).max(800),
   createdAt: z.string().datetime(),

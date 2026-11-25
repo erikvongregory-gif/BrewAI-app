@@ -126,6 +126,137 @@ function MetricCardSkeleton() {
   );
 }
 
+/** Aktiver Tarif oder Restguthaben — dieselbe Regel für Kennzahl und „Nächste Schritte“. */
+function hasActivePlan(summary: DashboardHomeSummary | null): boolean {
+  const unlimited = Boolean(summary?.unlimited || summary?.tokens.unlimited);
+  return (
+    unlimited ||
+    (!summary?.degradedBilling &&
+      (hasActiveSubscriptionFromState(summary?.plan, summary?.billingStatus) ||
+        (summary?.tokens.remaining ?? 0) > 0))
+  );
+}
+
+type NextStepId = "plan" | "brand" | "create";
+
+/**
+ * Zeigt nur offene Schritte bis zum ersten Motiv (Tarif → Markenprofil → erstes Bild).
+ * Rendert erst, wenn alle Daten geladen sind, damit die Karte nicht kurz aufblitzt,
+ * und verschwindet ganz, sobald nichts mehr offen ist.
+ */
+function BrewAiNextSteps({
+  summary,
+  summaryLoaded,
+  summaryError,
+  media,
+  mediaLoaded,
+  mediaError,
+  settingsLoaded,
+  brandProfileComplete,
+  brandProfileMode,
+  onOpenTab,
+  onOpenBrandSetup,
+}: {
+  summary: DashboardHomeSummary | null;
+  summaryLoaded: boolean;
+  summaryError?: string | null;
+  media: DashboardHomeMediaItem[];
+  mediaLoaded: boolean;
+  mediaError?: string | null;
+  settingsLoaded: boolean;
+  brandProfileComplete: boolean;
+  brandProfileMode: DashboardHomeSettings["brandProfileMode"];
+  onOpenTab: (tab: DashboardTab) => void;
+  onOpenBrandSetup: () => void;
+}) {
+  if (!summaryLoaded || !mediaLoaded || !settingsLoaded) return null;
+
+  const steps: { id: NextStepId; title: string; text: string }[] = [];
+  if (!summaryError && !hasActivePlan(summary)) {
+    steps.push({
+      id: "plan",
+      title: "Tarif wählen",
+      text: "Bilder erstellen ist mit einem aktiven Tarif möglich.",
+    });
+  }
+  if (!brandProfileComplete && brandProfileMode !== "skip") {
+    steps.push(
+      brandProfileMode === "undecided"
+        ? {
+            id: "brand",
+            title: "Markenprofil anlegen",
+            text: "Website deiner Brauerei eingeben – BrewAI übernimmt Farben, Tonalität und Sortiment.",
+          }
+        : {
+            id: "brand",
+            title: "Markenprofil vervollständigen",
+            text: "Je genauer das Profil, desto markentreuer werden deine Motive.",
+          },
+    );
+  }
+  if (!mediaError && media.length === 0) {
+    steps.push({
+      id: "create",
+      title: "Erstes Bild erstellen",
+      text: "Sorte und Anlass wählen – fertige Motive landen automatisch in der Mediathek.",
+    });
+  }
+  if (steps.length === 0) return null;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="leading-none">
+          {steps.length === 1 ? "Nächster Schritt" : "Nächste Schritte"}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <ol className="divide-y divide-border">
+          {steps.map((step, index) => {
+            const variant = index === 0 ? "default" : "outline";
+            return (
+              <li
+                key={step.id}
+                className="flex flex-col gap-3 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="flex min-w-0 gap-3">
+                  <span
+                    aria-hidden
+                    className="flex size-6 shrink-0 items-center justify-center rounded-full border text-muted-foreground text-xs tabular-nums"
+                  >
+                    {index + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm">{step.title}</p>
+                    <p className="text-muted-foreground text-sm">{step.text}</p>
+                  </div>
+                </div>
+                <div className="shrink-0 pl-9 sm:pl-0">
+                  {step.id === "plan" ? (
+                    <Button variant={variant} onClick={() => onOpenTab("pricing")}>
+                      Tarife ansehen
+                    </Button>
+                  ) : step.id === "brand" ? (
+                    <Button variant={variant} onClick={onOpenBrandSetup}>
+                      {brandProfileMode === "undecided" ? "Markenprofil anlegen" : "Profil ergänzen"}
+                    </Button>
+                  ) : (
+                    <Button asChild variant={variant}>
+                      <Link href="/inhalte-erstellen" prefetch={false}>
+                        Bild erstellen
+                      </Link>
+                    </Button>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </CardContent>
+    </Card>
+  );
+}
+
 /** Füllstand der verfügbaren Tokens; unter 15 % in Warnfarbe. */
 function TokenMeter({ pct }: { pct: number }) {
   const clamped = Math.min(100, Math.max(0, pct));
@@ -155,7 +286,6 @@ function BrewAiMetricCards({
   settings,
   settingsLoaded,
   brandProfileComplete,
-  brandProfileMode,
   onRetrySummary,
 }: {
   summary: DashboardHomeSummary | null;
@@ -203,11 +333,7 @@ function BrewAiMetricCards({
   const availablePct = tokensAvailablePct(remaining, monthly, unlimited);
   const planLabel = planLabelFromKey(summary?.plan ?? null, unlimited);
   const periodEnd = formatPeriodEnd(summary?.periodEnd);
-  const hasPlan =
-    unlimited ||
-    (!summary?.degradedBilling &&
-      (hasActiveSubscriptionFromState(summary?.plan, summary?.billingStatus) ||
-        (summary?.tokens.remaining ?? 0) > 0));
+  const hasPlan = hasActivePlan(summary);
   const brandLabel = settingsLoaded
     ? brandStatusLabel(brandProfileComplete, settings)
     : "—";
@@ -247,7 +373,7 @@ function BrewAiMetricCards({
               <FolderOpen className="size-4" />
             </div>
           </CardTitle>
-          <CardDescription>Assets diesen Monat</CardDescription>
+          <CardDescription>Motive diesen Monat</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-1">
           <div className="flex flex-wrap items-center gap-2">
@@ -261,8 +387,8 @@ function BrewAiMetricCards({
           </div>
           <p className="text-muted-foreground text-sm">
             {summary?.chargesTotal != null
-              ? `${formatDeNumber(summary.chargesTotal)} Gesamtabbuchungen`
-              : "Generierte Motive im laufenden Zeitraum"}
+              ? `${formatDeNumber(summary.chargesTotal)} insgesamt erstellt`
+              : "Erstellte Motive im laufenden Zeitraum"}
           </p>
         </CardContent>
       </Card>
@@ -346,7 +472,7 @@ function BrewAiActivityOverview({
         </CardDescription>
         <CardAction className="flex items-center gap-2">
           <Select value={range} onValueChange={(v) => setRange(v as TokenRangeKey)}>
-            <SelectTrigger size="sm" className="w-32">
+            <SelectTrigger size="sm" className="w-32" aria-label="Zeitraum">
               <SelectValue placeholder="Zeitraum" />
             </SelectTrigger>
             <SelectContent>
@@ -371,9 +497,10 @@ function BrewAiActivityOverview({
         {!summaryLoaded ? (
           <Skeleton className="h-80 w-full rounded-lg" />
         ) : !hasData ? (
-          <div className="flex h-80 w-full items-center justify-center rounded-lg bg-muted/40">
+          <div className="flex h-40 w-full items-center justify-center rounded-lg bg-muted/40 px-4 text-center">
             <p className="text-muted-foreground text-sm">
-              Noch keine Token-Nutzung in diesem Zeitraum vorhanden.
+              Noch kein Token-Verbrauch in diesem Zeitraum. Sobald du Bilder erstellst, siehst du hier den
+              Verlauf pro Tag.
             </p>
           </div>
         ) : (
@@ -456,9 +583,11 @@ function BrewAiAssetsOverview({
     <Card>
       <CardHeader>
         <CardTitle className="leading-none">
-          {mediaLoaded ? `${formatDeNumber(media.length)} Assets` : "Assets"}
+          {mediaLoaded
+            ? `${formatDeNumber(media.length)} ${media.length === 1 ? "Motiv" : "Motive"}`
+            : "Motive"}
         </CardTitle>
-        <CardDescription>Motive aus der Mediathek mit Format, Auflösung und Erstellungszeit.</CardDescription>
+        <CardDescription>Zuletzt erstellte Motive mit Format, Auflösung und Erstellungszeit.</CardDescription>
         <CardAction>
           <Button variant="outline" size="sm" onClick={onOpenMedia}>
             Zur Mediathek
@@ -467,15 +596,18 @@ function BrewAiAssetsOverview({
       </CardHeader>
 
       <CardContent className="pt-0">
+        {/* Suche und Filter erst, wenn es etwas zu durchsuchen gibt. */}
+        {mediaLoaded && !mediaError && media.length > 0 ? (
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Assets suchen…"
+            placeholder="Motive suchen…"
+            aria-label="Motive durchsuchen"
             className="max-w-sm"
           />
           <Select value={resolution} onValueChange={(v) => setResolution(v as typeof resolution)}>
-            <SelectTrigger size="sm" className="w-36">
+            <SelectTrigger size="sm" className="w-36" aria-label="Nach Auflösung filtern">
               <SelectValue placeholder="Auflösung" />
             </SelectTrigger>
             <SelectContent>
@@ -489,6 +621,7 @@ function BrewAiAssetsOverview({
             </SelectContent>
           </Select>
         </div>
+        ) : null}
 
         {!mediaLoaded ? (
           <div className="space-y-2">
@@ -505,12 +638,35 @@ function BrewAiAssetsOverview({
               </Button>
             ) : null}
           </div>
+        ) : media.length === 0 ? (
+          <div className="flex min-h-40 flex-col items-center justify-center gap-3 rounded-lg bg-muted/40 px-4 py-6 text-center">
+            <ImageIcon className="size-5 text-muted-foreground" aria-hidden />
+            <div className="space-y-1">
+              <p className="font-medium text-sm">Noch keine Motive</p>
+              <p className="text-muted-foreground text-sm">
+                Erstelle dein erstes Bild. Fertige Motive erscheinen hier und in der Mediathek.
+              </p>
+            </div>
+            {/* Outline: Die primäre Aktion steht oben in „Nächste Schritte“. */}
+            <Button asChild size="sm" variant="outline">
+              <Link href="/inhalte-erstellen" prefetch={false}>
+                Bild erstellen
+              </Link>
+            </Button>
+          </div>
         ) : rows.length === 0 ? (
-          <div className="flex h-40 flex-col items-center justify-center gap-2 rounded-lg bg-muted/40">
-            <ImageIcon className="size-5 text-muted-foreground" />
-            <p className="text-muted-foreground text-sm">
-              {media.length === 0 ? "Noch keine Assets vorhanden." : "Keine Assets passen zur Suche."}
-            </p>
+          <div className="flex h-40 flex-col items-center justify-center gap-3 rounded-lg bg-muted/40 px-4 text-center">
+            <p className="text-muted-foreground text-sm">Keine Motive passen zu Suche oder Filter.</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setQuery("");
+                setResolution("all");
+              }}
+            >
+              Filter zurücksetzen
+            </Button>
           </div>
         ) : (
           <div className="overflow-hidden">
@@ -518,8 +674,9 @@ function BrewAiAssetsOverview({
               <TableHeader className="[&_tr]:border-0">
                 <TableRow className="border-0 hover:bg-transparent">
                   <TableHead>Motiv</TableHead>
-                  <TableHead>Format</TableHead>
-                  <TableHead>Auflösung</TableHead>
+                  {/* Unter 640 px nur Motiv + Erstellt — sonst rutscht „Erstellt“ unsichtbar aus dem Bild. */}
+                  <TableHead className="hidden sm:table-cell">Format</TableHead>
+                  <TableHead className="hidden sm:table-cell">Auflösung</TableHead>
                   <TableHead className="text-right">Erstellt</TableHead>
                 </TableRow>
               </TableHeader>
@@ -536,16 +693,15 @@ function BrewAiAssetsOverview({
                             <ImageIcon className="size-4 text-muted-foreground" />
                           )}
                         </span>
-                        <div className="min-w-0">
-                          <div className="truncate font-medium text-sm leading-none">{mediaRowTitle(item)}</div>
-                          <div className="truncate text-muted-foreground text-xs leading-none">#{item.id.slice(0, 8)}</div>
+                        <div className="min-w-0 max-w-[11rem] truncate font-medium text-sm leading-none sm:max-w-xs">
+                          {mediaRowTitle(item)}
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <Badge variant="secondary">{item.aspectRatio}</Badge>
                     </TableCell>
-                    <TableCell>{item.resolution}</TableCell>
+                    <TableCell className="hidden sm:table-cell">{item.resolution}</TableCell>
                     <TableCell className="text-right text-muted-foreground text-sm">
                       {formatRelativeTime(item.createdAt)}
                     </TableCell>
@@ -572,12 +728,29 @@ export function AdminHomeView({
   brandProfileComplete,
   brandProfileMode,
   onOpenTab,
+  onOpenBrandSetup,
   onRetrySummary,
   onRetryMedia,
   initialTokenRange,
 }: AdminHomeViewProps) {
   return (
-    <div className="dash-rise-stack @container/main flex flex-col gap-4 md:gap-6">
+    <div className="@container/main flex flex-col gap-4 md:gap-6">
+      {/* Außerhalb von .dash-rise-stack: Die Karte erscheint erst nach dem Laden und darf die
+          nth-child-Staffelung (und damit die Einblendung) der Kennzahlen nicht neu auslösen. */}
+      <BrewAiNextSteps
+        summary={summary}
+        summaryLoaded={summaryLoaded}
+        summaryError={summaryError}
+        media={media}
+        mediaLoaded={mediaLoaded}
+        mediaError={mediaError}
+        settingsLoaded={settingsLoaded}
+        brandProfileComplete={brandProfileComplete}
+        brandProfileMode={brandProfileMode}
+        onOpenTab={onOpenTab}
+        onOpenBrandSetup={onOpenBrandSetup}
+      />
+      <div className="dash-rise-stack flex flex-col gap-4 md:gap-6">
       <BrewAiMetricCards
         summary={summary}
         summaryLoaded={summaryLoaded}
@@ -601,6 +774,7 @@ export function AdminHomeView({
         onRetryMedia={onRetryMedia}
         onOpenMedia={() => onOpenTab("media")}
       />
+      </div>
     </div>
   );
 }

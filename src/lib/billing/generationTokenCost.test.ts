@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { calculateGenerationTokenCost, calculatePerVariantTokenCost, calculateSeedanceVideoTokenCost, estimateStudioImageTokenCost, resolveImageBillingResolution } from "./generationTokenCost";
 
 describe("generationTokenCost", () => {
@@ -183,5 +183,29 @@ describe("generationTokenCost", () => {
         variantCount: 1,
       }),
     );
+  });
+});
+
+describe("Preisangaben Video passen zur Abrechnung", () => {
+  // Hermetisch: ein lokal gesetzter Pauschalpreis (KIE_SEEDANCE_TOKEN_COST) darf das Ergebnis nicht verfälschen.
+  beforeEach(() => vi.stubEnv("KIE_SEEDANCE_TOKEN_COST", ""));
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("Seedance 2.5 kostet im Standardfall 150, Seedance 2 100 Tokens", () => {
+    const base = { resolution: "720p" as const, duration: 5, generateAudio: true };
+    expect(calculateSeedanceVideoTokenCost({ ...base, modelId: "seedance-2" })).toBe(100);
+    expect(calculateSeedanceVideoTokenCost({ ...base, modelId: "seedance-2.5" })).toBe(150);
+  });
+
+  it("Hinweistext nennt beide tatsächlich berechneten Werte", async () => {
+    const { SEEDANCE_VIDEO_TOKEN_HINT } = await import("./planCatalog");
+    expect(SEEDANCE_VIDEO_TOKEN_HINT).toContain("Seedance 2 100 Tokens");
+    expect(SEEDANCE_VIDEO_TOKEN_HINT).toContain("Seedance 2.5 150 Tokens");
+  });
+
+  it("Tarifspanne rechnet die Untergrenze mit Seedance 2.5 (Start: 1.200 Tokens)", async () => {
+    const { formatPlanVideoEstimate } = await import("./generationTokenCost");
+    // 1200 / 360 (12 s, 2.5) = 3 · 1200 / 100 (5 s, Seedance 2) = 12
+    expect(formatPlanVideoEstimate(1200)).toBe("ca. 3–12 Videos");
   });
 });

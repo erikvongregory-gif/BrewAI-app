@@ -1,6 +1,16 @@
 import { getDashboardMetadata, type DashboardSettings } from "@/lib/dashboard/metadata";
+import {
+  BRAND_EVIDENCE_FIELDS,
+  EVIDENCE_STATUS,
+  isHardEvidence,
+  type BrandEvidenceField,
+  type EvidenceStatus,
+} from "@/lib/brand/brand-evidence-model";
 
 export type BrandProfileSource = "url" | "instagram" | "manual" | "skip";
+
+/** Belegstatus je Profilfeld (Scanner-Belegmodell bzw. „vom Nutzer bestätigt“). Altbestand: fehlt. */
+export type BrandFieldStatusMap = Partial<Record<BrandEvidenceField, EvidenceStatus>>;
 
 export type BrandProfile = {
   brandProfileMode: "undecided" | "guided" | "skip";
@@ -19,7 +29,26 @@ export type BrandProfile = {
   brandHeadlineFontName: string;
   brandFontFileUrl: string;
   brandFontWeight: string;
+  /**
+   * Optional: Belegstatus je Feld. Fehlt (Altbestand) → alle Felder wirken wie bisher.
+   * Vorhanden → nur `belegt`/`bestaetigt` sind harte Vorgaben, Rest nur weiche Hinweise.
+   */
+  brandFieldStatus?: BrandFieldStatusMap;
 };
+
+/** Tolerant: unbekannte Felder/Werte werden ignoriert, leere Karte → undefined. */
+export function parseBrandFieldStatus(value: unknown): BrandFieldStatusMap | undefined {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const raw = value as Record<string, unknown>;
+  const out: BrandFieldStatusMap = {};
+  for (const field of BRAND_EVIDENCE_FIELDS) {
+    const status = raw[field];
+    if (typeof status === "string" && (EVIDENCE_STATUS as readonly string[]).includes(status)) {
+      out[field] = status as EvidenceStatus;
+    }
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+}
 
 function asString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
@@ -51,7 +80,9 @@ function asBrandProfileSource(value: unknown): BrandProfileSource {
 export function getBrandProfileFromMetadata(userMetadata: unknown): BrandProfile {
   const dashboard = getDashboardMetadata(userMetadata);
   const settings = dashboard.settings as Record<string, unknown> | undefined;
+  const brandFieldStatus = parseBrandFieldStatus(settings?.brandFieldStatus);
   return {
+    ...(brandFieldStatus ? { brandFieldStatus } : {}),
     brandProfileMode: asBrandProfileMode(settings?.brandProfileMode),
     brandInstagramUrl: asString(settings?.brandInstagramUrl),
     brandWebsiteUrl: asString(settings?.brandWebsiteUrl),
@@ -154,6 +185,7 @@ export function buildGenericBrandProfilePatch(): Partial<DashboardSettings> {
     brandFontWeight: "700",
     brandLockLevel: "strict",
     brandAnalyzedAt: "",
+    brandFieldStatus: undefined,
   };
 }
 
@@ -169,14 +201,24 @@ export function buildGenericBrandProfilePatch(): Partial<DashboardSettings> {
 export function buildBrandProfilePromptContext(profile: BrandProfile): string {
   if (profile.brandProfileMode !== "guided") return "";
 
-  const facts = [
-    profile.breweryName ? `- Brand/Brewery: ${profile.breweryName}` : "",
-    profile.brandTone ? `- Brand tone & character: ${profile.brandTone}` : "",
-    profile.brandColors ? `- Brand color palette: ${profile.brandColors}` : "",
-    profile.brandDos ? `- Visual style, always: ${profile.brandDos}` : "",
-    profile.brandDonts ? `- Visual style, never: ${profile.brandDonts}` : "",
-  ].filter(Boolean);
-  if (facts.length === 0) return "";
+  const entries: Array<{ field: BrandEvidenceField; line: string }> = [
+    { field: "breweryName" as const, line: profile.breweryName ? `- Brand/Brewery: ${profile.breweryName}` : "" },
+    { field: "brandTone" as const, line: profile.brandTone ? `- Brand tone & character: ${profile.brandTone}` : "" },
+    { field: "brandColors" as const, line: profile.brandColors ? `- Brand color palette: ${profile.brandColors}` : "" },
+    { field: "brandDos" as const, line: profile.brandDos ? `- Visual style, always: ${profile.brandDos}` : "" },
+    { field: "brandDonts" as const, line: profile.brandDonts ? `- Visual style, never: ${profile.brandDonts}` : "" },
+  ].filter((entry) => entry.line);
+  if (entries.length === 0) return "";
+
+  // Belegmodell vorhanden: Unbestätigte KI-Schätzungen dürfen keine harten Vorgaben sein.
+  const status = profile.brandFieldStatus;
+  const isSoft = (field: BrandEvidenceField) => Boolean(status) && !isHardEvidence(status?.[field]);
+  const facts = entries.filter((entry) => !isSoft(entry.field)).map((entry) => entry.line);
+  const softFacts = entries.filter((entry) => isSoft(entry.field)).map((entry) => entry.line);
+  const softBlock = softFacts.length
+    ? ["Unconfirmed brand hints (soft inspiration only, never override the creative brief or the product references):", ...softFacts]
+    : [];
+  if (facts.length === 0) return softBlock.join("\n");
 
   const level = profile.brandLockLevel;
   const header =
@@ -190,9 +232,9 @@ export function buildBrandProfilePromptContext(profile: BrandProfile): string {
       ? "If the creative brief conflicts with this brand profile, the brand profile wins."
       : level === "balanced"
         ? "If the creative brief conflicts with this profile, keep brand tone and colors intact and follow the brief otherwise."
-        : profile.brandDonts
+        : profile.brandDonts && !isSoft("brandDonts")
           ? 'Only the "never" rules above are binding; adapt everything else freely to the brief.'
           : "Nothing here is strictly binding; the creative brief always wins.";
 
-  return [header, ...facts, conflictRule].join("\n");
+  return [header, ...facts, conflictRule, ...softBlock].join("\n");
 }

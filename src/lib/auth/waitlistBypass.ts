@@ -28,7 +28,7 @@ function encodeSignedPayload(payload: BypassPayload, secret: string) {
 function decodeSignedPayload(token: string | undefined | null, secret: string): BypassPayload | null {
   if (!token) return null;
   const [raw, signature] = token.split(".");
-  if (!raw || !signature || sign(raw, secret) !== signature) return null;
+  if (!raw || !signature || !tokensEqual(sign(raw, secret), signature)) return null;
   try {
     return JSON.parse(Buffer.from(raw, "base64url").toString("utf8")) as BypassPayload;
   } catch {

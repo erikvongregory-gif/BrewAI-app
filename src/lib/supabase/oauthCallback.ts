@@ -28,6 +28,7 @@ import {
   normalizeNextPath,
   secureCookieOptions,
 } from "@/lib/security/authResponses";
+import { nonceFromRequest } from "@/lib/security/contentSecurityPolicy";
 import { getOrCreateRequestId, logAuthEvent } from "@/lib/security/authObservability";
 import {
   buildPasswordRecoveryToken,
@@ -111,12 +112,14 @@ function sessionPollerResponse(
   postAuthNext: string,
   requestId: string,
   cookieSource?: NextResponse,
+  nonce?: string,
 ) {
   return createOAuthSessionPollerHtml(
     {
       successUrl: `${appOrigin}${postAuthNext}`,
       fallbackUrl: finishUrl(appOrigin, postAuthNext),
       requestId,
+      nonce,
     },
     cookieSource,
   );
@@ -230,6 +233,7 @@ async function redirectAfterOAuthSuccess(
       successUrl: `${appOrigin}${postAuthNext}`,
       fallbackUrl: finishUrl(appOrigin, postAuthNext),
       requestId,
+      nonce: nonceFromRequest(request),
     },
     redirectResponse,
   );
@@ -321,6 +325,7 @@ export async function handleAuthCallbackGet(request: Request) {
         targetUrl: `${appOrigin}${PASSWORD_RESET_NEXT}`,
         fallbackUrl: `${appOrigin}/passwort-vergessen?error=session`,
         requestId,
+        nonce: nonceFromRequest(request),
       });
     }
     return createNoStoreRedirect(`${appOrigin}/anmelden?error=auth`, requestId);
@@ -357,7 +362,7 @@ export async function handleAuthCallbackGet(request: Request) {
 
     const waitNext = resolvePostAuthNext(safeNext, false);
     const waitRedirect = createNoStoreRedirect(`${appOrigin}${waitNext}`, requestId);
-    return sessionPollerResponse(appOrigin, waitNext, requestId, waitRedirect);
+    return sessionPollerResponse(appOrigin, waitNext, requestId, waitRedirect, nonceFromRequest(request));
   }
 
   const provisionalNext = resolvePostAuthNext(safeNext, false);

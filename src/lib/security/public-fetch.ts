@@ -6,7 +6,11 @@ import { request as httpsRequest } from "node:https";
 const blockedIpv6 = new BlockList();
 blockedIpv6.addSubnet("::", 128, "ipv6");
 blockedIpv6.addSubnet("::1", 128, "ipv6");
+// IPv4-kompatible Adressen (veraltet, z. B. ::127.0.0.1) betten IPv4 ein – fail closed.
+blockedIpv6.addSubnet("::", 96, "ipv6");
 blockedIpv6.addSubnet("::ffff:0:0", 96, "ipv6");
+// IPv4/IPv6-Übersetzung (NAT64, RFC 6052): 64:ff9b::a9fe:a9fe erreicht über ein NAT64-Gateway 169.254.169.254.
+blockedIpv6.addSubnet("64:ff9b::", 96, "ipv6");
 blockedIpv6.addSubnet("64:ff9b:1::", 48, "ipv6");
 blockedIpv6.addSubnet("100::", 64, "ipv6");
 blockedIpv6.addSubnet("2001::", 23, "ipv6");
@@ -15,6 +19,8 @@ blockedIpv6.addSubnet("2002::", 16, "ipv6");
 blockedIpv6.addSubnet("3fff::", 20, "ipv6");
 blockedIpv6.addSubnet("fc00::", 7, "ipv6");
 blockedIpv6.addSubnet("fe80::", 10, "ipv6");
+// Site-local (veraltet, RFC 3879) – manche Stacks routen es weiterhin intern.
+blockedIpv6.addSubnet("fec0::", 10, "ipv6");
 blockedIpv6.addSubnet("ff00::", 8, "ipv6");
 
 /** Only globally routable addresses; IPv4-mapped and special IPv6 ranges fail closed. */
