@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
   persist: vi.fn(),
   automaticLooks: vi.fn(() => { throw new Error("V3 must not load automatic style images"); }),
   labelWords: vi.fn<() => Promise<string[]>>(),
+  labelCheck: vi.fn(async (_image: Buffer, _expected: string[]) => ({ status: "drift", missing: ["DUNKEL"] })),
   watermark: vi.fn(async (buffer: Buffer) => buffer),
 }));
 
@@ -34,7 +35,7 @@ vi.mock("@/lib/billing/generationJobs", () => ({
   getGenerationJobForUser: async () => ({ id: "job", user_id: "user", result: {} }),
 }));
 vi.mock("@/lib/openai/imageApiKey", () => ({ requireOpenAiImageApiKey: () => "test-key" }));
-vi.mock("@/lib/brand/label-text", () => ({ readLabelText: mocks.labelWords }));
+vi.mock("@/lib/brand/label-text", () => ({ readLabelText: mocks.labelWords, checkGeneratedLabel: mocks.labelCheck }));
 vi.mock("@/lib/brand/reference-image-bytes", () => ({
   resolveReferenceImageForVision: async (raw: string) => ({ mime: "image/png", base64: raw.slice(-8) }),
 }));
@@ -156,6 +157,9 @@ describe("studio generation contract", () => {
     expect(response.status).toBe(202);
     const request = mocks.render.mock.calls[0][0];
     expect(request.prompt).toContain("SELECTED BEER IN EVERY GLASS: dunkel");
+    expect(request.prompt).toContain("LABEL LOCK: Reproduce the label of Image 1");
+    // Die bezahlte Nachkontrolle läuft nur mit LABEL_FIDELITY_CHECK=log.
+    expect(mocks.labelCheck).not.toHaveBeenCalled();
     expect(request.prompt).toContain("Image 2: selected beer color swatch only");
     expect(request.prompt).toContain("Candid snapshot photography");
     expect(request.referenceImages).toHaveLength(2);
@@ -165,6 +169,22 @@ describe("studio generation contract", () => {
     expect(request.referenceImages[1].mime).toBe("image/png");
     // KI-Label ist Pflicht: auch ein altes Client-Flag aiWatermark:false schaltet es nicht ab.
     expect(mocks.watermark).toHaveBeenCalled();
+  });
+  it("logs label drift of the finished image when LABEL_FIDELITY_CHECK=log, without rejecting it", async () => {
+    vi.stubEnv("LABEL_FIDELITY_CHECK", "log");
+    const info = vi.spyOn(console, "info").mockImplementation(() => {});
+    mocks.labelWords.mockResolvedValue(["ABK", "DUNKEL"]);
+    const response = await product(new Request("https://app.example/api/inhalte-erstellen/create-task", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...characterPayload, characterName: undefined, characterReferenceImages: [], extraReferenceImages: [], behaelter: "F" }),
+    }));
+    expect(response.status).toBe(202);
+    expect(mocks.labelCheck).toHaveBeenCalledWith(expect.any(Buffer), ["ABK", "DUNKEL"]);
+    expect(info).toHaveBeenCalledWith("[label-fidelity]", expect.objectContaining({ status: "drift", missing: ["DUNKEL"] }));
+    expect(mocks.persist).toHaveBeenCalled();
+    info.mockRestore();
+    vi.unstubAllEnvs();
   });
   it.each([
     ["product", product, "reportage", "Candid snapshot photography"],

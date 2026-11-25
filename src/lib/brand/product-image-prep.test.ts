@@ -30,6 +30,15 @@ describe("prepareProductImage", () => {
     expect(await pixel(prepared!.buffer, 2, 2)).toEqual([255, 255, 255]);
   });
 
+  it("behält bis 2048 px Kantenlänge, damit Kleingedrucktes lesbar bleibt", async () => {
+    const noise = Buffer.alloc(2400 * 600 * 3);
+    for (let i = 0; i < noise.length; i++) noise[i] = (i * 7919) % 251;
+    const photo = await sharp(noise, { raw: { width: 600, height: 2400, channels: 3 } }).jpeg().toBuffer();
+    const prepared = await prepareProductImage(photo);
+    expect(prepared?.height).toBe(2048);
+    expect(prepared?.width).toBe(512);
+  });
+
   it("legt transparente PNGs auf Weiß statt Schwarz", async () => {
     const prepared = await prepareProductImage(await bottleOn({ r: 0, g: 0, b: 0, alpha: 0 }));
     expect(prepared?.cutout).toBe(true);

@@ -122,7 +122,7 @@ function referencesDirection(args: ImagePromptV3Args): string {
   const locked = (args.input.etikettModus ?? "marke") === "marke" && args.input.stiltreue !== "frei";
   const rules = args.references.map(({ index, role }) => {
     const purpose = {
-      product: locked ? "product artwork, logo, label typography and material identity only; discard its setting, people and lighting" : "product material only; label design may change",
+      product: locked ? "the real product; its label is finished printed artwork to carry over unchanged, together with logo and material identity. Discard only its setting, people and lighting" : "product material only; label design may change",
       shape: "container silhouette and proportions only",
       glass: "glass silhouette and proportions only; ignore any beer color, liquid or foam shown",
       liquid: "selected beer color swatch only; match this brown/gold/black liquid family in every poured glass under the scene lighting. It supplies no people, wardrobe, vessel, setting or photographic style",
@@ -133,6 +133,9 @@ function referencesDirection(args: ImagePromptV3Args): string {
     return `Image ${index}: ${purpose}.`;
   });
   if (locked && args.breweryName?.trim()) rules.push(`Product brand: "${args.breweryName.trim()}".`);
+  const product = args.references.find((ref) => ref.role === "product");
+  // Der Prompt kann die Treue nur erhöhen, nicht garantieren: das Modell zeichnet das Etikett neu.
+  if (locked && product) rules.push(`LABEL LOCK: Reproduce the label of Image ${product.index} as printed, line for line: same wording, same typeface and letter shapes, same layout, colors and logo. Do not retype, translate, correct, shorten, restyle or re-letter it, and add no words, medals or badges it does not show. Small print keeps its position and original wording; where the camera distance makes it too small to resolve, let it soften optically instead of inventing new legible text. Only perspective, wrap around the container, scene lighting and natural occlusion may differ from the reference.`);
   if (locked && args.labelText?.length) rules.push(`Exact label words: ${args.labelText.map((text) => JSON.stringify(text)).join(", ")}. Preserve spelling on the curved product surface.`);
   if (!locked) rules.push("Create original product artwork, without copying unrelated trademarks.");
   if (args.character?.appearanceLock) rules.push(args.character.appearanceLock);

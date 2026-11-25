@@ -392,7 +392,8 @@ export function BeerCreatePanel({
       if (file.size > 12 * 1024 * 1024) {
         throw new Error("Datei zu groß — bitte unter 12 MB.");
       }
-      const dataUrl = await readAndCompressImage(file);
+      // Produktfoto ist die Etikett-Referenz: 2048 px, damit Kleingedrucktes lesbar bleibt.
+      const dataUrl = await readAndCompressImage(file, 2048);
       setEtikettDataUrl(dataUrl);
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Upload fehlgeschlagen.");

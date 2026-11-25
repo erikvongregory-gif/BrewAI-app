@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import Anthropic from "@anthropic-ai/sdk";
+import sharp from "sharp";
 import { createAnthropicMessageWithModelFallback } from "@/lib/anthropic/modelCandidates";
 import type { OpenAiReferenceImage } from "@/lib/openai/generateImage";
 
@@ -35,6 +36,37 @@ export function parseLabelTextResponse(raw: string): string[] {
     if (words.length >= MAX_WORDS) break;
   }
   return words;
+}
+
+/** Erwartete Wörter, die im gelesenen Text fehlen (ohne Groß/Klein, Leer- und Satzzeichen). */
+export function missingLabelWords(expected: string[], found: string[]): string[] {
+  const norm = (text: string) => text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
+  const haystack = found.map(norm).join(" ");
+  return expected.filter((word) => !haystack.includes(norm(word)));
+}
+
+export type LabelCheck = { status: "ok" | "drift" | "unreadable"; missing: string[] };
+
+/**
+ * Nachkontrolle am fertigen Bild: stehen die großen Etikett-Wörter der Referenz noch drauf?
+ * Ein bezahlter Vision-Aufruf je Bild, deshalb nur per LABEL_FIDELITY_CHECK=log aktiv.
+ * shortcut: prüft nur die bis zu vier großen Wörter, weder Kleingedrucktes noch Schriftart;
+ * für eine harte Garantie das Original-Etikett aufs Bild montieren statt nachzulesen.
+ */
+export async function checkGeneratedLabel(
+  image: Buffer,
+  expected: string[],
+  read: typeof readLabelText = readLabelText,
+): Promise<LabelCheck> {
+  // Claude Vision skaliert ohnehin auf 1568 px; 4K-PNGs lägen über dem Upload-Limit.
+  const jpeg = await sharp(image)
+    .resize(1568, 1568, { fit: "inside", withoutEnlargement: true })
+    .jpeg({ quality: 90 })
+    .toBuffer();
+  const found = await read({ base64: jpeg.toString("base64"), mime: "image/jpeg" });
+  if (!found.length) return { status: "unreadable", missing: expected };
+  const missing = missingLabelWords(expected, found);
+  return { status: missing.length ? "drift" : "ok", missing };
 }
 
 export async function readLabelText(image: OpenAiReferenceImage): Promise<string[]> {

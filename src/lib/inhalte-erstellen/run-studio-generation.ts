@@ -2,7 +2,7 @@ import { after, NextResponse } from "next/server";
 import { requireImageGenerationUser } from "@/app/(dashboard)/inhalte-erstellen/lib/api-guards";
 import { hyperrealisticSchema, socialPostSchema, type HyperrealisticInput, type SocialPostInput } from "@/app/(dashboard)/inhalte-erstellen/lib/schemas";
 import { resolveReferenceImageForVision } from "@/lib/brand/reference-image-bytes";
-import { readLabelText } from "@/lib/brand/label-text";
+import { checkGeneratedLabel, readLabelText } from "@/lib/brand/label-text";
 import {
   canUseCampaignWithTextProfile,
   getBrandProfileFromMetadata,
@@ -99,6 +99,8 @@ type PreparedGeneration = {
   input: StudioInput;
   snapshot: GenerationSnapshot;
   prompt: string;
+  /** Große Etikett-Wörter der Referenz (leer ohne Marken-Etikett). */
+  labelWords: string[];
   referenceImages: OpenAiReferenceImage[];
   /** Product and explicit customer references for each variant. */
   referenceSets: OpenAiReferenceImage[][];
@@ -472,6 +474,7 @@ async function prepareStudioGeneration(args: {
     input,
     snapshot,
     prompt,
+    labelWords: labelText,
     referenceImages: assembled.references,
     referenceSets,
     useCharacterIdentity,
@@ -583,6 +586,12 @@ async function executeStudioGeneration(args: {
           OUTPUT_FORMAT,
           prepared.billingResolution,
         );
+
+    // Nur Messung (Log), kein Verwerfen: zeigt, wie oft das Etikett driftet.
+    if (process.env.LABEL_FIDELITY_CHECK === "log" && prepared.labelWords.length) {
+      const check = await checkGeneratedLabel(cropped, prepared.labelWords).catch(() => null);
+      if (check) console.info("[label-fidelity]", { jobId: job.id, variant, ...check });
+    }
 
     if (mode === "social" && prepared.headline) {
       const backgroundUrl = await uploadGeneratedImageToStorage({

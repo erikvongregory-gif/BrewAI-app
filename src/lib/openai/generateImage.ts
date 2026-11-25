@@ -53,6 +53,17 @@ export function resolveOpenAiImageTimeoutMs(raw = process.env.OPENAI_IMAGE_TIMEO
   return Math.min(parsed, 290_000);
 }
 
+/**
+ * `input_fidelity` der Edits-API (SDK-Typ: nur "high" | "low", Standard "low").
+ * Nur auf ausdrücklichen Wunsch per OPENAI_IMAGE_INPUT_FIDELITY: ob das eingestellte
+ * Modell den Parameter annimmt, ist ohne bezahlten Aufruf nicht geprüft, und ein
+ * abgelehnter Parameter wäre ein 400 für jede Generierung.
+ */
+export function resolveOpenAiInputFidelity(raw = process.env.OPENAI_IMAGE_INPUT_FIDELITY): "high" | "low" | null {
+  const value = raw?.trim().toLowerCase();
+  return value === "high" || value === "low" ? value : null;
+}
+
 export type OpenAiImageUsage = {
   inputTokens: number | null;
   outputTokens: number | null;
@@ -163,6 +174,7 @@ export async function generateOpenAiImage(args: {
   const { apiKey, model, prompt, size, outputFormat, quality, referenceImage, referenceImages } = args;
   const outputFmt = outputFormat === "jpg" ? "jpeg" : "png";
 
+  const inputFidelity = resolveOpenAiInputFidelity();
   const refs = (referenceImages ?? []).filter(Boolean);
   if (referenceImage) refs.unshift(referenceImage);
 
@@ -182,6 +194,7 @@ export async function generateOpenAiImage(args: {
         form.append("size", size);
         form.append("output_format", outputFmt);
         if (quality) form.append("quality", quality);
+        if (inputFidelity) form.append("input_fidelity", inputFidelity);
         res = await fetch("https://api.openai.com/v1/images/edits", {
           method: "POST",
           headers: { Authorization: `Bearer ${apiKey}` },
