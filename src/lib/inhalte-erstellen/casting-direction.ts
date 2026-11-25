@@ -1,6 +1,5 @@
 import { randomInt } from "node:crypto";
 import type { ImagePromptV3Args } from "./image-prompt-v3";
-import { resolvePhotoStyle } from "@/app/(dashboard)/inhalte-erstellen/lib/prompt-builders/hyperrealism-blocks";
 
 const FEATURES = [
   "a broad oval face with straight eyebrows",
@@ -13,7 +12,6 @@ const FEATURES = [
 
 /** Vary anonymous casting on each request, never a deliberately selected character. */
 export function buildCastingDirection(args: ImagePromptV3Args): string {
-  if (resolvePhotoStyle(args.input) === "premium") return "";
   if (args.references.some((reference) => reference.role === "character") || args.character?.appearanceLock) return "";
   const scene = args.input.zusatzWunsch || "";
   const hasPeople = (args.input.personenModus ?? (args.input.personImBild ? "D" : "A")) !== "A" ||

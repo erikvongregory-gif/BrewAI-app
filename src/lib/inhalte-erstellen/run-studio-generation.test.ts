@@ -160,6 +160,9 @@ describe("studio generation contract", () => {
     expect(request.prompt).toContain("Image 2: selected beer color swatch only");
     expect(request.prompt).toContain("Candid snapshot photography");
     expect(request.referenceImages).toHaveLength(2);
+    // Casting-Vorgabe hängt am Live-Prompt: neue Gesichter und klar erwachsen.
+    expect(request.prompt).toContain("New faces");
+    expect(request.prompt).toContain("well over 18");
     expect(request.referenceImages[1].mime).toBe("image/png");
     // Ohne sichtbares KI-Label bekommt jedes Bild trotzdem die maschinenlesbare Kennzeichnung.
     expect(mocks.provenance).toHaveBeenCalled();
