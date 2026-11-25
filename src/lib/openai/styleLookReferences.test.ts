@@ -17,7 +17,6 @@ const baseInput: HyperrealisticInput = {
   aspectRatio: "4:5",
   quality: "medium",
   variantCount: 1,
-  aiWatermark: false,
 };
 
 describe("style look library", () => {

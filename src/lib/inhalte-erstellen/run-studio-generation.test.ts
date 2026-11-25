@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
   persist: vi.fn(),
   automaticLooks: vi.fn(() => { throw new Error("V3 must not load automatic style images"); }),
   labelWords: vi.fn<() => Promise<string[]>>(),
-  provenance: vi.fn(async (buffer: Buffer) => buffer),
+  watermark: vi.fn(async (buffer: Buffer) => buffer),
 }));
 
 vi.mock("@/app/(dashboard)/inhalte-erstellen/lib/api-guards", () => ({
@@ -69,8 +69,7 @@ vi.mock("@/lib/openai/generateImage", () => ({
   cropImageBufferToAspectRatio: async (buffer: Buffer) => buffer,
 }));
 vi.mock("@/lib/openai/aiWatermark", () => ({
-  applyAiWatermark: async (buffer: Buffer) => buffer,
-  applyAiProvenanceMetadata: mocks.provenance,
+  applyAiWatermark: mocks.watermark,
 }));
 vi.mock("@/lib/supabase/storage", () => ({
   uploadGeneratedImageToStorage: async () => "https://cdn.example/out.png",
@@ -152,7 +151,7 @@ describe("studio generation contract", () => {
     const response = await product(new Request("https://app.example/api/inhalte-erstellen/create-task", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...characterPayload, characterName: undefined, characterReferenceImages: [], extraReferenceImages: [], photoStyle: "reportage", behaelter: "B", bierstil: "helles", glasTyp: "willibecher", zusatzWunsch: "Zwei Freunde stoßen mit Gläsern an" }),
+      body: JSON.stringify({ ...characterPayload, characterName: undefined, characterReferenceImages: [], extraReferenceImages: [], photoStyle: "reportage", behaelter: "B", bierstil: "helles", glasTyp: "willibecher", zusatzWunsch: "Zwei Freunde stoßen mit Gläsern an", aiWatermark: false }),
     }));
     expect(response.status).toBe(202);
     const request = mocks.render.mock.calls[0][0];
@@ -161,8 +160,8 @@ describe("studio generation contract", () => {
     expect(request.prompt).toContain("Candid snapshot photography");
     expect(request.referenceImages).toHaveLength(2);
     expect(request.referenceImages[1].mime).toBe("image/png");
-    // Ohne sichtbares KI-Label bekommt jedes Bild trotzdem die maschinenlesbare Kennzeichnung.
-    expect(mocks.provenance).toHaveBeenCalled();
+    // KI-Label ist Pflicht: auch ein altes Client-Flag aiWatermark:false schaltet es nicht ab.
+    expect(mocks.watermark).toHaveBeenCalled();
   });
   it.each([
     ["product", product, "reportage", "Candid snapshot photography"],

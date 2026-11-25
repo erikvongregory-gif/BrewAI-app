@@ -10,7 +10,7 @@ import {
 } from "./index";
 
 const baseInput = {
-  aiWatermark: false, etikettBild: "https://example.com/etikett.png",
+  etikettBild: "https://example.com/etikett.png",
   flaschenTyp: "nrw_500" as const,
   flaschenfarbe: "braun" as const,
   bierstil: "helles",

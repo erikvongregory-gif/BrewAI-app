@@ -27,7 +27,6 @@ import { hyperrealisticSchema, socialPostSchema } from "@/app/(dashboard)/inhalt
 import type { SocialPostInput } from "@/app/(dashboard)/inhalte-erstellen/lib/schemas";
 import { hasUsableBeerEtikett, MAX_MY_BEERS, type DashboardBeer } from "@/lib/dashboard/metadata";
 import { readAndCompressImage, splitDataUrl } from "@/lib/images/compress-image";
-import { StudioUiSwitch } from "@/components/studio/ui/switch";
 import { ImageGeneration } from "@/components/ui/ai-chat-image-generation-1";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { aspectRatioToOutputDimensions } from "@/lib/openai/imageAspectRatio";
@@ -144,7 +143,6 @@ export function InhalteErstellenStudio({
   const [aspectRatio, setAspectRatio] = useState<Aspect>("4:5");
   const [variantCount, setVariantCount] = useState<VariantCount>(1);
   const [requestQuality, setRequestQuality] = useState<"medium" | "high" | "ultra">("medium");
-  const [aiWatermark, setAiWatermark] = useState(false);
   const [photoStyle, setPhotoStyle] = useState<PhotoStyle>("reportage");
 
   const [was, setWas] = useState(BEER_STYLE_OPTIONS[0]);
@@ -720,7 +718,6 @@ export function InhalteErstellenStudio({
         aspectRatio,
         quality: studioRequestQuality,
         variantCount,
-        aiWatermark,
         headline: headline.trim(),
         subline: subline.trim() || undefined,
         ctaText: ctaText.trim() || undefined,
@@ -900,7 +897,6 @@ export function InhalteErstellenStudio({
         aspectRatio,
         quality: studioRequestQuality,
         variantCount,
-        aiWatermark,
       };
       const parsedResult = hyperrealisticSchema.safeParse(payload);
       if (!parsedResult.success) {
@@ -1819,17 +1815,6 @@ export function InhalteErstellenStudio({
             </div>
           </div>
 
-          <div className="studio-create-field studio-create-field--switch">
-            <StudioUiSwitch
-              checked={aiWatermark}
-              onCheckedChange={setAiWatermark}
-              label="AI-Kennzeichnung"
-            />
-            <span className="studio-create-field__hint">
-              Dezentes „AI“-Label unten rechts — erkennbar für veröffentlichte Inhalte (EU AI Act, Art. 50).
-            </span>
-          </div>
-
           <div className="studio-create-summary">
             <div>
               {variantCount} Variante{variantCount === 1 ? "" : "n"}
@@ -1837,7 +1822,7 @@ export function InhalteErstellenStudio({
             <div>
               Format {aspectRatio} · Markenprofil {etikettModus === "marke" ? "aktiv" : "frei"}
               {` · ${PHOTO_STYLE_OPTIONS.find((option) => option.id === photoStyle)?.label ?? "Reportage"}`}
-              {aiWatermark ? " · AI-Label" : ""}
+              {" · AI-Label"}
             </div>
             <div className="studio-create-summary__cost">
               Geschätzter Verbrauch: <strong>{formatDeNumber(generationTokenCost)} Tokens</strong>

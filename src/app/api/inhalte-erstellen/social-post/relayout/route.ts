@@ -6,6 +6,7 @@ import { composeSocialTextOverlay, parsePrimaryBrandColor } from "@/lib/social/t
 import { getBrandProfileFromMetadata } from "@/lib/dashboard/brandProfile";
 import { publicFetch } from "@/lib/security/public-fetch";
 import { uploadGeneratedImageWithThumb } from "@/lib/supabase/storage";
+import { applyAiWatermark } from "@/lib/openai/aiWatermark";
 import { persistGeneratedMediaItems } from "@/lib/dashboard/persistGeneratedMedia";
 import { hydratePrivateAssets } from "@/lib/supabase/privateAssets";
 import { aspectRatioToOutputDimensions } from "@/lib/openai/imageAspectRatio";
@@ -75,7 +76,7 @@ export async function POST(req: Request) {
     });
     const uploaded = await uploadGeneratedImageWithThumb({
       userId: guard.userId,
-      buffer: composited,
+      buffer: await applyAiWatermark(composited, "png"),
       outputFormat: "png",
     });
     images.push(uploaded.imageUrl);
