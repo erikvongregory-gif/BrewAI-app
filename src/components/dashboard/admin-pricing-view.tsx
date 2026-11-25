@@ -30,12 +30,13 @@ function visiblePlanFeatures(features: string[]): string[] {
     .map((feature) => feature.replace(/\s*·\s*ca\.[^·]*Videos?\s*$/i, "").trim());
 }
 
+/** Kurzes Einblenden ohne blur(): Filter kosten auf großen Karten Repaints; Staffelung halbiert. */
 function reveal(reduced: boolean | null, delay: number) {
   return {
-    initial: reduced ? false as const : { opacity: 0, y: -20, filter: "blur(10px)" },
-    whileInView: { opacity: 1, y: 0, filter: "blur(0px)" },
+    initial: reduced ? false as const : { opacity: 0, y: -8 },
+    whileInView: { opacity: 1, y: 0 },
     viewport: { once: true, amount: 0.1 },
-    transition: { duration: reduced ? 0 : 0.5, delay: reduced ? 0 : delay },
+    transition: { duration: reduced ? 0 : 0.25, delay: reduced ? 0 : delay / 2 },
   };
 }
 
@@ -217,7 +218,7 @@ export function AdminPricingView({
                 <motion.span
                   initial={reducedMotion ? false : { y: "-100%" }}
                   animate={{ y: 0 }}
-                  transition={reducedMotion ? { duration: 0 } : { type: "spring", stiffness: 250, damping: 40, delay: index * 0.15 }}
+                  transition={reducedMotion ? { duration: 0 } : { type: "spring", stiffness: 400, damping: 40, delay: index * 0.05 }}
                 >{word}{index < 2 ? "\u00a0" : ""}</motion.span>
               </span>
             ))}

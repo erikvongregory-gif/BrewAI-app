@@ -21,7 +21,7 @@ function easeOut(t: number) {
  * Schreibt direkt in Reacts eigenen Textknoten (nodeValue) — kein Re-Render pro Frame,
  * kein Konflikt mit React-Updates. Erstes HTML zeigt den Endwert (SSR ohne JS korrekt).
  */
-export function CountUp({ value, format, duration = 0.9, delay = 0, className }: CountUpProps) {
+export function CountUp({ value, format, duration = 0.5, delay = 0, className }: CountUpProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const shown = useRef<number | null>(null);
   const formatRef = useRef(format);
@@ -48,7 +48,7 @@ export function CountUp({ value, format, duration = 0.9, delay = 0, className }:
       return;
     }
 
-    const ms = (first ? duration : 0.6) * 1000;
+    const ms = (first ? duration : 0.35) * 1000;
     const wait = (first ? delay : 0) * 1000;
     let raf = 0;
     let start: number | null = null;
