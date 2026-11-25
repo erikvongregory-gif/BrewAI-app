@@ -87,7 +87,7 @@ export default async function DashboardPage({
     redirect(qs ? `/anmelden?${qs}` : "/anmelden");
   }
 
-  const resourceUser = await workspaceResourceUser(user);
+  const resourceUser = await workspaceResourceUser(user, false, { hydrate: false });
   const onboardingState = sanitizeStudioOnboardingState(
     getDashboardMetadata(resourceUser.user_metadata).onboarding,
   );

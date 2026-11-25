@@ -7,8 +7,6 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { isOwnerUser } from "@/lib/auth/owner";
 import { hasPaidSubscription, paidPlanFromBilling } from "@/lib/billing/access";
 import { buildOwnerBillingRow, ensureBillingRow, getBillingRow } from "@/lib/billing/store";
-import { getDashboardMetadata } from "@/lib/dashboard/metadata";
-import { readDashboardMedia } from "@/lib/dashboard/media-store";
 import { loadGenerationUsageStats } from "@/lib/dashboard/generationUsage";
 
 export async function GET() {
@@ -21,91 +19,64 @@ export async function GET() {
   } = await supabase.auth.getUser();
 
   if (user && !(await hasPassedTwoFactor(user))) return NextResponse.json({ error: "Zwei-Faktor-Prüfung erforderlich.", code: "two_factor_required" }, { status: 403 });
-  if (user) { try { user = await workspaceResourceUser(user, false); } catch { return NextResponse.json({error:"Teamzugriff nicht erlaubt."},{status:403}); } }
+  if (user) { try { user = await workspaceResourceUser(user, false, { hydrate: false }); } catch { return NextResponse.json({error:"Teamzugriff nicht erlaubt."},{status:403}); } }
   if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
+  const userId = user.id;
 
-  let billing = null as Awaited<ReturnType<typeof getBillingRow>>;
-  let degradedBilling = false;
   const isOwner = isOwnerUser(user);
-  try {
-    if (isOwner) {
-      billing = buildOwnerBillingRow(user.id);
-    } else {
-      await ensureBillingRow(user.id);
-      billing = await getBillingRow(user.id);
-    }
-  } catch (error) {
-    degradedBilling = true;
-    console.error("dashboard.summary: billing fallback aktiv", error);
-  }
-  const dashboard = getDashboardMetadata(user.user_metadata);
-  const media = await readDashboardMedia(user.id, { limit: 6 }).catch(() => dashboard.mediaLibrary ?? []);
   const client = createAdminClient();
-  const activeMembers = await client.from("workspace_members").select("user_id").eq("owner_id",user.id);
-  const pendingInvites = await client.from("workspace_invites").select("id").eq("owner_id",user.id).gt("expires_at",new Date().toISOString());
-  if(activeMembers.error || pendingInvites.error)return NextResponse.json({error:"Teamdaten konnten nicht geladen werden."},{status:503});
+
+  // Alle Abfragen sind voneinander unabhängig — parallel statt ~10 Roundtrips hintereinander.
+  const billingTask = (async () => {
+    if (isOwner) return { billing: buildOwnerBillingRow(userId), degradedBilling: false };
+    try {
+      await ensureBillingRow(userId);
+      return { billing: await getBillingRow(userId), degradedBilling: false };
+    } catch (error) {
+      console.error("dashboard.summary: billing fallback aktiv", error);
+      return { billing: null, degradedBilling: true };
+    }
+  })();
+
+  const [{ billing, degradedBilling }, activeMembers, pendingInvites, usage, chargesCount] = await Promise.all([
+    billingTask,
+    client.from("workspace_members").select("user_id").eq("owner_id", userId),
+    client.from("workspace_invites").select("id").eq("owner_id", userId).gt("expires_at", new Date().toISOString()),
+    // Verbrauchsstatistik aus generation_jobs — überlebt Mediathek-Löschen (paginiert, kein Media-Fallback)
+    loadGenerationUsageStats({
+      countCompletedSince: async (iso) => {
+        const result = await client
+          .from("generation_jobs")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .eq("status", "completed")
+          .gte("created_at", iso);
+        return { count: result.count ?? null, error: result.error };
+      },
+      listCompletedPage: async (cutoffIso, from, to) => {
+        const result = await client
+          .from("generation_jobs")
+          .select("created_at,charged,result")
+          .eq("user_id", userId)
+          .eq("status", "completed")
+          .gte("created_at", cutoffIso)
+          .order("created_at", { ascending: true })
+          .range(from, to);
+        return { data: result.data ?? null, error: result.error };
+      },
+    }),
+    client
+      .from("generation_jobs")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("status", "completed"),
+  ]);
+
+  if (activeMembers.error || pendingInvites.error) return NextResponse.json({ error: "Teamdaten konnten nicht geladen werden." }, { status: 503 });
   const activeMemberCount = 1 + (activeMembers.data ?? []).length;
   const invitedCount = (pendingInvites.data ?? []).length;
-
-  const sortedMedia = media.slice().sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
-  const mediaActivities = sortedMedia.slice(0, 6).map((item) => ({
-    id: item.id,
-    type: "media" as const,
-    title: "Bild generiert",
-    desc: item.prompt.slice(0, 80),
-    time: item.createdAt,
-    color: "blue" as const,
-  }));
-
-  // Verbrauchsstatistik aus generation_jobs — überlebt Mediathek-Löschen (paginiert, kein Media-Fallback)
-  const usage = await loadGenerationUsageStats({
-    countCompletedSince: async (iso) => {
-      const result = await client
-        .from("generation_jobs")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .eq("status", "completed")
-        .gte("created_at", iso);
-      return { count: result.count ?? null, error: result.error };
-    },
-    listCompletedPage: async (cutoffIso, from, to) => {
-      const result = await client
-        .from("generation_jobs")
-        .select("created_at,charged,result")
-        .eq("user_id", user.id)
-        .eq("status", "completed")
-        .gte("created_at", cutoffIso)
-        .order("created_at", { ascending: true })
-        .range(from, to);
-      return { data: result.data ?? null, error: result.error };
-    },
-  });
   const { postsThisMonth, tokenUsageByDay, degradedUsage } = usage;
-
-  const chargesCount = await client
-    .from("generation_jobs")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", user.id)
-    .eq("status", "completed");
   const chargesTotal = chargesCount.error ? undefined : (chargesCount.count ?? 0);
-
-  const activities = [
-    ...mediaActivities,
-    ...(invitedCount > 0
-      ? [
-          {
-            id: "team-invite",
-            type: "team" as const,
-            title: "Teameinladungen offen",
-            desc: `${invitedCount} Einladung(en) warten auf Annahme`,
-            time: new Date().toISOString(),
-            color: "purple" as const,
-          },
-        ]
-      : []),
-  ]
-    .sort((a, b) => +new Date(b.time) - +new Date(a.time))
-    .slice(0, 8);
 
   return NextResponse.json({
     summary: {
@@ -132,6 +103,5 @@ export async function GET() {
       degradedUsage,
       tokenUsageByDay,
     },
-    activities,
   });
 }

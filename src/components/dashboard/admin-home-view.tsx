@@ -1,15 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
-import { format, parseISO } from "date-fns";
-import { de } from "date-fns/locale";
-import {
-  Area,
-  CartesianGrid,
-  ComposedChart,
-  XAxis,
-} from "recharts";
 import { motion } from "framer-motion";
 import {
   Coins,
@@ -29,14 +22,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  type ChartConfig,
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -100,12 +85,10 @@ export type AdminHomeViewProps = {
   initialTokenRange?: TokenRangeKey;
 };
 
-const chartConfig = {
-  tokens: {
-    label: "Tokens",
-    color: "var(--chart-1)",
-  },
-} satisfies ChartConfig;
+const TokenActivityChart = dynamic(() => import("./token-activity-chart"), {
+  ssr: false,
+  loading: () => <Skeleton className="h-80 w-full rounded-lg" />,
+});
 
 function MetricCardSkeleton() {
   return (
@@ -273,7 +256,7 @@ function TokenMeter({ pct }: { pct: number }) {
         className={clamped < 15 ? "h-full origin-left rounded-full bg-destructive" : "h-full origin-left rounded-full bg-primary"}
         initial={{ scaleX: 0 }}
         animate={{ scaleX: clamped / 100 }}
-        transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       />
     </div>
   );
@@ -381,7 +364,7 @@ function BrewAiMetricCards({
               {summary?.postsThisMonth == null ? (
                 "—"
               ) : (
-                <CountUp value={summary.postsThisMonth} format={formatDeNumber} delay={0.06} />
+                <CountUp value={summary.postsThisMonth} format={formatDeNumber} delay={0.03} />
               )}
             </div>
           </div>
@@ -405,7 +388,7 @@ function BrewAiMetricCards({
         <CardContent className="flex flex-col gap-1">
           <div className="flex flex-wrap items-center gap-2">
             <div className="font-medium text-3xl tabular-nums leading-none tracking-tight">
-              <CountUp value={summary?.teamMembers ?? 0} format={formatDeNumber} delay={0.12} />
+              <CountUp value={summary?.teamMembers ?? 0} format={formatDeNumber} delay={0.06} />
             </div>
             {(summary?.openInvites ?? 0) > 0 ? (
               <Badge variant="secondary">{summary?.openInvites} offen</Badge>
@@ -504,50 +487,7 @@ function BrewAiActivityOverview({
             </p>
           </div>
         ) : (
-          <ChartContainer config={chartConfig} className="aspect-auto h-80 w-full">
-            <ComposedChart data={chartData} margin={{ top: 0 }}>
-              <defs>
-                <linearGradient id="fillTokens" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--color-tokens)" stopOpacity={0.36} />
-                  <stop offset="95%" stopColor="var(--color-tokens)" stopOpacity={0.04} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid vertical={false} strokeOpacity={0.5} />
-              <XAxis
-                dataKey="date"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                minTickGap={48}
-                tickFormatter={(value) =>
-                  parseISO(value).toLocaleDateString("de-DE", {
-                    month: "short",
-                    day: "numeric",
-                  })
-                }
-              />
-              <ChartTooltip
-                cursor={false}
-                content={
-                  <ChartTooltipContent
-                    className="w-50"
-                    indicator="line"
-                    labelFormatter={(value) => format(parseISO(String(value)), "d. MMMM yyyy", { locale: de })}
-                  />
-                }
-              />
-              <ChartLegend verticalAlign="top" content={<ChartLegendContent className="mb-5 justify-end" />} />
-              <Area
-                dataKey="tokens"
-                type="natural"
-                fill="url(#fillTokens)"
-                stroke="var(--color-tokens)"
-                strokeWidth={1.25}
-                dot={false}
-                fillOpacity={1}
-              />
-            </ComposedChart>
-          </ChartContainer>
+          <TokenActivityChart data={chartData} />
         )}
       </CardContent>
     </Card>

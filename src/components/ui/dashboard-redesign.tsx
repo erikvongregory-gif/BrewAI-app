@@ -7,13 +7,21 @@ import { StudioViewTransition } from "@/components/studio/studio-view-transition
 import { MARKETING_SITE_URL } from "@/lib/siteConfig";
 import { useStudioShell } from "@/components/studio/studio-workspace-shell";
 import { AdminHomeView } from "@/components/dashboard/admin-home-view";
-import { AdminPricingView } from "@/components/dashboard/admin-pricing-view";
-import { AdminSettingsView } from "@/components/dashboard/admin-settings-view";
-import { AdminTeamView } from "@/components/dashboard/admin-team-view";
-import { BrandProfileView } from "@/components/dashboard/BrandProfileView";
-import { BrandProfileSetupModal, type BrandScanSuggestion } from "@/components/dashboard/BrandProfileSetupModal";
-import { BrewAiAssistantView } from "@/components/studio/hopfen-hugo-assistant";
-import { StudioMediaLibrary, type MediaItem } from "@/components/studio/media/studio-media-library";
+import type { BrandScanSuggestion } from "@/components/dashboard/BrandProfileSetupModal";
+import type { MediaItem } from "@/components/studio/media/studio-media-library";
+import dynamic from "next/dynamic";
+
+// Nicht-Start-Tabs und das Marken-Modal erst bei Bedarf laden — sonst steckt alles im ersten Bundle.
+const AdminPricingView = dynamic(() => import("@/components/dashboard/admin-pricing-view").then((m) => m.AdminPricingView));
+const AdminSettingsView = dynamic(() => import("@/components/dashboard/admin-settings-view").then((m) => m.AdminSettingsView));
+const AdminTeamView = dynamic(() => import("@/components/dashboard/admin-team-view").then((m) => m.AdminTeamView));
+const BrandProfileView = dynamic(() => import("@/components/dashboard/BrandProfileView").then((m) => m.BrandProfileView));
+const BrewAiAssistantView = dynamic(() => import("@/components/studio/hopfen-hugo-assistant").then((m) => m.BrewAiAssistantView));
+const StudioMediaLibrary = dynamic(() => import("@/components/studio/media/studio-media-library").then((m) => m.StudioMediaLibrary));
+const BrandProfileSetupModal = dynamic(
+  () => import("@/components/dashboard/BrandProfileSetupModal").then((m) => m.BrandProfileSetupModal),
+  { ssr: false },
+);
 import { hasActiveSubscriptionFromState } from "@/lib/billing/access";
 import {
   clearHomepageCheckoutParams,
@@ -259,6 +267,9 @@ export function DashboardRedesignShell(props: {
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [settingsError, setSettingsError] = useState<string | null>(null);
   const [brandProfileSetupOpen, setBrandProfileSetupOpen] = useState(false);
+  // Modal erst beim ersten Öffnen mounten (lädt dann sein Chunk) und danach für die Schließ-Animation behalten.
+  const [brandSetupMounted, setBrandSetupMounted] = useState(false);
+  if (brandProfileSetupOpen && !brandSetupMounted) setBrandSetupMounted(true);
   const [brandQuickStartUrl, setBrandQuickStartUrl] = useState("");
   const [brandAutoAnalyzeSignal, setBrandAutoAnalyzeSignal] = useState(0);
   const [showBrandProfileChoice, setShowBrandProfileChoice] = useState(false);
@@ -787,14 +798,16 @@ export function DashboardRedesignShell(props: {
       ) : null}
       </StudioViewTransition>
 
-    <BrandProfileSetupModal
-      open={brandProfileSetupOpen}
-      onOpenChange={setBrandProfileSetupOpen}
-      title="Marke einlesen"
-      onSaved={applyBrandScanAndPersist}
-      initialWebsiteUrl={brandQuickStartUrl}
-      autoAnalyzeSignal={brandAutoAnalyzeSignal}
-    />
+    {brandSetupMounted ? (
+      <BrandProfileSetupModal
+        open={brandProfileSetupOpen}
+        onOpenChange={setBrandProfileSetupOpen}
+        title="Marke einlesen"
+        onSaved={applyBrandScanAndPersist}
+        initialWebsiteUrl={brandQuickStartUrl}
+        autoAnalyzeSignal={brandAutoAnalyzeSignal}
+      />
+    ) : null}
 
     {showBrandProfileChoice ? (
       <div

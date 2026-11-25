@@ -28,7 +28,7 @@ export async function GET() {
     return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
   }
 
-  user = await workspaceResourceUser(user);
+  user = await workspaceResourceUser(user, false, { hydrate: false });
   const freeTrialImageUsed = Boolean(user.user_metadata?.free_trial_image_used_at);
   const onboardingBonusClaimed = Boolean(user.user_metadata?.onboarding_bonus_claimed_at);
 

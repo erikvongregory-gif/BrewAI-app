@@ -57,7 +57,7 @@ async function requireUserId(write = false): Promise<string | NextResponse> {
     );
   if (user) {
     try {
-      user = await workspaceResourceUser(user, write);
+      user = await workspaceResourceUser(user, write, { hydrate: false });
     } catch {
       return NextResponse.json({ error: "Teamzugriff nicht erlaubt." }, { status: 403 });
     }

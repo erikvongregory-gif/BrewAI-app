@@ -56,15 +56,20 @@ export async function getWorkspace(userId: string): Promise<{ ownerId: string; r
   return { ownerId: data.owner_id, role: data.role as DashboardTeamRole };
 }
 
-/** Resource context only. Never use this returned identity for login, 2FA or platform-admin checks. */
-export async function workspaceResourceUser(user: User, write = false): Promise<User> {
+/**
+ * Resource context only. Never use this returned identity for login, 2FA or platform-admin checks.
+ * `hydrate: false` skips re-signing private asset URLs in user_metadata (one storage call per asset)
+ * for callers that only need the id or non-asset metadata.
+ */
+export async function workspaceResourceUser(user: User, write = false, { hydrate = true } = {}): Promise<User> {
   const workspace = await getWorkspace(user.id);
   if (write && !canWriteWithRole(workspace.role)) {
     throw new Error("Deine Teamrolle erlaubt nur Lesezugriff.");
   }
-  if (workspace.ownerId === user.id) return { ...user, user_metadata: await hydratePrivateAssets(user.user_metadata,user.id) };
+  const sign = (meta: User["user_metadata"], ownerId: string) => (hydrate ? hydratePrivateAssets(meta, ownerId) : meta);
+  if (workspace.ownerId === user.id) return { ...user, user_metadata: await sign(user.user_metadata,user.id) };
   const { data, error } = await createAdminClient().auth.admin.getUserById(workspace.ownerId);
   if (error || !data.user) throw new Error("Teamkonto nicht gefunden.");
   // Preserve actor app_metadata so a team member never inherits platform administrator privileges.
-  return { ...data.user, app_metadata: user.app_metadata, user_metadata: await hydratePrivateAssets(data.user.user_metadata,workspace.ownerId) };
+  return { ...data.user, app_metadata: user.app_metadata, user_metadata: await sign(data.user.user_metadata,workspace.ownerId) };
 }

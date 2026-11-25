@@ -3967,20 +3967,20 @@ html:has(.brewai-admin) {
 }
 
 /* ── View-Wechsel im Dashboard (StudioViewTransition / Route-Template) ── */
+/* Kurz und ohne blur(): Filter-Animationen erzwingen Repaints der ganzen Fläche und wirken träge. */
 @keyframes studio-view-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
-    filter: blur(2px);
+    transform: translateY(6px);
   }
 }
 
 .studio-view-transition {
-  animation: studio-view-in 320ms var(--motion-ease-out) backwards;
+  animation: studio-view-in 220ms var(--motion-ease-out) backwards;
 }
 
 .studio-view-transition[data-variant="tab"] {
-  animation-duration: var(--motion-base);
+  animation-duration: 180ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3999,21 +3999,20 @@ html:has(.brewai-admin) {
 @keyframes dash-rise {
   from {
     opacity: 0;
-    transform: translateY(10px);
-    filter: blur(3px);
+    transform: translateY(6px);
   }
 }
 
 .dash-rise-group > [data-slot="card"],
 .dash-rise-stack > :nth-child(n + 2) {
-  animation: dash-rise var(--motion-slow) var(--motion-ease-out) backwards;
+  animation: dash-rise var(--motion-base) var(--motion-ease-out) backwards;
 }
 
-.dash-rise-group > :nth-child(2) { animation-delay: 60ms; }
-.dash-rise-group > :nth-child(3) { animation-delay: 120ms; }
-.dash-rise-group > :nth-child(4) { animation-delay: 180ms; }
-.dash-rise-stack > :nth-child(2) { animation-delay: 220ms; }
-.dash-rise-stack > :nth-child(3) { animation-delay: 280ms; }
+.dash-rise-group > :nth-child(2) { animation-delay: 30ms; }
+.dash-rise-group > :nth-child(3) { animation-delay: 60ms; }
+.dash-rise-group > :nth-child(4) { animation-delay: 90ms; }
+.dash-rise-stack > :nth-child(2) { animation-delay: 80ms; }
+.dash-rise-stack > :nth-child(3) { animation-delay: 110ms; }
 
 /* Skeleton: wandernder Glanz statt Pulsieren */
 @keyframes skeleton-shimmer {
@@ -4059,15 +4058,15 @@ html:has(.brewai-admin) {
 }
 
 .media-grid > .media-tile {
-  animation: media-tile-in var(--motion-slow) var(--motion-ease-out) backwards;
+  animation: media-tile-in var(--motion-base) var(--motion-ease-out) backwards;
 }
 
 /* Nur die ersten Kacheln staffeln — später eingefügte (neue Motive, Nachladen) kommen sofort. */
-.media-grid > .media-tile:nth-child(2) { animation-delay: 40ms; }
-.media-grid > .media-tile:nth-child(3) { animation-delay: 80ms; }
-.media-grid > .media-tile:nth-child(4) { animation-delay: 120ms; }
-.media-grid > .media-tile:nth-child(5) { animation-delay: 160ms; }
-.media-grid > .media-tile:nth-child(6) { animation-delay: 200ms; }
+.media-grid > .media-tile:nth-child(2) { animation-delay: 20ms; }
+.media-grid > .media-tile:nth-child(3) { animation-delay: 40ms; }
+.media-grid > .media-tile:nth-child(4) { animation-delay: 60ms; }
+.media-grid > .media-tile:nth-child(5) { animation-delay: 80ms; }
+.media-grid > .media-tile:nth-child(6) { animation-delay: 100ms; }
 .media-grid > .media-tile:nth-child(7) { animation-delay: 240ms; }
 .media-grid > .media-tile:nth-child(8) { animation-delay: 280ms; }
 .media-grid > .media-tile:nth-child(9) { animation-delay: 320ms; }
