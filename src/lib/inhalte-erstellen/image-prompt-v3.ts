@@ -47,6 +47,13 @@ export const V3_PHOTO_PRESETS = {
   campaign: "Art-directed beverage advertising photography with a distinctive, memorable visual hierarchy. Translate the customer's scene into one clear visual idea through a deliberate hero framing, a purposeful camera angle, controlled foreground and background layers and clean negative space where the composition benefits from it. Direct attention to the selected product through composition, local contrast and focus while preserving its real size. Choose one full-frame lens suited to the framing: 35mm for an immersive wide view, 50mm for a natural medium view, or 85mm for a compressed close detail; use f/2.8–f/4 for selective focus and f/5.6 when more depth must stay readable. Use a shaped directional key light, controlled fill or negative fill for dimensional shadows, and a subtle edge light only when physically motivated by the scene. Sculpt believable highlights on glass and packaging while keeping the label readable and reflections coherent with the surroundings. A cohesive, restrained advertising color grade, rich tonal separation and protected highlights; skin tones and the selected beer color remain accurate. The result should feel deliberately photographed for a brand campaign, with tactile materials and optical depth, no artificial product glow, oversized packaging or composited lighting. Add no campaign text or extra props unless the customer requests them.",
 } as const;
 
+/**
+ * Nur für die 4K-Stufe: Das Modell füllt die zusätzlichen Pixel sonst mit nachgeschärfter Textur
+ * (helle Kantensäume, körnige Haut, verschmierte Unschärfe).
+ */
+export const LARGE_FORMAT_FINISHING =
+  "LARGE-FORMAT FINISHING: This is a very large output that will be viewed at full size. Resolve detail the way a good lens and sensor do at this size, as an unsharpened camera file: edges are clean and slightly soft at pixel level, with no bright or dark outlines around hair, faces, glass rims or lettering. Fine texture such as skin, hair, fabric and wood is continuous and fine-grained, never gritty, crunchy or speckled. Anything outside the focal plane is smooth optical blur with soft gradual edges, not a smeared or painted surface with hard fragments in it. Where another instruction asks for crisp or sharp detail, read it as accurate focus, not added sharpening or contrast. Do not fill the extra resolution with invented micro-texture.";
+
 const TIME: Record<HyperrealisticInput["tageszeit"], string> = {
   tageslicht: "daylight",
   goldene_stunde: "low late-afternoon sunlight",
@@ -156,6 +163,7 @@ export function buildImagePromptV3(args: ImagePromptV3Args): string {
     hasBrief ? "" : input.personBeschreibung || "",
     productDirection(input, args.beerAppearance),
     `PHOTOGRAPHY: ${input.photoStyle ? V3_PHOTO_PRESETS[input.photoStyle] : "Natural photographic exposure, coherent scene lighting and believable optical depth of field."} Default ambient time: ${TIME[input.tageszeit]}.${input.shotType ? ` Requested framing: ${SHOT[input.shotType]}.` : ""}`,
+    input.quality === "ultra" ? LARGE_FORMAT_FINISHING : "",
     referencesDirection({ ...args, input }),
     identity ? "Preserve only the explicitly selected character's identity." : "Invent new, distinct adult identities when people are requested; do not reuse a stock cast or people from product or style references.",
     "People, hands, beverage and label share one camera exposure and lighting setup; their focus and illumination follow their actual distance from the camera and light. Preserve the selected photographic treatment. Natural skin, realistic grips and glass reflections. Sparse irregular condensation only if the drink is cold. No pasted product, artificial glow, distorted label or extra limbs. Alcohol is held or consumed only by adults.",

@@ -13,6 +13,11 @@ function prompt(overrides: Record<string, unknown> = {}) {
 }
 
 describe("independent V3 image direction", () => {
+  it("adds the large-format finishing rule only for the 4K tier", () => {
+    expect(prompt({ quality: "ultra" })).toContain("LARGE-FORMAT FINISHING");
+    expect(prompt({ quality: "high" })).not.toContain("LARGE-FORMAT FINISHING");
+    expect(prompt()).not.toContain("LARGE-FORMAT FINISHING");
+  });
   it("gives premium coherent photographic optics and physical detail without forcing blur or clutter", () => {
     const text = prompt({ photoStyle: "premium" });
     expect(text).toContain("one credible photographic exposure from one camera position");
