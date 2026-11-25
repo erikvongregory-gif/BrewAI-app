@@ -177,6 +177,23 @@ describe("independent V3 image direction", () => {
     expect(text).not.toContain("Invent new, distinct adult identities");
   });
 
+  it("asks for a real photograph in the opening line", () => {
+    expect(prompt()).toContain("Create one photorealistic, real beverage photograph someone could have taken with a real camera");
+  });
+  it.each(["premium", "campaign"] as const)("keeps %s free of cinematic styling and heavy retouching", (photoStyle) => {
+    expect(V3_PHOTO_PRESETS[photoStyle]).toContain("Avoid cinematic lighting, dramatic color grading or stylized composition. No glamorization and no heavy retouching.");
+  });
+  it("lets location light lead in premium and keeps the studio key only for location-free shots", () => {
+    expect(V3_PHOTO_PRESETS.premium).toContain("At a real location, the existing light of that place leads");
+    expect(V3_PHOTO_PRESETS.premium).toContain("Only when the customer scene is a studio or product shot without a location, use one large soft key");
+  });
+  it("marks locked label words as verbatim and preserves geometry", () => {
+    const input = hyperrealisticSchema.parse({ etikettBild: "https://example.com/product.png", flaschenTyp: "nrw_500", bierstil: "helles", szene: "biergarten_sommer" });
+    const text = buildImagePromptV3({ input, references: [{ index: 1, role: "product" }], labelText: ["ABK"] });
+    expect(text).toContain('Exact label words: "ABK" (EXACT, verbatim, no extra characters).');
+    expect(text).toContain("Preserve product geometry and label legibility exactly.");
+  });
+
   it("normalizes product fields without adding scene or personality defaults", () => {
     const input = hyperrealisticSchema.parse({ etikettBild: "https://example.com/product.png", flaschenTyp: "nrw_500", bierstil: "alkoholfrei_pilsner", beerName: "Helles Alkoholfrei", szene: "biergarten_sommer", keepLabel: false });
     const result = normalizeV3Input(input);
