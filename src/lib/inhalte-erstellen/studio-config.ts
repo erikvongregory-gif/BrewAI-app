@@ -51,7 +51,6 @@ export type StudioDraft = {
   variantCount: VariantCount;
   photoStyle: NonNullable<HyperrealisticInput["photoStyle"]>;
   hyperreal: boolean;
-  aiWatermark: boolean;
   behaelter: NonNullable<HyperrealisticInput["behaelter"]>;
   szene: HyperrealisticInput["szene"];
   tageszeit: HyperrealisticInput["tageszeit"];

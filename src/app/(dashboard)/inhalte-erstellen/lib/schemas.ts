@@ -206,7 +206,6 @@ export const hyperrealisticSchema = z.object({
   quality: imageQualitySchema,
   variantCount: z.union([z.literal(1), z.literal(2), z.literal(3)]).default(3),
   /** Sichtbares „AI“-Label (EU AI Act Art. 50 — Transparenz bei synthetischen Bildern). */
-  aiWatermark: z.boolean().default(false),
 });
 
 export const productIsolateSchema = z.object({

@@ -14,7 +14,7 @@ const mocks = vi.hoisted(() => ({
   automaticLooks: vi.fn(() => { throw new Error("V3 must not load automatic style images"); }),
   labelWords: vi.fn<() => Promise<string[]>>(),
   labelCheck: vi.fn(async (_image: Buffer, _expected: string[]) => ({ status: "drift", missing: ["DUNKEL"] })),
-  provenance: vi.fn(async (buffer: Buffer) => buffer),
+  watermark: vi.fn(async (buffer: Buffer) => buffer),
 }));
 
 vi.mock("@/app/(dashboard)/inhalte-erstellen/lib/api-guards", () => ({
@@ -70,8 +70,7 @@ vi.mock("@/lib/openai/generateImage", () => ({
   cropImageBufferToAspectRatio: async (buffer: Buffer) => buffer,
 }));
 vi.mock("@/lib/openai/aiWatermark", () => ({
-  applyAiWatermark: async (buffer: Buffer) => buffer,
-  applyAiProvenanceMetadata: mocks.provenance,
+  applyAiWatermark: mocks.watermark,
 }));
 vi.mock("@/lib/supabase/storage", () => ({
   uploadGeneratedImageToStorage: async () => "https://cdn.example/out.png",
@@ -153,7 +152,7 @@ describe("studio generation contract", () => {
     const response = await product(new Request("https://app.example/api/inhalte-erstellen/create-task", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...characterPayload, characterName: undefined, characterReferenceImages: [], extraReferenceImages: [], photoStyle: "reportage", behaelter: "B", bierstil: "helles", glasTyp: "willibecher", zusatzWunsch: "Zwei Freunde stoßen mit Gläsern an" }),
+      body: JSON.stringify({ ...characterPayload, characterName: undefined, characterReferenceImages: [], extraReferenceImages: [], photoStyle: "reportage", behaelter: "B", bierstil: "helles", glasTyp: "willibecher", zusatzWunsch: "Zwei Freunde stoßen mit Gläsern an", aiWatermark: false }),
     }));
     expect(response.status).toBe(202);
     const request = mocks.render.mock.calls[0][0];
@@ -164,9 +163,12 @@ describe("studio generation contract", () => {
     expect(request.prompt).toContain("Image 2: selected beer color swatch only");
     expect(request.prompt).toContain("Candid snapshot photography");
     expect(request.referenceImages).toHaveLength(2);
+    // Casting-Vorgabe hängt am Live-Prompt: neue Gesichter und klar erwachsen.
+    expect(request.prompt).toContain("New faces");
+    expect(request.prompt).toContain("well over 18");
     expect(request.referenceImages[1].mime).toBe("image/png");
-    // Ohne sichtbares KI-Label bekommt jedes Bild trotzdem die maschinenlesbare Kennzeichnung.
-    expect(mocks.provenance).toHaveBeenCalled();
+    // KI-Label ist Pflicht: auch ein altes Client-Flag aiWatermark:false schaltet es nicht ab.
+    expect(mocks.watermark).toHaveBeenCalled();
   });
   it("logs label drift of the finished image when LABEL_FIDELITY_CHECK=log, without rejecting it", async () => {
     vi.stubEnv("LABEL_FIDELITY_CHECK", "log");
