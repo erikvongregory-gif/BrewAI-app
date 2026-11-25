@@ -6,7 +6,7 @@ import { useState } from "react";
 import { CircleUser, CreditCard, EllipsisVertical, Loader2, LogOut, RotateCcw, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { TokenAvatarRing } from "@/components/dashboard-shell/token-avatar-ring";
+import { TokenAvatarRing, TokenBalanceMenuBlock } from "@/components/dashboard-shell/token-avatar-ring";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -107,6 +107,8 @@ export function NavUser({
                 </div>
               </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <TokenBalanceMenuBlock />
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>

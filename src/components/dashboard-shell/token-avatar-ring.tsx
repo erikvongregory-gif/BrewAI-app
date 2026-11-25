@@ -3,6 +3,8 @@
 import { useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useBillingCredits } from "@/components/dashboard-shell/billing-credits-provider";
+import Link from "next/link";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 export type BillingTokenSnapshot = {
@@ -27,6 +29,12 @@ export function tokenRingProgress(snapshot: BillingTokenSnapshot | null): number
   if (snapshot.unlimited) return 1;
   if (snapshot.total <= 0) return 0;
   return Math.min(1, Math.max(0, snapshot.remaining / snapshot.total));
+}
+
+export function tokenBalanceLabel(snapshot: BillingTokenSnapshot | null): string {
+  if (snapshot == null) return "Token-Stand wird geladen";
+  if (snapshot.unlimited) return "Unbegrenzte Tokens";
+  return `${snapshot.remaining.toLocaleString("de-DE")} von ${snapshot.total.toLocaleString("de-DE")} Tokens übrig`;
 }
 
 type TokenAvatarRingProps = {
@@ -59,18 +67,14 @@ export function TokenAvatarRing({ children, className, size = 36 }: TokenAvatarR
   const radius = (vb - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
   const dashOffset = circumference * (1 - progress);
-  const label =
-    snapshot == null
-      ? "Token-Stand wird geladen"
-      : snapshot.unlimited
-        ? "Unbegrenzte Tokens"
-        : `${snapshot.remaining.toLocaleString("de-DE")} von ${snapshot.total.toLocaleString("de-DE")} Tokens übrig`;
+  const label = tokenBalanceLabel(snapshot);
 
   return (
+    <Tooltip>
+    <TooltipTrigger asChild>
     <span
       className={cn("relative inline-flex shrink-0 items-center justify-center overflow-visible", className)}
       style={{ width: size, height: size }}
-      title={label}
       aria-label={label}
     >
       <svg
@@ -121,5 +125,39 @@ export function TokenAvatarRing({ children, className, size = 36 }: TokenAvatarR
         {children}
       </span>
     </span>
+    </TooltipTrigger>
+    <TooltipContent side="bottom" sideOffset={6}>{label}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+/** Token-Stand als Kopf im Konto-Menü (Klick auf den Avatar-Ring). */
+export function TokenBalanceMenuBlock() {
+  const snapshot = useBillingTokens();
+  const progress = tokenRingProgress(snapshot);
+  return (
+    <div className="px-2 py-2">
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="text-xs text-muted-foreground">Tokens</span>
+        <Link href="/dashboard/pricing" className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
+          Aufladen
+        </Link>
+      </div>
+      <p className="mt-0.5 text-sm font-medium tabular-nums">
+        {snapshot == null
+          ? "Wird geladen …"
+          : snapshot.unlimited
+            ? "Unbegrenzt"
+            : <>{snapshot.remaining.toLocaleString("de-DE")} <span className="font-normal text-muted-foreground">von {snapshot.total.toLocaleString("de-DE")} übrig</span></>}
+      </p>
+      {snapshot && !snapshot.unlimited ? (
+        <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden>
+          <div
+            className={cn("h-full rounded-full", progress < 0.15 ? "bg-destructive" : "bg-[var(--color-acc,#C7691E)]")}
+            style={{ width: `${Math.round(progress * 100)}%` }}
+          />
+        </div>
+      ) : null}
+    </div>
   );
 }

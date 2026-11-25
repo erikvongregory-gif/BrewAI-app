@@ -7,7 +7,7 @@ import { BadgeCheck, Compass, CreditCard, LogOut, Settings2 } from "lucide-react
 
 import { startDashboardTour } from "@/components/dashboard-shell/dashboard-product-tour";
 
-import { TokenAvatarRing } from "@/components/dashboard-shell/token-avatar-ring";
+import { TokenAvatarRing, TokenBalanceMenuBlock } from "@/components/dashboard-shell/token-avatar-ring";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -79,6 +79,8 @@ export function AccountSwitcher({
             </div>
           </DropdownMenuItem>
         ))}
+        <DropdownMenuSeparator />
+        <TokenBalanceMenuBlock />
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
