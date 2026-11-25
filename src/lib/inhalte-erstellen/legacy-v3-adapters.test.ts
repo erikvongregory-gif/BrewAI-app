@@ -19,7 +19,7 @@ describe("V3 compatibility for older generation APIs", () => {
     const text = buildCampaignPromptV3(input);
     expect(text).toContain('"Unser neues Bier"');
     expect(text).toContain('"Jetzt erhältlich"');
-    expect(text).toContain("Art-directed beverage advertising photography");
+    expect(text).toContain("commissioned brand campaign shoot on location");
   });
 
   it.each(["hyperreal", "product_studio", "campaign_social", "product_cutout"] as const)("uses V3 for provider image type %s without inventing product specifications", (imageType) => {

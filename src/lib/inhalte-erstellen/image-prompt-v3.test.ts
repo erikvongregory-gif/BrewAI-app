@@ -13,6 +13,19 @@ function prompt(overrides: Record<string, unknown> = {}) {
 }
 
 describe("independent V3 image direction", () => {
+  it("opens bottles for drinking or toasting, not for an open cooler", () => {
+    const cooler = prompt({ behaelter: "F", zusatzWunsch: "Freunde am Grill, offene Kühlbox mit Flaschen im Vordergrund" });
+    expect(cooler).toContain("sealed unless the customer explicitly depicts opening it");
+    expect(cooler).toContain("in a cooler, crate, bucket, basket or carrier) stay sealed");
+    expect(prompt({ behaelter: "F", zusatzWunsch: "Drei Freunde stoßen mit Flaschen an" })).toContain("crown cap removed");
+    expect(prompt({ behaelter: "F", zusatzWunsch: "Eine offene Flasche auf dem Tisch" })).toContain("crown cap removed");
+  });
+  it("keeps repeated products and labels physically varied", () => {
+    const text = prompt();
+    expect(text).toContain("show exactly that many");
+    expect(text).toContain("never a dry, flat sticker");
+    expect(text).toContain("rather than in a symmetric, camera-facing cluster");
+  });
   it("adds the large-format finishing rule only for the 4K tier", () => {
     expect(prompt({ quality: "ultra" })).toContain("LARGE-FORMAT FINISHING");
     expect(prompt({ quality: "high" })).not.toContain("LARGE-FORMAT FINISHING");

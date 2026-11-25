@@ -74,7 +74,7 @@ const PHOTO_STYLE_OPTIONS: Array<{ value: PhotoStyle; label: string; fullLabel: 
     value: "campaign",
     label: "Kampagne",
     fullLabel: "Kampagnenmotiv",
-    hint: "Inszeniertes Key Visual: Produkt dominiert den Frame, Hände reichen oder stoßen an, Untersicht oder Himmel. Im Feed bleibt oben Platz für die Headline.",
+    hint: "Key Visual wie aus einem echten Kampagnen-Shooting: klare Bildidee, Produkt im Mittelpunkt, Licht vom Ort, echte Haut und Hände. Im Feed bleibt oben Platz für die Headline.",
   },
 ];
 
