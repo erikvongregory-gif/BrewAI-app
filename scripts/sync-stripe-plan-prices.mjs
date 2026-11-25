@@ -15,10 +15,10 @@ import Stripe from "stripe";
 const ROOT = path.resolve(import.meta.dirname, "..");
 
 const PLAN_AMOUNTS = {
-  start: { monthlyList: 100_00, yearlyPromoAnnual: 79 * 12 * 100 },
-  growth: { monthlyList: 200_00, yearlyPromoAnnual: 149 * 12 * 100 },
-  pro: { monthlyList: 400_00, yearlyPromoAnnual: 299 * 12 * 100 },
-  enterprise: { monthlyList: 799_00, yearlyPromoAnnual: 599 * 12 * 100 },
+  start: { monthlyList: 29_00, yearlyPromoAnnual: 24 * 12 * 100 },
+  growth: { monthlyList: 79_00, yearlyPromoAnnual: 65 * 12 * 100 },
+  pro: { monthlyList: 199_00, yearlyPromoAnnual: 165 * 12 * 100 },
+  enterprise: { monthlyList: 499_00, yearlyPromoAnnual: 415 * 12 * 100 },
 };
 
 const ENV_KEYS = {

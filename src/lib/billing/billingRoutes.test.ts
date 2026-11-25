@@ -5,13 +5,14 @@ vi.mock("@/lib/dashboard/workspace",()=>({getWorkspace:async()=>({ownerId:"user_
 const mocks = vi.hoisted(() => ({
   grant: vi.fn(), claim: vi.fn(), renew: vi.fn(), activate: vi.fn(),
   release: vi.fn(), processed: vi.fn(), retrieve: vi.fn(), event: vi.fn(),
-  sync: vi.fn(), row: vi.fn(),
+  sync: vi.fn(), row: vi.fn(), hasRow: vi.fn(), bySub: vi.fn(),
 }));
 vi.mock("@/lib/billing/store", () => ({
   grantTokenPackSession: mocks.grant, claimStripeWebhookEvent: mocks.claim,
   renewBillingPeriodTokens: mocks.renew, activatePlanForUser: mocks.activate,
   releaseStripeWebhookEvent: mocks.release, markStripeWebhookEventProcessed: mocks.processed,
   cancelBillingSubscription: vi.fn(), getByStripeCustomerId: vi.fn(), getBillingRow: mocks.row,
+  hasBillingRow: mocks.hasRow, getByStripeSubscriptionId: mocks.bySub,
 }));
 vi.mock("@/lib/billing/stripeServer", () => ({
   getStripeClient: () => ({ webhooks: { constructEvent: mocks.event } }),
@@ -42,6 +43,7 @@ beforeEach(() => {
   vi.stubEnv("STRIPE_WEBHOOK_SECRET", "test_secret");
   mocks.grant.mockResolvedValue(true); mocks.claim.mockResolvedValue(true);
   mocks.row.mockResolvedValue(null);
+  mocks.hasRow.mockResolvedValue(true); mocks.bySub.mockResolvedValue({ user_id: "user_one" });
   mocks.retrieve.mockResolvedValue(session);
   mocks.event.mockReturnValue({ id: "evt_one", type: "checkout.session.completed", data: { object: session } });
 });
@@ -93,5 +95,18 @@ describe("token purchase routes", () => {
     } } });
     expect((await webhook(request())).status).toBe(200);
     expect(mocks.renew).toHaveBeenCalledWith({ stripeSubscriptionId: "sub_one", currentPeriodEnd: new Date(1790812800 * 1000).toISOString() });
+  });
+  it("ignores an EvGlab token purchase from the shared Stripe account", async () => {
+    mocks.hasRow.mockResolvedValue(false);
+    expect((await webhook(request())).status).toBe(200);
+    expect(mocks.grant).not.toHaveBeenCalled();
+  });
+  it("acknowledges an EvGlab renewal instead of failing it", async () => {
+    mocks.bySub.mockResolvedValue(null);
+    mocks.event.mockReturnValue({ id: "evt_evg", type: "invoice.paid", data: { object: {
+      billing_reason: "subscription_cycle", parent: { subscription_details: { subscription: "sub_evg" } }, lines: { data: [] },
+    } } });
+    expect((await webhook(request())).status).toBe(200);
+    expect(mocks.renew).not.toHaveBeenCalled();
   });
 });

@@ -113,6 +113,14 @@ export async function getByStripeCustomerId(customerId: string): Promise<Billing
   return (data as BillingRow | null) ?? null;
 }
 
+/** Ob die Nutzer-ID ein BrewAI-Billing-Profil hat (Stripe-Konto wird mit EvGlab geteilt). */
+export async function hasBillingRow(userId: string): Promise<boolean> {
+  const { data, error } = await createAdminClient()
+    .from("billing_subscriptions").select("user_id").eq("user_id", userId).maybeSingle();
+  if (error) throw new Error(error.message);
+  return data !== null;
+}
+
 export async function getByStripeSubscriptionId(subscriptionId: string): Promise<BillingRow | null> {
   const admin = createAdminClient();
   const { data, error } = await admin

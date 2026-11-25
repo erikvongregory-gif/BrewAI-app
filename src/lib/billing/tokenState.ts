@@ -3,10 +3,10 @@ import crypto from "crypto";
 export type SubscriptionPlanKey = "start" | "growth" | "pro" | "enterprise";
 
 export const SUBSCRIPTION_PLAN_TOKENS: Record<SubscriptionPlanKey, number> = {
-  start: 1200,
-  growth: 3000,
-  pro: 7500,
-  enterprise: 20000,
+  start: 400,
+  growth: 1500,
+  pro: 4500,
+  enterprise: 12000,
 };
 
 export const SUBSCRIPTION_PLAN_KEYS: SubscriptionPlanKey[] = ["start", "growth", "pro", "enterprise"];

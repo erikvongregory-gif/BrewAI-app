@@ -205,9 +205,9 @@ function ScreenBody({ screen }: { screen: MarketingScreenId }) {
       body = (
         <AdminPricingView
           currentPlan="pro"
-          monthlyTokens={7500}
+          monthlyTokens={4500}
           usedTokens={1680}
-          remainingTokens={5820}
+          remainingTokens={2820}
         />
       );
       break;

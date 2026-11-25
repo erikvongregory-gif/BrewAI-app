@@ -55,12 +55,12 @@ describe("evaluateCostGuard", () => {
 
 describe("resolveCostGuardLimits", () => {
   it("uses plan defaults and lets env override them", () => {
-    expect(resolveCostGuardLimits("start", {}).maxTokensPerDay).toBe(480);
+    expect(resolveCostGuardLimits("start", {}).maxTokensPerDay).toBe(160);
     expect(resolveCostGuardLimits("owner", {}).maxTokensPerDay).toBe(Number.POSITIVE_INFINITY);
     expect(resolveCostGuardLimits(null, {}).maxJobsPerDay).toBe(60);
     expect(resolveCostGuardLimits("pro", { AI_COST_GUARD_MAX_JOBS_PER_DAY: "7", AI_COST_GUARD_MAX_TOKENS_PER_DAY: "x" })).toMatchObject({
       maxJobsPerDay: 7,
-      maxTokensPerDay: 3000,
+      maxTokensPerDay: 1800,
     });
   });
 
