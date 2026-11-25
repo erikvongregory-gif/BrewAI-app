@@ -1,5 +1,5 @@
-/** Liest eine Datei, komprimiert auf max 1024×1024 und liefert eine JPEG-DataURL fuer den Upload. */
-export async function readAndCompressImage(file: File): Promise<string> {
+/** Liest eine Datei, komprimiert auf max `maxDim` (Standard 1024) Kantenlänge und liefert eine JPEG-DataURL fuer den Upload. */
+export async function readAndCompressImage(file: File, maxDim = 1024): Promise<string> {
   const dataUrl = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result ?? ""));
@@ -14,7 +14,6 @@ export async function readAndCompressImage(file: File): Promise<string> {
     image.src = dataUrl;
   });
 
-  const maxDim = 1024;
   const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
   const targetW = Math.max(1, Math.round(img.width * scale));
   const targetH = Math.max(1, Math.round(img.height * scale));

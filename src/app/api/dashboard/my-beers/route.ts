@@ -37,7 +37,8 @@ const beerSchema = z.object({
   /** Optionaler Etikett-Upload — wird server-seitig als kurze HTTPS-URL persistiert. */
   etikettPayload: z
     .object({
-      base64: z.string().min(32).max(600_000),
+      // 2048-px-JPEG vom Client (Etikett-Referenz), bis ca. 1,8 MB binär.
+      base64: z.string().min(32).max(2_400_000),
       mime: z.enum(["image/jpeg", "image/png", "image/webp"]),
     })
     .optional(),

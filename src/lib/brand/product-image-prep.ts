@@ -8,7 +8,9 @@ import sharp from "sharp";
  * Fotos mit echtem Hintergrund (Szene, Holz, Theke) bleiben inhaltlich unverändert.
  */
 
-const OUTPUT_EDGE = 1200;
+// 2048 statt 1200: bei 1200 px ist Kleingedrucktes (ca. 1,2–2 mm Schrift) nur 5–8 px hoch
+// und schon in der Referenz unlesbar; was dort fehlt, kann kein Bildmodell wiedergeben.
+const OUTPUT_EDGE = 2048;
 /** Farbabstand (RGB, euklidisch), bis zu dem ein Pixel noch als Hintergrund gilt. */
 const BG_TOLERANCE = 34;
 /** Anteil der Randpixel, die Hintergrundfarbe haben müssen, damit freigestellt wird. */

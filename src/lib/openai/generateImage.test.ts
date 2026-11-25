@@ -48,6 +48,26 @@ describe("generateOpenAiImage", () => {
     expect(line).not.toContain("Biergarten");
   });
 
+  it("sends input_fidelity only when OPENAI_IMAGE_INPUT_FIDELITY asks for it", async () => {
+    vi.spyOn(console, "info").mockImplementation(() => {});
+    const fetchMock = vi.fn(async () => jsonResponse(200, { data: [{ b64_json: PNG_BASE64 }] }));
+    vi.stubGlobal("fetch", fetchMock);
+    const args = { ...baseArgs, referenceImages: [{ base64: PNG_BASE64, mime: "image/png" }] };
+    const sentForm = (call: number) => (fetchMock.mock.calls[call] as unknown as [string, RequestInit])[1].body as FormData;
+
+    await generateOpenAiImage(args);
+    expect(sentForm(0).has("input_fidelity")).toBe(false);
+
+    vi.stubEnv("OPENAI_IMAGE_INPUT_FIDELITY", "high");
+    await generateOpenAiImage(args);
+    expect(sentForm(1).get("input_fidelity")).toBe("high");
+
+    vi.stubEnv("OPENAI_IMAGE_INPUT_FIDELITY", "ultra");
+    await generateOpenAiImage(args);
+    expect(sentForm(2).has("input_fidelity")).toBe(false);
+    vi.unstubAllEnvs();
+  });
+
   it("does not pay twice: no second request after a timeout", async () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
     const fetchMock = vi.fn(async () => {

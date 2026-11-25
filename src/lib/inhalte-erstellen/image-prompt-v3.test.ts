@@ -149,6 +149,12 @@ describe("independent V3 image direction", () => {
     const text = buildImagePromptV3({ input, references: [{ index: 1, role: "character" }, { index: 2, role: "product" }], character: { appearanceLock: "Customer-defined red jacket" }, labelText: ["ABK", "DUNKEL"] });
     expect(text).toContain("Image 1: the explicitly selected character identity only");
     expect(text).toContain('Exact label words: "ABK", "DUNKEL"');
+    // Etikett-Sperre zeigt auf das Produktfoto (hier Bild 2), samt Kleingedrucktem.
+    expect(text).toContain("LABEL LOCK: Reproduce the label of Image 2 as printed, line for line");
+    expect(text).toContain("Small print keeps its position and original wording");
+    expect(text).toContain("instead of inventing new legible text");
+    const free = buildImagePromptV3({ input: { ...input, keepLabel: false, etikettModus: "generisch" }, references: [{ index: 1, role: "product" }], labelText: ["ABK"] });
+    expect(free).not.toContain("LABEL LOCK");
     expect(text).toContain("Customer-defined red jacket");
     expect(text).not.toContain("Invent new, distinct adult identities");
   });
