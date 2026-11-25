@@ -1,12 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import { useId, useState } from "react";
-import { ArrowRight, Check, Globe2, Images, Palette, ScanLine, SlidersHorizontal } from "lucide-react";
+import { ArrowRight, Check, Globe2, Images } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { BrandingCard } from "@/components/ui/branding-card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ColorPaletteCard } from "@/components/ui/color-palette-card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import styles from "./brand-profile-empty-state.module.css";
 
 type BrandProfileEmptyStateProps = {
   skipped: boolean;
@@ -15,6 +17,16 @@ type BrandProfileEmptyStateProps = {
   onOpenBrandSetup: () => void;
   onSkipBrandProfile: () => void;
 };
+
+/** Beispielwerte für die Vorschau — gleiche Bausteine wie das aktive Profil. */
+const SAMPLE_COLORS = ["c7691e", "e6ae76", "e4d6bc", "87907d", "303d34"];
+const SAMPLE_TONE = ["Ehrlich", "Handwerklich", "Nahbar"];
+
+const STEPS = [
+  { title: "Website eingeben", text: "Oder Screenshots und Referenzbilder hinzufügen." },
+  { title: "Marke erkennen", text: "BrewAI schlägt Farben, Schrift, Tonalität und Bildregeln vor." },
+  { title: "Prüfen & übernehmen", text: "Du entscheidest, was in dein Profil kommt." },
+];
 
 export function BrandProfileEmptyState({
   skipped,
@@ -45,91 +57,130 @@ export function BrandProfileEmptyState({
   }
 
   return (
-    <section className={styles.page} aria-labelledby="brand-empty-title">
-      <header className={styles.header}>
+    <section className="mx-auto flex w-full max-w-[1240px] flex-col gap-6" aria-labelledby="brand-empty-title">
+      <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 id="brand-empty-title" className="text-2xl font-semibold tracking-tight">Markenprofil</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Dein Stil. Die Grundlage für deine Motive.</p>
         </div>
-        <span className={styles.status}><span aria-hidden="true" />{skipped ? "Aktuell ohne Markenprofil" : "Noch nicht eingerichtet"}</span>
+        <Badge variant="secondary">{skipped ? "Aktuell ohne Markenprofil" : "Noch nicht eingerichtet"}</Badge>
       </header>
 
-      <div className={styles.hero}>
-        <div className={styles.copy}>
-          <span className={styles.eyebrow}><Palette size={15} aria-hidden="true" /> Unverwechselbar deine Marke</span>
-          <h2 className={styles.headline}>Damit jedes Motiv<br />nach dir aussieht.</h2>
-          <p className={styles.lead}>Deine Farben, dein Ton, deine Bildsprache. Hinterlege einmal, was deine Marke ausmacht — und gib jedem neuen Motiv eine gemeinsame Richtung.</p>
-
-          <form className={styles.form} onSubmit={(event) => { event.preventDefault(); submit(); }}>
-            <Label htmlFor={inputId} className="text-sm font-medium">Starte mit deiner Website</Label>
-            <div className={styles.inputRow}>
-              <div className={styles.inputWrap}>
-                <Globe2 size={17} aria-hidden="true" />
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Lies deine Marke ein</CardTitle>
+          <CardDescription>
+            Ein Link genügt: BrewAI erkennt Farben, Schrift und Tonalität und wendet sie auf jedes neue Motiv an.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <form
+            className="flex flex-col gap-2"
+            onSubmit={(event) => {
+              event.preventDefault();
+              submit();
+            }}
+          >
+            <Label htmlFor={inputId} className="sr-only">Website deiner Brauerei</Label>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <div className="relative min-w-0 flex-1">
+                <Globe2 size={16} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
                 <Input
                   id={inputId}
                   value={url}
-                  onChange={(event) => { setUrl(event.target.value); if (error) setError(""); }}
+                  onChange={(event) => {
+                    setUrl(event.target.value);
+                    if (error) setError("");
+                  }}
                   placeholder="deine-brauerei.de"
                   inputMode="url"
                   autoComplete="url"
                   autoCapitalize="none"
                   spellCheck={false}
-                  required
                   maxLength={2000}
                   aria-invalid={Boolean(error)}
                   aria-describedby={`${inputId}-hint${error ? ` ${inputId}-error` : ""}`}
-                  className="h-12 bg-background pl-10 text-base md:text-sm"
+                  className="h-11 pl-9"
                 />
               </div>
-              <Button type="submit" disabled={!url.trim()} className="h-12 gap-2 px-4">
+              <Button type="submit" className="h-11 gap-2 px-5">
                 Website einlesen <ArrowRight size={16} aria-hidden="true" />
               </Button>
             </div>
             {error ? <p id={`${inputId}-error`} role="alert" className="text-sm text-destructive">{error}</p> : null}
-            <p id={`${inputId}-hint`} className="flex items-start gap-1.5 text-xs leading-5 text-muted-foreground"><Check size={14} className="mt-0.5 shrink-0" aria-hidden="true" />Du prüfst das Ergebnis, bevor du es übernimmst.</p>
+            <p id={`${inputId}-hint`} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Check size={14} className="shrink-0" aria-hidden="true" />
+              Du prüfst das Ergebnis, bevor du es übernimmst.
+            </p>
           </form>
 
-          <div className={styles.alternative}>
-            <Button type="button" variant="ghost" onClick={onOpenBrandSetup} className="h-auto min-h-11 justify-start gap-3 whitespace-normal px-2 py-2 text-left">
-              <span className={styles.alternativeIcon}><Images size={17} aria-hidden="true" /></span>
-              <span><span className="block text-sm font-medium">Keine Website? Geht auch anders.</span><span className="mt-0.5 block text-xs font-normal text-muted-foreground">Screenshots oder manuell starten</span></span>
-              <ArrowRight size={15} className="ml-auto" aria-hidden="true" />
-            </Button>
-          </div>
-        </div>
+          <Button type="button" variant="outline" onClick={onOpenBrandSetup} className="h-auto justify-start gap-3 py-2.5 text-left whitespace-normal sm:self-start">
+            <Images size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
+            Keine Website? Mit Screenshots oder manuell starten
+          </Button>
+        </CardContent>
+      </Card>
 
-        <figure className={styles.preview} aria-label="Beispiel eines Markenprofils mit Typografie, Farben und Bildsprache">
-          <div className={styles.board} aria-hidden="true">
-            <div className={styles.typeCard}>
-              <span className={styles.cardLabel}>Typografie</span>
-              <span className={styles.letters}>Aa<span>Bb</span></span>
-              <span className={styles.typeNote}>Charakter in jedem Detail.</span>
-            </div>
-            <div className={styles.imageCard}>
-              <Image src="/studio-templates/produkt.png" alt="" fill sizes="(max-width: 640px) 200px, 300px" className="object-cover" />
-              <span className={styles.imageLabel}>Bildsprache</span>
-            </div>
-            <div className={styles.paletteCard}>
-              <div className={styles.cardTop}><span>Deine Farbwelt</span><Palette size={14} /></div>
-              <div className={styles.swatches}><span /><span /><span /><span /><span /></div>
-              <span className={styles.paletteNote}>Eine Marke. Ein stimmiges Gesamtbild.</span>
-            </div>
-            <div className={styles.toneCard}><span className={styles.cardLabel}>Tonalität</span><div><span>Ehrlich</span><span>Handwerklich</span><span>Nahbar</span></div></div>
-          </div>
-          <figcaption className={styles.caption}>Beispielprofil · Dein Ergebnis wird auf deine Marke abgestimmt.</figcaption>
-        </figure>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm font-medium">So sieht dein Profil danach aus</h2>
+          <Badge variant="outline">Beispiel</Badge>
+        </div>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2" aria-label="Beispiel eines Markenprofils">
+          <BrandingCard
+            category="Branding"
+            title="Typography"
+            subtitle="Deine Hausschrift"
+            displayElement={<span>Aa<span className="text-white/40">Bb</span></span>}
+            className="!h-auto border-neutral-800 bg-[#1c1c1c] text-white shadow-none hover:shadow-xl [&_.text-muted-foreground]:text-neutral-400"
+          />
+          <ColorPaletteCard
+            colors={SAMPLE_COLORS}
+            statsText="deine-brauerei.de"
+            className="min-h-[180px] border shadow-sm"
+            icon={
+              <span className="hidden gap-1.5 sm:flex">
+                {SAMPLE_TONE.map((tone) => (
+                  <Badge key={tone} variant="outline" className="font-normal">{tone}</Badge>
+                ))}
+              </span>
+            }
+          />
+        </div>
       </div>
 
-      <ol className={styles.steps} aria-label="So entsteht dein Markenprofil">
-        {[
-          { icon: Globe2, title: "Quelle verbinden", text: "Website oder Referenzen hinzufügen." },
-          { icon: ScanLine, title: "Marke erkennen", text: "Wir schlagen Farben, Tonalität und Bildregeln vor." },
-          { icon: SlidersHorizontal, title: "Prüfen & verfeinern", text: "Du entscheidest, was zu deiner Marke passt." },
-        ].map(({ icon: Icon, title, text }, index) => <li key={title}><span className={styles.stepIcon}><Icon size={18} aria-hidden="true" /></span><div><p className="text-sm font-medium"><span className="mr-2 text-xs tabular-nums text-muted-foreground">0{index + 1}</span>{title}</p><p className="mt-1 text-xs leading-5 text-muted-foreground">{text}</p></div></li>)}
-      </ol>
-      <footer className={styles.footer}>
-        <p className="text-xs leading-5 text-muted-foreground">{skipped ? "Du kannst weiterhin ohne Markenprofil generieren und es jederzeit ergänzen." : "Du kannst dein Markenprofil jederzeit ändern oder später einrichten."}</p>
-        {!skipped ? <Button type="button" variant="ghost" onClick={onSkipBrandProfile} className="h-10 shrink-0 text-xs text-muted-foreground">Vorerst ohne Profil fortfahren <ArrowRight size={14} aria-hidden="true" /></Button> : null}
+      <Card>
+        <CardHeader>
+          <CardTitle className="leading-none">So entsteht dein Markenprofil</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <ol className="grid gap-4 sm:grid-cols-3">
+            {STEPS.map((step, index) => (
+              <li key={step.title} className="flex gap-3">
+                <span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full border text-xs text-muted-foreground tabular-nums">
+                  {index + 1}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium">{step.title}</p>
+                  <p className="text-sm text-muted-foreground">{step.text}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </CardContent>
+      </Card>
+
+      <footer className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
+        <p className="text-xs text-muted-foreground">
+          {skipped
+            ? "Du kannst weiterhin ohne Markenprofil generieren und es jederzeit ergänzen."
+            : "Du kannst dein Markenprofil jederzeit ändern oder später einrichten."}
+        </p>
+        {!skipped ? (
+          <Button type="button" variant="ghost" size="sm" onClick={onSkipBrandProfile} className="text-muted-foreground">
+            Vorerst ohne Profil fortfahren <ArrowRight size={14} aria-hidden="true" />
+          </Button>
+        ) : null}
       </footer>
     </section>
   );
