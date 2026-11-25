@@ -16,7 +16,7 @@ import { ensureBillingRow, getEffectiveBillingRow } from "@/lib/billing/store";
 import { requireActiveSubscription } from "@/lib/billing/access";
 import { validateBriefForGeneration } from "@/lib/prompts/prompt-compiler/validate";
 import { composeSocialTextOverlay, parsePrimaryBrandColor } from "@/lib/social/text-overlay";
-import { applyAiProvenanceMetadata, applyAiWatermark } from "@/lib/openai/aiWatermark";
+import { applyAiWatermark } from "@/lib/openai/aiWatermark";
 import {
   cropImageBufferToAspectRatio,
   generateOpenAiImage,
@@ -598,10 +598,8 @@ async function executeStudioGeneration(args: {
           ctaBackground: prepared.brandAccent,
         },
       });
-      // Ohne sichtbares Label trotzdem maschinenlesbar als KI-generiert kennzeichnen (Art. 50 Abs. 2 KI-VO).
-      const finalBuffer = prepared.input.aiWatermark
-        ? await applyAiWatermark(composited, OUTPUT_FORMAT)
-        : await applyAiProvenanceMetadata(composited, OUTPUT_FORMAT);
+      // KI-Kennzeichnung ist Pflicht (Art. 50 KI-VO): sichtbares Label + Metadaten, nicht abschaltbar.
+      const finalBuffer = await applyAiWatermark(composited, OUTPUT_FORMAT);
       const uploaded = await uploadGeneratedImageWithThumb({
         userId: args.userId,
         buffer: finalBuffer,
@@ -611,9 +609,7 @@ async function executeStudioGeneration(args: {
       return;
     }
 
-    const finalBuffer = prepared.input.aiWatermark
-      ? await applyAiWatermark(cropped, OUTPUT_FORMAT)
-      : await applyAiProvenanceMetadata(cropped, OUTPUT_FORMAT);
+    const finalBuffer = await applyAiWatermark(cropped, OUTPUT_FORMAT);
     const uploaded = await uploadGeneratedImageWithThumb({
       userId: args.userId,
       buffer: finalBuffer,

@@ -8,7 +8,7 @@ import { ensureProductGeometryLocks } from "./hyperrealism-blocks";
 import { buildHyperrealisticPrompt } from "./hyperrealistic";
 
 const baseInput: HyperrealisticInput = {
-  aiWatermark: false, etikettBild: "https://example.com/label.png",
+  etikettBild: "https://example.com/label.png",
   flaschenTyp: "nrw_500",
   flaschenfarbe: "braun",
   bierstil: "hefeweizen",

@@ -22,7 +22,6 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("keeps the three explicit photo-style locks visually distinct", () => {
     const base = {
-      aiWatermark: false,
       etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "nrw_500" as const,
       flaschenfarbe: "braun" as const,
@@ -55,7 +54,7 @@ describe("inhalte-erstellen prompt builders", () => {
   it("builds a hyperrealistic prompt snapshot", () => {
     expect(
       buildHyperrealisticPrompt({
-        aiWatermark: false, etikettBild: "https://example.com/etikett.png",
+        etikettBild: "https://example.com/etikett.png",
         flaschenTyp: "nrw_500",
         flaschenfarbe: "braun",
         bierstil: "pils",
@@ -74,7 +73,6 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("does not describe beer foam or hops for mineral water", () => {
     const prompt = buildHyperrealisticPrompt({
-      aiWatermark: false,
       etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "nrw_500",
       flaschenfarbe: "klar",
@@ -97,7 +95,6 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("places mineral water without a poured beer glass", () => {
     const prompt = buildProductPlacementPrompt({
-      aiWatermark: false,
       stimmung: "entspannt",
       etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "nrw_500",
@@ -124,7 +121,7 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("places the product photo without describing a brand name for the label", () => {
     const prompt = buildProductPlacementPrompt({
-      aiWatermark: false, stimmung: "entspannt", etikettBild: "https://example.com/etikett.png",
+      stimmung: "entspannt", etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "nrw_500",
       flaschenfarbe: "braun",
       bierstil: "helles",
@@ -163,7 +160,6 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("unterscheidet Stiltreue normal vs hoch beim Label-Lock", () => {
     const hoch = buildProductPlacementPrompt({
-      aiWatermark: false,
       stimmung: "entspannt",
       etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "nrw_500",
@@ -182,7 +178,6 @@ describe("inhalte-erstellen prompt builders", () => {
       variantCount: 1,
     });
     const normal = buildProductPlacementPrompt({
-      aiWatermark: false,
       stimmung: "entspannt",
       etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "nrw_500",
@@ -207,7 +202,6 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("keeps free style fidelity internally consistent", () => {
     const prompt = buildProductPlacementPrompt({
-      aiWatermark: false,
       stimmung: "entspannt",
       etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "nrw_500",
@@ -233,7 +227,6 @@ describe("inhalte-erstellen prompt builders", () => {
   it("describes every attached reference by its actual role", () => {
     const prompt = buildProductPlacementPrompt(
       {
-        aiWatermark: false,
         stimmung: "entspannt",
         etikettBild: "https://example.com/etikett.png",
         flaschenTyp: "nrw_500",
@@ -265,7 +258,6 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("selects campaign camera direction instead of forcing a documentary film look", () => {
     const prompt = buildProductPlacementPrompt({
-      aiWatermark: false,
       stimmung: "feierlich",
       stimmungTrend: "premium",
       contentPreset: "campaign_social",
@@ -292,7 +284,6 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("lets an explicit reportage selection override the automatic social campaign style", () => {
     const prompt = buildProductPlacementPrompt({
-      aiWatermark: false,
       stimmung: "feierlich",
       contentPreset: "campaign_social",
       photoStyle: "reportage",
@@ -316,7 +307,6 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("applies explicit premium photography independent of people and mood", () => {
     const prompt = buildProductPlacementPrompt({
-      aiWatermark: false,
       stimmung: "gesellig",
       stimmungTrend: "nachhaltig",
       photoStyle: "premium",
@@ -340,7 +330,6 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("applies explicit campaign art direction outside the social preset", () => {
     const prompt = buildProductPlacementPrompt({
-      aiWatermark: false,
       stimmung: "entspannt",
       photoStyle: "campaign",
       etikettBild: "https://example.com/etikett.png",
@@ -362,7 +351,7 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("lets free-text intent override biergarten defaults for mountain toasting", () => {
     const next = applyClientIntentOverrides({
-      aiWatermark: false, etikettBild: "https://example.com/etikett.png",
+      etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "nrw_500",
       flaschenfarbe: "braun",
       bierstil: "helles",
@@ -395,7 +384,7 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("maps brewery toasting freitext to brauereihof with people", () => {
     const next = applyClientIntentOverrides({
-      aiWatermark: false, etikettBild: "https://example.com/etikett.png",
+      etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "nrw_500",
       flaschenfarbe: "braun",
       bierstil: "helles",
@@ -420,7 +409,7 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("maps laughing brewer freitext to person hero + brewery scene", () => {
     const next = applyClientIntentOverrides({
-      aiWatermark: false, etikettBild: "https://example.com/etikett.png",
+      etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "nrw_500",
       flaschenfarbe: "braun",
       bierstil: "helles",
@@ -448,7 +437,7 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("forces two older Bavarians into the prompt instead of No-people packshot", () => {
     const next = applyClientIntentOverrides({
-      aiWatermark: false, etikettBild: "https://example.com/etikett.png",
+      etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "nrw_500",
       flaschenfarbe: "braun",
       bierstil: "helles",
@@ -478,7 +467,7 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("never emits hard No-people when freitext exists even for unknown synonyms", () => {
     const prompt = buildProductPlacementPrompt({
-      aiWatermark: false, etikettBild: "https://example.com/etikett.png",
+      etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "nrw_500",
       flaschenfarbe: "braun",
       bierstil: "helles",
@@ -501,7 +490,6 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("maps pour freitext to Flasche+Glas and wires the selected glass type", () => {
     const next = applyClientIntentOverrides({
-      aiWatermark: false,
       etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "euro_longneck_330",
       flaschenfarbe: "braun",
@@ -537,7 +525,6 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("forces cloudy liquid for helles when filtrierung is unfiltriert", () => {
     const next = applyClientIntentOverrides({
-      aiWatermark: false,
       etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "euro_longneck_330",
       flaschenfarbe: "braun",
@@ -564,7 +551,7 @@ describe("inhalte-erstellen prompt builders", () => {
 
   it("haelt das Glas auf Flaschenvolumen (kein 0,5-l-Krug neben 0,33 l)", () => {
     const prompt = buildProductPlacementPrompt({
-      aiWatermark: false, stimmung: "entspannt", etikettBild: "https://example.com/etikett.png",
+      stimmung: "entspannt", etikettBild: "https://example.com/etikett.png",
       flaschenTyp: "euro_longneck_330",
       flaschenfarbe: "braun",
       bierstil: "bock",
@@ -650,7 +637,6 @@ describe("mode schemas", () => {
 
 describe("Bügelverschluss und Hand an der Flasche", () => {
   const pour = {
-    aiWatermark: false,
     etikettBild: "https://example.com/etikett.png",
     flaschenTyp: "buegel_500" as const,
     flaschenfarbe: "braun" as const,
@@ -692,7 +678,6 @@ describe("Bügelverschluss und Hand an der Flasche", () => {
 
 describe("Produkt sitzt im Foto statt reinkopiert", () => {
   const base = {
-    aiWatermark: false,
     etikettBild: "https://example.com/etikett.png",
     flaschenTyp: "nrw_500" as const,
     flaschenfarbe: "braun" as const,

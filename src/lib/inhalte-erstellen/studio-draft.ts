@@ -35,7 +35,6 @@ export function defaultStudioDraft(partial?: Partial<StudioDraft>): StudioDraft 
     variantCount: 1 as const,
     photoStyle: "reportage" as const,
     hyperreal: false,
-    aiWatermark: false,
     behaelter: "B" as const,
     szene: "biergarten_sommer" as const,
     tageszeit: "tageslicht" as const,

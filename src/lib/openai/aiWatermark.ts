@@ -37,7 +37,7 @@ export function buildAiWatermarkOverlay(width: number, height: number, corner: A
 
   const svg = `<svg width="${boxWidth}" height="${boxHeight}" viewBox="0 0 ${boxWidth} ${boxHeight}" xmlns="http://www.w3.org/2000/svg">
   <rect x="0" y="0" width="${boxWidth}" height="${boxHeight}" rx="${radius}"
-    fill="rgba(20,18,14,0.4)" stroke="rgba(255,255,255,0.2)" stroke-width="0.75"/>
+    fill="rgba(20,18,14,0.52)" stroke="rgba(255,255,255,0.22)" stroke-width="0.75"/>
   <svg x="${padX}" y="${padY}" width="${glyphW}" height="${glyphH}" viewBox="0 0 100 56" preserveAspectRatio="xMidYMid meet">
     ${aiLabelGlyphPaths()}
   </svg>
@@ -83,15 +83,6 @@ function withAiProvenance(image: Sharp): Sharp {
 
 function encode(pipeline: Sharp, outputFormat: "png" | "jpg"): Promise<Buffer> {
   return outputFormat === "jpg" ? pipeline.jpeg({ quality: 92 }).toBuffer() : pipeline.png().toBuffer();
-}
-
-/**
- * Nur maschinenlesbare KI-Kennzeichnung (EXIF + XMP), ohne sichtbares Label.
- * Für Bilder ohne sichtbares „AI“-Badge gedacht, damit die Kennzeichnung nicht vom
- * Nutzerschalter abhängt (vgl. Art. 50 Abs. 2 KI-VO).
- */
-export async function applyAiProvenanceMetadata(buffer: Buffer, outputFormat: "png" | "jpg" = "png"): Promise<Buffer> {
-  return encode(withAiProvenance(sharp(buffer)), outputFormat);
 }
 
 /** Sichtbares AI-Label + maschinenlesbare Metadaten (EXIF-Beschreibung und IPTC-XMP). */

@@ -1,5 +1,6 @@
 import { buildFreeformImagePromptV3 } from "@/lib/inhalte-erstellen/image-prompt-v3";
 import { uploadGeneratedImageToStorage } from "@/lib/supabase/storage";
+import { applyAiWatermark } from "@/lib/openai/aiWatermark";
 import { workspaceResourceUser } from "@/lib/dashboard/workspace";
 import { reserveGeneration, finishGeneration } from "@/lib/billing/generationJobs";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
@@ -268,7 +269,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "OpenAI lieferte kein Bild." }, { status: 502 });
     }
 
-    const imageUrl = await uploadGeneratedImageToStorage({userId,buffer:Buffer.from(base64Image,"base64"),outputFormat:body.outputFormat??"png"});
+    const outputFormat = body.outputFormat ?? "png";
+    const imageUrl = await uploadGeneratedImageToStorage({userId,buffer:await applyAiWatermark(Buffer.from(base64Image,"base64"),outputFormat),outputFormat});
 
     const consumeResult = await finishGeneration(job, tokenCost, { imageUrl, usedModel: usedModelLabel });
 

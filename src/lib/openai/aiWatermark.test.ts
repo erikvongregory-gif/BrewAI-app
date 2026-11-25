@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import sharp from "sharp";
 import {
   AI_DIGITAL_SOURCE_TYPE,
-  applyAiProvenanceMetadata,
   applyAiWatermark,
   buildAiProvenanceXmp,
   buildAiWatermarkOverlay,
@@ -65,20 +64,11 @@ describe("machine-readable AI marking", () => {
     expect(AI_DIGITAL_SOURCE_TYPE).toBe("http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia");
   });
 
-  it.each(["png", "jpg"] as const)("embeds XMP and EXIF without a visible badge (%s)", async (format) => {
-    const base = await baseImage();
-    const marked = await applyAiProvenanceMetadata(base, format);
+  it.each(["png", "jpg"] as const)("embeds XMP and EXIF alongside the visible badge (%s)", async (format) => {
+    const marked = await applyAiWatermark(await baseImage(), format);
     const meta = await sharp(marked).metadata();
     expect(meta.format).toBe(format === "jpg" ? "jpeg" : "png");
     expect(meta.xmp?.toString("utf8")).toContain("trainedAlgorithmicMedia");
     if (format === "jpg") expect(meta.exif?.toString("latin1")).toContain("AI-generated");
-    const original = await sharp(base).raw().toBuffer();
-    const pixels = await sharp(marked).raw().toBuffer();
-    if (format === "png") expect(pixels.equals(original)).toBe(true);
-  });
-
-  it("keeps the XMP marking on visibly watermarked images", async () => {
-    const marked = await applyAiWatermark(await baseImage(), "png");
-    expect((await sharp(marked).metadata()).xmp?.toString("utf8")).toContain("trainedAlgorithmicMedia");
   });
 });

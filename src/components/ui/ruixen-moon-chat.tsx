@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "motion/react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { GlowButton } from "@/components/ui/glow-button";
-import { Switch } from "@/components/ui/switch";
 import {
   Popover,
   PopoverContent,
@@ -171,7 +170,6 @@ export default function RuixenMoonChat() {
   const [genBusy, setGenBusy] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
   const [photoStyle, setPhotoStyle] = useState<PhotoStyle>("reportage");
-  const [aiWatermark, setAiWatermark] = useState(false);
   const [runs, setRuns] = useState<CreateRun[]>([]);
   const [activeRunId, setActiveRunId] = useState<string | null>(null);
   const runPayloads = useRef(new Map<string, unknown>());
@@ -465,7 +463,6 @@ export default function RuixenMoonChat() {
       stiltreue: usesProductPhoto ? ("hoch" as const) : ("frei" as const),
       keepLabel: usesProductPhoto,
       photoStyle,
-      aiWatermark,
       beerName: beer?.name?.trim() || undefined,
       zusatzWunsch: intentParts.join(". ").slice(0, 800),
       characterName: selectedCharacter?.name?.trim() || undefined,
@@ -487,7 +484,6 @@ export default function RuixenMoonChat() {
     }
   }, [
     activePreset,
-    aiWatermark,
     aspectRatio,
     genBusy,
     launchRun,
@@ -1129,15 +1125,7 @@ export default function RuixenMoonChat() {
                 </div>
                 <div className="flex w-full items-center justify-between gap-3">
                   <div className="flex items-center gap-1.5">
-                    <label className="flex cursor-pointer items-center gap-2 text-xs font-medium text-foreground dark:text-white">
-                      <span>AI-Label</span>
-                      <Switch
-                        checked={aiWatermark}
-                        onCheckedChange={setAiWatermark}
-                        aria-label="AI-Label"
-                        className="data-[state=checked]:!bg-emerald-600 dark:data-[state=checked]:!bg-emerald-600"
-                      />
-                    </label>
+                    <span className="text-xs text-muted-foreground">AI-Label immer aktiv</span>
                     <Popover>
                       <PopoverTrigger asChild>
                         <button
@@ -1153,8 +1141,8 @@ export default function RuixenMoonChat() {
                         align="end"
                         className="w-64 p-3 text-xs leading-relaxed text-muted-foreground"
                       >
-                        Dezentes „AI“-Label unten rechts — erkennbar für veröffentlichte Inhalte (EU AI Act,
-                        Art. 50).
+                        Jedes Bild bekommt ein dezentes „AI“-Label unten rechts und eine KI-Kennzeichnung in den
+                        Metadaten. Das ist nach EU AI Act (Art. 50) Pflicht und lässt sich nicht abschalten.
                       </PopoverContent>
                     </Popover>
                   </div>

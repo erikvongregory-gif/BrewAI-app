@@ -13,7 +13,6 @@ import { applyClientIntentOverrides } from "./hyperrealistic";
 import { buildImagePromptV3 } from "@/lib/inhalte-erstellen/image-prompt-v3";
 
 const base: HyperrealisticInput = {
-  aiWatermark: false,
   etikettBild: "https://example.com/etikett.png",
   flaschenTyp: "nrw_500",
   flaschenfarbe: "braun",
