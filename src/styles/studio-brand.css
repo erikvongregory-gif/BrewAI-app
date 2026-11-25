@@ -742,6 +742,34 @@
   border-radius: 16px !important;
 }
 
+/* Dark Mode: Studio-Tokens sind nur hell definiert — im Modal (Eingabe, Analyse, „Profil prüfen“)
+   auf die App-Farben des Dark Themes umbiegen. Gilt nur hier, nicht fürs restliche Studio. */
+:is(.dark, .dark *) .studio-brand-modal {
+  --bg: var(--background);
+  --s1: var(--card);
+  --s2: var(--card);
+  --s3: var(--muted);
+  --s4: color-mix(in oklab, var(--muted) 80%, var(--foreground));
+  --line: var(--border);
+  --line2: color-mix(in oklab, var(--foreground) 18%, transparent);
+  --line-faint: color-mix(in oklab, var(--foreground) 7%, transparent);
+  --field: var(--muted);
+  --raised: var(--card);
+  --t1: var(--foreground);
+  --t2: color-mix(in oklab, var(--foreground) 82%, var(--muted-foreground));
+  --t3: var(--muted-foreground);
+  --fg-2: var(--foreground);
+  --fg-4: var(--muted-foreground);
+  --fg-6: var(--muted-foreground);
+  --ac-tint: rgba(199, 105, 30, 0.18);
+  --sh-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+:is(.dark, .dark *) .evg-studio.studio-brand-modal,
+:is(.dark, .dark *) .evg-studio .studio-brand-modal {
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5) !important;
+}
+
 .evg-studio .studio-brand-modal .studio-modal-body {
   position: relative;
   max-height: min(92vh, 720px);
