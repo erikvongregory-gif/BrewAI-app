@@ -159,6 +159,9 @@ describe("studio generation contract", () => {
     expect(request.prompt).toContain("Image 2: selected beer color swatch only");
     expect(request.prompt).toContain("Candid snapshot photography");
     expect(request.referenceImages).toHaveLength(2);
+    // Casting-Vorgabe hängt am Live-Prompt: neue Gesichter und klar erwachsen.
+    expect(request.prompt).toContain("New faces");
+    expect(request.prompt).toContain("well over 18");
     expect(request.referenceImages[1].mime).toBe("image/png");
     // KI-Label ist Pflicht: auch ein altes Client-Flag aiWatermark:false schaltet es nicht ab.
     expect(mocks.watermark).toHaveBeenCalled();

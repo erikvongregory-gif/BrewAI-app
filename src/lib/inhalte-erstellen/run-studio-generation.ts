@@ -38,6 +38,7 @@ import {
   generateCharacterIdentityImage,
 } from "@/lib/kie/nanoBananaCharacterGenerate";
 import { buildImagePromptV3, normalizeV3Input } from "@/lib/inhalte-erstellen/image-prompt-v3";
+import { buildCastingDirection } from "@/lib/inhalte-erstellen/casting-direction";
 import {
   ProviderError,
   isProviderError,
@@ -398,7 +399,7 @@ async function prepareStudioGeneration(args: {
       compiled: { normalized_brief: { scene: input.zusatzWunsch || "" }, reference_roles: compilerReferenceRoles },
     }, { status: 422 });
   }
-  const prompt = buildImagePromptV3({
+  const promptArgs = {
     beerAppearance,
     input: { ...input, aspectRatio: effectiveAspectRatio(input.aspectRatio as Aspect, useCharacterIdentity) },
     references: assembled.roles,
@@ -408,7 +409,10 @@ async function prepareStudioGeneration(args: {
       ? { name: input.characterName, role: input.characterRole, appearanceLock: input.characterAppearanceLock }
       : undefined,
     labelText,
-  });
+  };
+  // Ohne Casting-Vorgabe liefert das Modell immer dasselbe Standardgesicht — der stärkste KI-Hinweis.
+  // Leer bei gewähltem Charakter oder Motiven ohne Menschen; enthält auch den Erwachsenen-Hinweis.
+  const prompt = [buildImagePromptV3(promptArgs), buildCastingDirection(promptArgs)].filter(Boolean).join("\n\n");
 
   const qualityEnv = process.env.OPENAI_IMAGE_QUALITY?.trim().toLowerCase();
   const requestedQuality =
