@@ -5,7 +5,7 @@ import { resolveStripeCustomerId } from "./stripeCustomer";
 
 describe("resolveStripeCustomerId", () => {
   it("binds the idempotency key to user and parameters", async () => {
-    const create = vi.fn(async (_params: unknown, _opts: { idempotencyKey: string }) => ({ id: "cus_new" }));
+    const create = vi.fn<(params: unknown, opts: { idempotencyKey: string }) => Promise<{ id: string }>>(async () => ({ id: "cus_new" }));
     const stripe = { customers: { create, retrieve: vi.fn() } } as never;
     await resolveStripeCustomerId({ stripe, userId: "u1", email: "a@example.test" });
     await resolveStripeCustomerId({ stripe, userId: "u1", email: "a@example.test" });
