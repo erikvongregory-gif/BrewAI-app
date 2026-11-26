@@ -60,7 +60,7 @@ import {
   type DashboardHomeSummary,
   type TokenRangeKey,
 } from "@/components/studio/dashboard/dashboard-home-utils";
-import { hasActiveSubscriptionFromState } from "@/lib/billing/access";
+import { hasActiveSubscriptionFromState } from "@/lib/billing/subscriptionState";
 
 type DashboardTab = "dashboard" | "media" | "team" | "brand" | "settings" | "pricing";
 

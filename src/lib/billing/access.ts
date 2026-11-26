@@ -26,11 +26,7 @@ export function hasActiveSubscription(
   return row.monthly_tokens > row.used_tokens;
 }
 
-/** UI/Summary: nur bezahlter Plan (summary.plan ist dafür schon gefiltert). */
-export function hasActiveSubscriptionFromState(plan: string | null | undefined, status: string | undefined): boolean {
-  if (!plan) return false;
-  return status === "active" || status === "trialing";
-}
+export { hasActiveSubscriptionFromState } from "./subscriptionState";
 
 /** Plan-Key für Pricing/Summary — Bonus ohne Stripe liefert null. */
 export function paidPlanFromBilling(
