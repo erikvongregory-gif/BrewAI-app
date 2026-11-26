@@ -2,7 +2,17 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, {
+  Suspense,
+  startTransition,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { StudioViewTransition } from "@/components/studio/studio-view-transition";
 import { MARKETING_SITE_URL } from "@/lib/siteConfig";
 import { useStudioShell } from "@/components/studio/studio-workspace-shell";
@@ -264,7 +274,9 @@ export function DashboardRedesignShell(props: {
     scrollByUrl.current.set(current, window.scrollY);
     restoreScrollRef.current = false;
     const url = new URL(href, window.location.href);
-    setTab(tabFromPathname(url.pathname) ?? "dashboard");
+    // Transition: Muss ein Tab-Chunk (next/dynamic) erst laden, bleibt der alte Tab stehen, statt dass
+    // die Seite in den loading.tsx-Fallback fällt (das trennte die Effekte und lud alle Daten neu).
+    startTransition(() => setTab(tabFromPathname(url.pathname) ?? "dashboard"));
     const target = url.pathname + url.search + url.hash;
     if (target !== current + window.location.hash) window.history.pushState(null, "", target);
   }, []);
@@ -402,7 +414,7 @@ export function DashboardRedesignShell(props: {
     const next = (fromPath || searchParams.get("tab") || "dashboard").toLowerCase();
     const resolved: DashboardTab = PATH_TABS.has(next as DashboardTab) ? (next as DashboardTab) : "dashboard";
     if (resolved !== tab) {
-      setTab(resolved);
+      startTransition(() => setTab(resolved));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, searchParams]);
@@ -758,6 +770,11 @@ export function DashboardRedesignShell(props: {
 
   return (
     <>
+      {/* Eigene Grenze für die per next/dynamic geladenen Tabs (ohne eigenes Suspense): Ein Lade-Suspend
+          darf nie bis zur loading.tsx-Grenze der Seite durchschlagen. */}
+      <Suspense
+        fallback={<Skeleton role="status" aria-busy="true" aria-label="Bereich wird geladen" className="h-80 w-full rounded-xl" />}
+      >
       <StudioViewTransition viewKey={tab} variant="tab">
       {tab === "dashboard" ? (
         <AdminHomeView
@@ -862,6 +879,7 @@ export function DashboardRedesignShell(props: {
         />
       ) : null}
       </StudioViewTransition>
+      </Suspense>
 
     {brandSetupMounted ? (
       <BrandProfileSetupModal
