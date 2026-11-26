@@ -1,12 +1,10 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { getServerUser } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { MARKETING_SITE_URL } from "@/lib/siteConfig";
 import { isOwnerUser } from "@/lib/auth/owner";
-import { ensureBillingRow, getBillingRow } from "@/lib/billing/store";
-import { hasActiveSubscription } from "@/lib/billing/access";
-import { syncBillingFromStripe } from "@/lib/billing/stripeSync";
+import { redirectUnlessStudioBilling } from "@/lib/dashboard/studioBillingGate";
 import { getDashboardMetadata } from "@/lib/dashboard/metadata";
 import { needsFullOnboardingFlow, sanitizeStudioOnboardingState } from "@/lib/dashboard/onboarding";
 import { isVideosCreateEnabled } from "@/lib/featureFlags";
@@ -39,16 +37,14 @@ export default async function VideosErstellenPage() {
     );
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getServerUser();
 
   if (!user) {
     redirect("/anmelden");
   }
 
-  const resourceUser = await orWorkspaceBlockedRedirect(workspaceResourceUser(user));
+  // Nur Onboarding-Status und Brauereiname werden gelesen: keine Asset-URLs signieren (A-6).
+  const resourceUser = await orWorkspaceBlockedRedirect(workspaceResourceUser(user, false, { hydrate: false }));
 
   if (
     needsFullOnboardingFlow(
@@ -63,27 +59,7 @@ export default async function VideosErstellenPage() {
   }
 
   if (!isOwnerUser(user)) {
-    await ensureBillingRow(resourceUser.id);
-    let billing = await getBillingRow(resourceUser.id);
-    // Begrenzte Reparatur vor Zugangssperre — nicht beim normalen Dashboard-Besuch.
-    if (!hasActiveSubscription(billing)) {
-      try {
-        const syncResult = await syncBillingFromStripe({
-          userId: resourceUser.id,
-          userEmail: resourceUser.email,
-          currentRow: billing,
-        });
-        if (syncResult.synced) {
-          billing = await getBillingRow(resourceUser.id);
-        }
-      } catch {
-        /* Stripe optional */
-      }
-    }
-
-    if (!hasActiveSubscription(billing)) {
-      redirect("/dashboard/pricing");
-    }
+    await redirectUnlessStudioBilling(resourceUser);
   }
 
   const dashboard = (resourceUser.user_metadata?.dashboard ?? {}) as Record<string, unknown>;

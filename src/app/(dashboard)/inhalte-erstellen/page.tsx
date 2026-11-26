@@ -1,15 +1,13 @@
 import { orWorkspaceBlockedRedirect, workspaceResourceUser } from "@/lib/dashboard/workspace";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { getServerUser } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { MARKETING_SITE_URL } from "@/lib/siteConfig";
 import { getDashboardMetadata } from "@/lib/dashboard/metadata";
 import { needsFullOnboardingFlow, sanitizeStudioOnboardingState } from "@/lib/dashboard/onboarding";
 import { isOwnerUser } from "@/lib/auth/owner";
-import { ensureBillingRow, getBillingRow } from "@/lib/billing/store";
-import { hasActiveSubscription } from "@/lib/billing/access";
-import { syncBillingFromStripe } from "@/lib/billing/stripeSync";
+import { redirectUnlessStudioBilling } from "@/lib/dashboard/studioBillingGate";
 import { InhalteErstellenMoonChatPage } from "@/components/ui/inhalte-erstellen-moon-chat-page";
 
 export const dynamic = "force-dynamic";
@@ -37,16 +35,14 @@ export default async function InhalteErstellenPage() {
     );
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getServerUser();
 
   if (!user) {
     redirect("/anmelden");
   }
 
-  const resourceUser = await orWorkspaceBlockedRedirect(workspaceResourceUser(user));
+  // Nur Onboarding-Status wird gelesen: keine Asset-URLs signieren (A-6).
+  const resourceUser = await orWorkspaceBlockedRedirect(workspaceResourceUser(user, false, { hydrate: false }));
   if (
     needsFullOnboardingFlow(
       sanitizeStudioOnboardingState(getDashboardMetadata(resourceUser.user_metadata).onboarding),
@@ -56,27 +52,7 @@ export default async function InhalteErstellenPage() {
   }
 
   if (!isOwnerUser(user)) {
-    await ensureBillingRow(resourceUser.id);
-    let billing = await getBillingRow(resourceUser.id);
-    // Begrenzte Reparatur vor Zugangssperre — nicht beim normalen Dashboard-Besuch.
-    if (!hasActiveSubscription(billing)) {
-      try {
-        const syncResult = await syncBillingFromStripe({
-          userId: resourceUser.id,
-          userEmail: resourceUser.email,
-          currentRow: billing,
-        });
-        if (syncResult.synced) {
-          billing = await getBillingRow(resourceUser.id);
-        }
-      } catch {
-        /* Stripe optional */
-      }
-    }
-
-    if (!hasActiveSubscription(billing)) {
-      redirect("/dashboard/pricing");
-    }
+    await redirectUnlessStudioBilling(resourceUser);
   }
 
   return <InhalteErstellenMoonChatPage />;
