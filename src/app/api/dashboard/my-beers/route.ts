@@ -1,4 +1,4 @@
-import { workspaceResourceUser } from "@/lib/dashboard/workspace";
+import { workspaceResourceUser, workspaceErrorResponse } from "@/lib/dashboard/workspace";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -88,8 +88,8 @@ async function requireBeerUser(req: Request, write: boolean) {
   if (user) {
     try {
       user = await workspaceResourceUser(user, write);
-    } catch {
-      return { error: NextResponse.json({ error: "Teamzugriff nicht erlaubt." }, { status: 403 }) };
+    } catch (e) {
+      return { error: workspaceErrorResponse(e) };
     }
   }
   if (!user) return { error: NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 }) };
@@ -148,7 +148,7 @@ export async function GET() {
   } = await supabase.auth.getUser();
 
   if (user && !(await hasPassedTwoFactor(user))) return NextResponse.json({ error: "Zwei-Faktor-Prüfung erforderlich.", code: "two_factor_required" }, { status: 403 });
-  if (user) { try { user = await workspaceResourceUser(user, false); } catch { return NextResponse.json({error:"Teamzugriff nicht erlaubt."},{status:403}); } }
+  if (user) { try { user = await workspaceResourceUser(user, false); } catch (e) { return workspaceErrorResponse(e); } }
   if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
 
   try {
