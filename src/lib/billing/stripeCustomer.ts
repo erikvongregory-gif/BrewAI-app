@@ -1,5 +1,6 @@
 import type Stripe from "stripe";
 import { setStripeCustomerId } from "@/lib/billing/store";
+import { idempotencyKeyWithParams } from "@/lib/billing/checkoutIdempotency";
 
 /**
  * Stellt sicher, dass die zurueckgegebene Stripe-Customer-ID im aktuell
@@ -35,10 +36,11 @@ export async function resolveStripeCustomerId(args: {
     }
   }
 
-  const customer = await stripe.customers.create({
-    email: email ?? undefined,
-    metadata: { user_id: userId },
-  }, { idempotencyKey: `customer:${userId}` });
+  const params = { email: email ?? undefined, metadata: { user_id: userId } };
+  // Hash im Key: neue E-Mail innerhalb von 24 h ergibt einen neuen Key statt Stripes Parameter-Fehler.
+  const customer = await stripe.customers.create(params, {
+    idempotencyKey: idempotencyKeyWithParams(`customer:${userId}`, params),
+  });
   await setStripeCustomerId(userId, customer.id);
   return customer.id;
 }

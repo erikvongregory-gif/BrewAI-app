@@ -18,6 +18,11 @@ export function checkoutConsentTimestamp(lockExpiresAt: string | null | undefine
  * „Keys for idempotent requests can only be used with the same parameters“.
  */
 export function checkoutIdempotencyKey(lockId: string, params: unknown): string {
+  return idempotencyKeyWithParams(`checkout:${lockId}`, params);
+}
+
+/** Stripe-Idempotency-Key, der sich mit den Parametern ändert (gleiche Parameter → gleicher Key). */
+export function idempotencyKeyWithParams(base: string, params: unknown): string {
   const digest = createHash("sha256").update(JSON.stringify(params)).digest("hex").slice(0, 32);
-  return `checkout:${lockId}:${digest}`;
+  return `${base}:${digest}`;
 }
