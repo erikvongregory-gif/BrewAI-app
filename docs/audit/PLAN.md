@@ -20,7 +20,10 @@ Grundlage: `docs/audit/AUDIT.md` (5 × P0, 11 × P1, 12 × P2). Jeder Agent fass
 | navigation-specialist | N-3 (offline: Navigation führt zu weißer Seite), B-4 (CLS 0,19–0,37 mobil beim schnellen Wechsel), B-5 (unbekannter Abschnitt liefert 200 statt 404) | dieselben Dateien wie oben |
 | feature-reliability | **N-1 P0** (Einladungslink `/invite/<token>`: Feld `passwordConfirm` fehlt, mindestens 8 Zeichen), **N-2 P0** (Checkout-Idempotenz: Zeitstempel im Parameterset führt nach 24-h-Lock zu 500), N-4 (Rohmeldungen von zod und Stripe durch deutsche Texte ersetzen), N-6 (Auth vor Validierung, 401 statt 400) | `src/app/invite/[token]/page.tsx`, `src/app/api/billing/checkout/route.ts`, `src/app/api/dashboard/team/route.ts`, `src/app/api/dashboard/settings/route.ts`, `src/app/api/dashboard/media/route.ts`, `src/app/api/openai/image2/generate/route.ts` |
 
-Neu für Welle 3 (ui-design-qa): N-5 (Prompt wird ohne Hinweis auf 800 Zeichen gekürzt), N-7 (axe: Labels, Kontrast, mobile Teamtabelle).
+Neu für Welle 3 (ui-design-qa): N-5 (Prompt wird ohne Hinweis auf 800 Zeichen gekürzt), N-7 (axe: Labels, Kontrast, mobile Teamtabelle). Aus der Sichtprüfung von Welle 1: Die Seiten `/zugang-pausiert` und die Root-404 zeigen nur eine Karte oben auf einer leeren Fläche, ohne Logo und ohne vertikale Zentrierung. Auf „Zugang pausiert“ ist „Abmelden“ die einzige Aktion und nur als Outline-Button gestaltet. Der Text „damit er das Abo verlängert“ soll neutral formuliert werden. Die Überschriften „Lüne BräuMARKENPROFIL“ und „Admin-BereichADMINISTRATION“ haben kein Leerzeichen.
+
+### Ergebnis Welle 1 (E2E am Stand `1920a5a`)
+Abgeschlossen: 220 Tests bestanden, 24 fehlgeschlagen, 44 übersprungen. Die Baseline lag bei 194/50/44. **0 Regressionen.** Noch rot sind B-2 „Prefetch > 0“ (im Dev-Modus nicht prüfbar, die Reaktion liegt unter 300 ms), N-5 sowie 20 Querschnittstests mit axe (N-7). Die letzten beiden gehören zu Welle 3.
 Für CHANGELOG bzw. Gründer: Der Bucket `generated-images` ist nicht versioniert. Das Schema liegt in `docs/*.sql` statt in `supabase/migrations`. Stripe Checkout zeigt „evglab sandbox“.
 
 ## Welle 2 – nach Welle 1, gleiche Dateien wie oben

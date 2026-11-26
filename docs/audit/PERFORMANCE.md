@@ -23,7 +23,11 @@ Ersparnis: −23 Dateien / ca. −769 KB Schriften pro hartem Laden auf jeder Ro
 
 | Route | Vorher roh / gzip | Erwartet roh / gzip | Nachher |
 |---|---:|---:|---:|
-| `/dashboard/[[...section]]` | 1625 KB / 495 KB | ~1181 KB / ~362 KB | |
+| `/dashboard/[[...section]]` | 1625 KB / 495 KB | ~1181 KB / ~362 KB | **1213 KB / 375 KB** (−412 / −120 KB) |
+| `/inhalte-erstellen` | 1099 KB / 337 KB | unverändert | **1127 KB / 348 KB** (+28 / +11 KB, vermutlich Error-Boundaries/Skeleton/Entwurf-State aus Welle 1 – in Welle 2 prüfen) |
+| `/anmelden` | – | – | 696 KB / 219 KB |
+
+Nachher gemessen am Build von `6827279` (Welle 1 gemergt), gzip selbst aus den First-Load-Chunks berechnet. Globales CSS weiterhin 610 KB roh (A-3, Welle 3). Schrift-Preload pro Route nicht gemessen (Dev-E2E lädt anders als Produktion); Build enthält jetzt 48 woff2-Dateien insgesamt.
 | `/marketing-preview/[screen]` | 1973 KB / 601 KB | ~1529 KB / ~468 KB | |
 
 Chunk `0ap3hiwn9twov.js` (crypto-browserify): 444 KB roh / 133 KB gzip, sollte im neuen Build fehlen.
