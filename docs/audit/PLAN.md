@@ -32,6 +32,9 @@ Für CHANGELOG bzw. Gründer: Der Bucket `generated-images` ist nicht versionier
 - **Screenshots:** Neu aufnehmen, nur mit Renders von Lüne Bräu, ohne ABK und Seeblick.
 - **Vor dem Abschluss (nach Welle 3):** Ein E2E-Volllauf zusätzlich gegen einen Produktions-Build (`next build && next start`), mit dem Vorladen-Test aus B-2.
 
+### Ergebnis Welle 2 (E2E am Stand `da837f1`)
+Abgeschlossen: 220 Tests bestanden, 24 fehlgeschlagen, 44 übersprungen, **0 Regressionen**. Die roten Tests sind dieselben wie nach Welle 1 (N-5, N-7/axe, B-2-Prefetch im Dev-Modus). Bundle `/dashboard` 1038 / 323 KB, `/inhalte-erstellen` 1012 / 315 KB (siehe `PERFORMANCE.md`). Die Setup-Prüfung „Test-URL im Bundle“ ist nur noch ein Messwert, weil supabase-js nicht mehr im First-Load des Dashboards liegt.
+
 ## Welle 2 – nach Welle 1, gleiche Dateien wie oben
 - **performance-engineer:** A-5 und A-6, also `cache()` für `getUser` und `getWorkspace`, keine Signierung aller Asset-URLs bei jedem Besuch und kein synchroner Stripe-Sync im Render. Betroffen: `workspace.ts`, `inhalte-erstellen/page.tsx`, `videos-erstellen/page.tsx` und die Datenteile der Dashboard-Page.
 - **feature-reliability:** C-3, das Rate-Limit der Team-API. Erst nach B-1 neu messen; wahrscheinlich ist es dann erledigt.
