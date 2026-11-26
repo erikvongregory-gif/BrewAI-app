@@ -63,6 +63,7 @@ import {
 } from "@/app/(dashboard)/inhalte-erstellen/lib/api-guards";
 import { POST as generationStatus } from "@/app/api/generation/status/route";
 import { POST as mediaPost } from "@/app/api/dashboard/media/route";
+import { writeDashboardMedia } from "@/lib/dashboard/media-store";
 
 const APP = "https://app.brewai.de";
 const actor = { id: "member-1", app_metadata: {}, user_metadata: {} };
@@ -187,7 +188,13 @@ describe("POST /api/dashboard/media", () => {
       const response = await mediaPost(post("/api/dashboard/media", { origin: APP, body: { ...item, imageUrl } }));
       expect(response.status, imageUrl).toBe(400);
     }
-    expect(mocks.getUser).not.toHaveBeenCalled();
+    expect(writeDashboardMedia).not.toHaveBeenCalled();
+  });
+
+  it("prüft die Anmeldung vor dem Body: ohne Session 401 statt 400", async () => {
+    mocks.getUser.mockResolvedValueOnce({ data: { user: null } });
+    const response = await mediaPost(post("/api/dashboard/media", { origin: APP, body: { kaputt: true } }));
+    expect(response.status).toBe(401);
   });
 
   it("akzeptiert weiterhin https-URLs", async () => {

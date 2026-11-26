@@ -1,4 +1,4 @@
-import { getWorkspace } from "@/lib/dashboard/workspace";
+import { billingOwnerDenied } from "@/lib/dashboard/workspace";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     } = await supabase.auth.getUser();
 
     if (user && !(await hasPassedTwoFactor(user))) return NextResponse.json({ error: "Zwei-Faktor-Prüfung erforderlich.", code: "two_factor_required" }, { status: 403 });
-  if (user && (await getWorkspace(user.id)).role !== "owner") return NextResponse.json({error:"Abrechnung kann nur der Teaminhaber verwalten."},{status:403});
+  if (user) { const denied = await billingOwnerDenied(user.id); if (denied) return denied; }
     if (!user) {
       return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
     }

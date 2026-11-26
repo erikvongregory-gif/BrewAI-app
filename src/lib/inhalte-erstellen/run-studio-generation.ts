@@ -180,7 +180,9 @@ export async function handleStudioGenerationRequest(req: Request, mode: StudioMo
       deadlineAt,
     }).catch(async (error) => {
       if (isProviderError(error)) return;
-      const message = error instanceof Error ? error.message : "Bildgenerierung fehlgeschlagen.";
+      // Ist der Job schon abgeschlossen (Fehlerpfad oben), ändert generation_finish nichts mehr.
+      console.error("[studio-generation] Auftrag fehlgeschlagen", error);
+      const message = "Die Bildgenerierung ist fehlgeschlagen. Für diesen Auftrag wurden keine Tokens berechnet.";
       try {
         await finishGeneration(job, 0, {
           error: message,
@@ -653,7 +655,9 @@ async function executeStudioGeneration(args: {
         if (reason.classified.code === "provider_content_rejected") break;
         continue;
       }
-      errors.push(reason instanceof Error ? reason.message : `Variante ${index + 1}: Unbekannter Fehler.`);
+      // Rohfehler (z. B. sharp „extract_area: bad extract area“) nur ins Log, nie zum Nutzer.
+      console.error(JSON.stringify({ domain: "studio-generation", event: "variant_failed", jobId: job.id, variant: index + 1, error: reason instanceof Error ? reason.message : String(reason) }));
+      errors.push(`Variante ${index + 1}: Das Bild konnte nicht verarbeitet werden. Bitte versuch es noch einmal, dafür wurden keine Tokens berechnet.`);
     }
   }
 

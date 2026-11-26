@@ -28,6 +28,9 @@ export default defineConfig({
       "_t4-preview/**",
       "graphify-out/**",
       "BrewAI-Cursor-Handoff/**",
+      // Agent-Worktrees (veraltete Kopien) und Playwright-Suite (läuft separat).
+      ".claude/**",
+      "tests/e2e/**",
     ],
   },
 });

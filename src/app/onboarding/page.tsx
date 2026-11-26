@@ -7,6 +7,7 @@ import { hasActiveSubscription } from "@/lib/billing/access";
 import { getEffectiveBillingRow } from "@/lib/billing/store";
 import { needsFullOnboardingFlow, sanitizeStudioOnboardingState } from "@/lib/dashboard/onboarding";
 import { getFreshUserDashboardMetadata } from "@/lib/dashboard/freshMetadata";
+import { orWorkspaceBlockedRedirect } from "@/lib/dashboard/workspace";
 import { TWO_FACTOR_PAGE, hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
@@ -36,7 +37,7 @@ export default async function OnboardingPage() {
     redirect(TWO_FACTOR_PAGE);
   }
 
-  const dashboard = await getFreshUserDashboardMetadata(user.id, user.user_metadata);
+  const dashboard = await orWorkspaceBlockedRedirect(getFreshUserDashboardMetadata(user.id, user.user_metadata));
   const onboarding = sanitizeStudioOnboardingState(dashboard.onboarding);
 
   if (!needsFullOnboardingFlow(onboarding)) {

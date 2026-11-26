@@ -83,7 +83,26 @@ export default async function InviteTokenPage({ params, searchParams }: InvitePa
                 id="invite-password"
                 name="password"
                 type="password"
-                minLength={6}
+                autoComplete="new-password"
+                minLength={8}
+                required
+                aria-describedby="invite-password-hint"
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2.5"
+              />
+              <p id="invite-password-hint" className="mt-1 text-xs text-zinc-600">
+                Mindestens 8 Zeichen.
+              </p>
+            </div>
+            <div>
+              <label htmlFor="invite-password-confirm" className="text-sm font-medium text-zinc-800">
+                Passwort wiederholen
+              </label>
+              <input
+                id="invite-password-confirm"
+                name="passwordConfirm"
+                type="password"
+                autoComplete="new-password"
+                minLength={8}
                 required
                 className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2.5"
               />

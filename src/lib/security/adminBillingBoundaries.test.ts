@@ -70,7 +70,7 @@ vi.mock("@/lib/supabase/server", () => ({
   }),
 }));
 vi.mock("@/lib/auth/twoFactorSession", () => ({ hasPassedTwoFactor: async () => true }));
-vi.mock("@/lib/dashboard/workspace", () => ({ getWorkspace: async () => ({ ownerId: "brewer-1", role: "owner" }) }));
+vi.mock("@/lib/dashboard/workspace", () => ({ getWorkspace: async () => ({ ownerId: "brewer-1", role: "owner" }), billingOwnerDenied: async () => null }));
 vi.mock("@/lib/billing/store", () => ({
   ensureBillingRow: async () => undefined,
   getBillingRow: async () => ({

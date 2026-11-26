@@ -1,4 +1,4 @@
-import { workspaceResourceUser } from "@/lib/dashboard/workspace";
+import { workspaceErrorResponse, workspaceResourceUser } from "@/lib/dashboard/workspace";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { NextResponse } from "next/server";
 import { hasPaidSubscription, paidPlanFromBilling } from "@/lib/billing/access";
@@ -28,7 +28,11 @@ export async function GET() {
     return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
   }
 
-  user = await workspaceResourceUser(user, false, { hydrate: false });
+  try {
+    user = await workspaceResourceUser(user, false, { hydrate: false });
+  } catch (error) {
+    return workspaceErrorResponse(error);
+  }
   const freeTrialImageUsed = Boolean(user.user_metadata?.free_trial_image_used_at);
   const onboardingBonusClaimed = Boolean(user.user_metadata?.onboarding_bonus_claimed_at);
 
