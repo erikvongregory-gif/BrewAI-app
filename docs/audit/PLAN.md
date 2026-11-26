@@ -26,6 +26,12 @@ Neu für Welle 3 (ui-design-qa): N-5 (Prompt wird ohne Hinweis auf 800 Zeichen g
 Abgeschlossen: 220 Tests bestanden, 24 fehlgeschlagen, 44 übersprungen. Die Baseline lag bei 194/50/44. **0 Regressionen.** Noch rot sind B-2 „Prefetch > 0“ (im Dev-Modus nicht prüfbar, die Reaktion liegt unter 300 ms), N-5 sowie 20 Querschnittstests mit axe (N-7). Die letzten beiden gehören zu Welle 3.
 Für CHANGELOG bzw. Gründer: Der Bucket `generated-images` ist nicht versioniert. Das Schema liegt in `docs/*.sql` statt in `supabase/migrations`. Stripe Checkout zeigt „evglab sandbox“.
 
+## Welle 2 – Zusatzaufträge des Gründers (26.11.2026)
+- **navigation-specialist:** Bei B-1 den globalen Klick-Handler durch gezielte `window.history.pushState`-Aufrufe in der Tab-Navigation ersetzen. Das Verhalten bleibt gleich. Außerdem C-3 im Client: Die 429-Meldung samt `Retry-After` wird angezeigt.
+- **feature-reliability:** Teaminhaber mit abgelaufenem Abo: Separat gekaufte Credits bleiben nutzbar. Unterscheidet der Code gekaufte und im Abo enthaltene Credits, werden die im Abo enthaltenen bei inaktivem Abo gesperrt. Unterscheidet er sie nicht, bleibt das Generieren mit Restguthaben erlaubt, und die Lücke kommt in den CHANGELOG. Dazu `confirm-session` ohne rohe Stripe-Meldungen.
+- **Screenshots:** Neu aufnehmen, nur mit Renders von Lüne Bräu, ohne ABK und Seeblick.
+- **Vor dem Abschluss (nach Welle 3):** Ein E2E-Volllauf zusätzlich gegen einen Produktions-Build (`next build && next start`), mit dem Vorladen-Test aus B-2.
+
 ## Welle 2 – nach Welle 1, gleiche Dateien wie oben
 - **performance-engineer:** A-5 und A-6, also `cache()` für `getUser` und `getWorkspace`, keine Signierung aller Asset-URLs bei jedem Besuch und kein synchroner Stripe-Sync im Render. Betroffen: `workspace.ts`, `inhalte-erstellen/page.tsx`, `videos-erstellen/page.tsx` und die Datenteile der Dashboard-Page.
 - **feature-reliability:** C-3, das Rate-Limit der Team-API. Erst nach B-1 neu messen; wahrscheinlich ist es dann erledigt.
