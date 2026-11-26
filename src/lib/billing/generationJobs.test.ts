@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildGenerationBillingSnapshot,
   generationRequestHash,
+  reservationErrorResponse,
 } from "./generationJobs";
 import type { BillingRow } from "./store";
 
@@ -39,6 +40,23 @@ describe("generationRequestHash", () => {
     const req = new Request("https://app.example/api/inhalte-erstellen/create-task");
     const payload = { quality: "medium", variantCount: 2 };
     expect(generationRequestHash(req, payload)).toBe(generationRequestHash(req, payload));
+  });
+});
+
+describe("reservationErrorResponse", () => {
+  it("meldet ein inaktives Abo verständlich statt 'Guthaben prüfen'", async () => {
+    const today = reservationErrorResponse("Kein aktives Abo.");
+    expect(today.status).toBe(402);
+    expect((await today.json()).code).toBe("subscription_inactive");
+    const proposed = reservationErrorResponse("Nicht genug gekaufte Tokens.");
+    expect(proposed.status).toBe(402);
+    expect((await proposed.json()).error).toMatch(/gekaufte Credits/);
+  });
+  it("behält Idempotenz-Konflikt und allgemeinen Fehler bei", async () => {
+    expect((await reservationErrorResponse("Idempotency key mismatch").json()).code).toBe("idempotency_key_mismatch");
+    const other = reservationErrorResponse("Nicht genug Tokens.");
+    expect(other.status).toBe(409);
+    expect((await other.json()).code).toBe("reservation_failed");
   });
 });
 

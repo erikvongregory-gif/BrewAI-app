@@ -1,5 +1,5 @@
 import { crawlCatalogPages, formatCatalogCrawlNote } from "@/lib/brand/catalog-crawl";
-import { workspaceResourceUser } from "@/lib/dashboard/workspace";
+import { workspaceResourceUser, workspaceErrorResponse } from "@/lib/dashboard/workspace";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -118,7 +118,7 @@ async function analyzeBrandUrl(req: Request, progress: ProgressFn): Promise<Next
     } = await supabase.auth.getUser();
 
     if (user && !(await hasPassedTwoFactor(user))) return NextResponse.json({ error: "Zwei-Faktor-Prüfung erforderlich.", code: "two_factor_required" }, { status: 403 });
-  if (user) { try { user = await workspaceResourceUser(user, true); } catch { return NextResponse.json({error:"Teamzugriff nicht erlaubt."},{status:403}); } }
+  if (user) { try { user = await workspaceResourceUser(user, true); } catch (e) { return workspaceErrorResponse(e); } }
     if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
 
     const parsed = bodySchema.safeParse(await req.json());

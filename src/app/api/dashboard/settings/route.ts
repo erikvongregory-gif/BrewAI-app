@@ -1,4 +1,4 @@
-import { getWorkspace, workspaceResourceUser } from "@/lib/dashboard/workspace";
+import { getWorkspace, workspaceResourceUser, workspaceErrorResponse } from "@/lib/dashboard/workspace";
 import { canWriteWithRole } from "@/lib/dashboard/teamRoles";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { NextResponse } from "next/server";
@@ -221,8 +221,8 @@ export async function GET(req: Request) {
   let workspace: User;
   try {
     workspace = await workspaceResourceUser(actor, false);
-  } catch {
-    return NextResponse.json({ error: "Teamzugriff nicht erlaubt." }, { status: 403 });
+  } catch (e) {
+    return workspaceErrorResponse(e);
   }
 
   // Frische Actor-Metadata (JWT kann stale sein).
@@ -283,8 +283,8 @@ export async function PUT(req: Request) {
     canWriteBrand = canWriteWithRole(membership.role);
     // Marke lesen immer erlaubt; Schreiben nur für Owner/Admin/Editor.
     workspace = await workspaceResourceUser(actor, false);
-  } catch {
-    return NextResponse.json({ error: "Teamzugriff nicht erlaubt." }, { status: 403 });
+  } catch (e) {
+    return workspaceErrorResponse(e);
   }
 
   let body: unknown;

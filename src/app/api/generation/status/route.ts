@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { workspaceResourceUser } from "@/lib/dashboard/workspace";
+import { workspaceResourceUser, workspaceErrorResponse } from "@/lib/dashboard/workspace";
 import { finishGeneration, type GenerationJob } from "@/lib/billing/generationJobs";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -38,8 +38,8 @@ async function requireUserId(): Promise<string | NextResponse> {
   if (user) {
     try {
       user = await workspaceResourceUser(user, false);
-    } catch {
-      return NextResponse.json({ error: "Teamzugriff nicht erlaubt." }, { status: 403 });
+    } catch (e) {
+      return workspaceErrorResponse(e);
     }
   }
   if (!user) {

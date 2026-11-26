@@ -1,7 +1,7 @@
 import { buildFreeformImagePromptV3 } from "@/lib/inhalte-erstellen/image-prompt-v3";
 import { uploadGeneratedImageToStorage } from "@/lib/supabase/storage";
 import { applyAiWatermark } from "@/lib/openai/aiWatermark";
-import { workspaceResourceUser } from "@/lib/dashboard/workspace";
+import { workspaceResourceUser, workspaceErrorResponse } from "@/lib/dashboard/workspace";
 import { reserveGeneration, finishGeneration } from "@/lib/billing/generationJobs";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { randomUUID } from "crypto";
@@ -121,7 +121,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Nicht angemeldet.", code: "auth_required" }, { status: 401 });
     }
     if (!(await hasPassedTwoFactor(user))) return NextResponse.json({ error: "Zwei-Faktor-Prüfung erforderlich.", code: "two_factor_required" }, { status: 403 });
-    try { user = await workspaceResourceUser(user, true); } catch { return NextResponse.json({error:"Teamzugriff nicht erlaubt."},{status:403}); }
+    try { user = await workspaceResourceUser(user, true); } catch (e) { return workspaceErrorResponse(e); }
     const userId = user.id;
 
     const parsed = schema.safeParse(await req.json().catch(() => null));
