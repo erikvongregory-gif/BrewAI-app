@@ -32,7 +32,7 @@ const BrandProfileSetupModal = dynamic(
   () => import("@/components/dashboard/BrandProfileSetupModal").then((m) => m.BrandProfileSetupModal),
   { ssr: false },
 );
-import { hasActiveSubscriptionFromState } from "@/lib/billing/access";
+import { hasActiveSubscriptionFromState } from "@/lib/billing/subscriptionState";
 import {
   clearHomepageCheckoutParams,
   getHomepageCheckoutPlan,
