@@ -83,9 +83,9 @@ Ursache der +28 KB nach Welle 1: Im Welle-1-Build liegt der Root-`error.tsx` (mi
 
 | Route | Welle 1 roh / gzip | Erwartet roh / gzip | Nachher |
 |---|---:|---:|---:|
-| `/inhalte-erstellen` | 1127 / 348 KB | ~990 / ~309 KB | |
-| `/dashboard/[[...section]]` | 1213 / 375 KB | ~1108 / ~345 KB | |
-| `/onboarding` | 832 KB / nicht gemessen | ~727 KB / nicht gemessen | |
+| `/inhalte-erstellen` | 1127 / 348 KB | ~990 / ~309 KB | **1012 / 315 KB** |
+| `/dashboard/[[...section]]` | 1213 / 375 KB | ~1108 / ~345 KB | **1038 / 323 KB** |
+| `/onboarding` | 832 KB / nicht gemessen | ~727 KB / nicht gemessen | **726 / 227 KB** |
 
 Nicht verschoben, weil sofort sichtbar oder in einer fremden Datei: `motion`/`framer-motion` (Shell, Navigation, Icons) und `MagneticText`. Kandidat für den navigation-specialist: `dashboard-product-tour.tsx` in `brewai-admin-shell.tsx` nur laden, wenn `uiTourSeen` false ist (liegt im 154-KB-Chunk `04scmlg9jd3dc.js`). `embla` und Charts kommen in keinem Client-Pfad dieser Routen vor.
 
@@ -94,3 +94,7 @@ Nicht verschoben, weil sofort sichtbar oder in einer fremden Datei: `motion`/`fr
 - `geist` aus `package.json`/`package-lock.json` entfernt (die Schriften kommen aus `next/font/google`, das Paket wird nirgends importiert).
 - `TOKEN_STATE_SECRET` in `.env.example` und `docs/go-live-checklist.md` als „nicht mehr benötigt“ markiert.
 - Keine neuen Indizes nötig: `workspace_members` (PK `user_id`, Index `owner_id`), `account_deletion_jobs` (PK `user_id`) und `billing_subscriptions` (PK `user_id`) decken die Abfragen in `getWorkspace` bereits ab.
+
+Nachher gemessen am Build von `c509c3a` (Welle 2 komplett). Zwischendurch war `/dashboard` auf 1326 KB gestiegen: Ein `cache()` auf Modulebene machte die Kette Client → `billing/access.ts` → `owner.ts` → supabase-js/`next/server` nicht mehr tree-shakebar. Behoben mit `subscriptionState.ts` (server-frei) und `/* @__PURE__ */`. Neuer Schutztest: `src/lib/security/clientServerBoundary.test.ts`.
+
+**Gesamt seit Baseline:** `/dashboard` 1625 / 495 KB → 1038 / 323 KB (−36 % roh, −35 % gzip); `/inhalte-erstellen` 1099 / 337 → 1012 / 315 KB.
