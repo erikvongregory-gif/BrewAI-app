@@ -44,7 +44,7 @@ import { markDashboardPerf } from "@/lib/dashboard/dashboardPerf";
 import { buildGenericBrandProfilePatch, isBrandProfileCompleteFromSettings } from "@/lib/dashboard/brandProfile";
 import { mergeDashboardSettings, sanitizeDashboardSettings } from "@/lib/dashboard/settingsPayload";
 import { canWriteWithRole } from "@/lib/dashboard/teamRoles";
-import { fetchWithRetry } from "@/lib/http/fetchWithRetry";
+import { fetchWithRetry, parseRetryAfterMs } from "@/lib/http/fetchWithRetry";
 import { signOutAndRedirect } from "@/lib/auth/signOutClient";
 
 type DashboardTab =
@@ -472,7 +472,8 @@ export function DashboardRedesignShell(props: {
       }
     })();
 
-    void (async () => {
+    let teamRetryTimer: number | undefined;
+    const loadTeam = async (allowRetry: boolean) => {
       try {
         const res = await load("/api/dashboard/team");
         if (!res || ignore) return;
@@ -483,6 +484,15 @@ export function DashboardRedesignShell(props: {
             setMyTeamRole(json.role);
           }
           setTeamError(null);
+        } else if (res.status === 429) {
+          // C-3: Server-Meldung zeigen und einmal nach Retry-After selbst neu laden.
+          const json = (await res.json().catch(() => null)) as { error?: string } | null;
+          if (ignore) return;
+          setTeamError(json?.error ?? "Zu viele Anfragen. Teamdaten werden gleich neu geladen.");
+          if (allowRetry) {
+            const waitMs = Math.min(parseRetryAfterMs(res.headers.get("Retry-After")) ?? 5_000, 60_000);
+            teamRetryTimer = window.setTimeout(() => void loadTeam(false), waitMs);
+          }
         } else {
           setTeamError("Teamdaten konnten nicht geladen werden.");
         }
@@ -491,7 +501,8 @@ export function DashboardRedesignShell(props: {
       } finally {
         if (!ignore) setTeamLoaded(true);
       }
-    })();
+    };
+    void loadTeam(true);
 
     void (async () => {
       try {
@@ -516,6 +527,7 @@ export function DashboardRedesignShell(props: {
 
     return () => {
       ignore = true;
+      window.clearTimeout(teamRetryTimer);
     };
   }, []);
 
