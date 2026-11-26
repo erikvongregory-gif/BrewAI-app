@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   createContext,
@@ -42,6 +41,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { APP_CONFIG } from "@/config/app-config";
 import { BillingCreditsProvider } from "@/components/dashboard-shell/billing-credits-provider";
 import { DashboardProductTour } from "@/components/dashboard-shell/dashboard-product-tour";
+import { DashboardTabLink, canNavigateDashboardTab } from "@/components/dashboard-shell/dashboard-tab-nav";
 import { cn } from "@/lib/utils";
 import { sidebarItems } from "@/navigation/sidebar/sidebar-items";
 import { submitSignOut } from "@/lib/auth/submitSignOut";
@@ -91,11 +91,11 @@ function BrewAiSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link href="/dashboard">
+              <DashboardTabLink href="/dashboard">
                 <EvglabMark size={18} />
                 <span className="font-semibold text-base">{APP_CONFIG.name}</span>
                 <span className="font-bold text-xs tracking-wide text-muted-foreground">Beta</span>
-              </Link>
+              </DashboardTabLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -165,8 +165,8 @@ export function BrewAiAdminShell({
   // beim Unmount selbst auf.
 
   // Offline würde der RSC-Abruf eines Links scheitern und Next auf eine harte Navigation ausweichen
-  // (weiße chrome-error-Seite). Dann lieber hierbleiben und Bescheid geben. Document-Capture läuft nach
-  // dem Window-Capture der Dashboard-Abschnitte (die brauchen keinen Server) und vor next/link.
+  // (weiße chrome-error-Seite). Dann lieber hierbleiben und Bescheid geben. Document-Capture läuft vor
+  // next/link; Dashboard-Abschnitte (DashboardTabLink, kein Server nötig) lässt er durch.
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0 || navigator.onLine !== false) return;
@@ -178,6 +178,7 @@ export function BrewAiAdminShell({
       if (url.origin !== window.location.origin) return;
       // Sprungmarken auf derselben Seite brauchen kein Netz.
       if (url.pathname === window.location.pathname && url.search === window.location.search) return;
+      if (canNavigateDashboardTab(url.href)) return;
       event.preventDefault();
       toast.error("Keine Verbindung", {
         id: "offline-nav",

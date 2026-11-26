@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { DashboardTabLink } from "@/components/dashboard-shell/dashboard-tab-nav";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -277,7 +278,7 @@ function NavLinkItem({ item, isActive, showIconFallback, unseen = 0 }: NavLinkIt
         isActive={isActive}
         className={NAV_BUTTON_OVER_PILL}
       >
-        <Link
+        <DashboardTabLink
           id={`tour-nav-${item.id}`}
           href={item.url}
           target={item.newTab ? "_blank" : undefined}
@@ -286,7 +287,7 @@ function NavLinkItem({ item, isActive, showIconFallback, unseen = 0 }: NavLinkIt
         >
           <NavLinkIcon item={item} showFallback={showIconFallback} />
           <span>{item.title}</span>
-        </Link>
+        </DashboardTabLink>
       </SidebarMenuButton>
       <NavItemBadge badge={item.badge} />
       <NavUnseenBadge count={unseen} />
@@ -410,7 +411,7 @@ function NavDropdownItem({ item, isActive, isSubItemActive }: NavDropdownItemPro
 
               return (
                 <DropdownMenuItem key={subItem.id} asChild disabled={subItem.disabled}>
-                  <Link
+                  <DashboardTabLink
                     href={subItem.url}
                     target={subItem.newTab ? "_blank" : undefined}
                     rel={subItem.newTab ? "noreferrer" : undefined}
@@ -420,7 +421,7 @@ function NavDropdownItem({ item, isActive, isSubItemActive }: NavDropdownItemPro
                   >
                     {SubIcon && <SubIcon />}
                     <span>{subItem.title}</span>
-                  </Link>
+                  </DashboardTabLink>
                 </DropdownMenuItem>
               );
             })}
@@ -470,7 +471,7 @@ function NavCollapsibleItem({ item, isActive, defaultOpen, isSubItemActive }: Na
                     aria-disabled={subItem.disabled}
                     isActive={isSubItemActive(subItem.url)}
                   >
-                    <Link
+                    <DashboardTabLink
                       href={subItem.url}
                       target={subItem.newTab ? "_blank" : undefined}
                       rel={subItem.newTab ? "noreferrer" : undefined}
@@ -478,7 +479,7 @@ function NavCollapsibleItem({ item, isActive, defaultOpen, isSubItemActive }: Na
                     >
                       {SubIcon && <SubIcon />}
                       <span>{subItem.title}</span>
-                    </Link>
+                    </DashboardTabLink>
                   </SidebarMenuSubButton>
                 </SidebarMenuSubItem>
               );

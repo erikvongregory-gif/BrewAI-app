@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { DashboardTabLink } from "@/components/dashboard-shell/dashboard-tab-nav";
 import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import { StudioIcon } from "@/components/studio/icons";
@@ -107,7 +107,7 @@ export default function LumaBar() {
                     }
                   />
                 ) : null}
-                <Link
+                <DashboardTabLink
                   href={item.href}
                   aria-current={isActive ? "page" : undefined}
                   aria-label={item.label}
@@ -118,7 +118,7 @@ export default function LumaBar() {
                   )}
                 >
                   <StudioIcon name={item.icon} size={22} />
-                </Link>
+                </DashboardTabLink>
               </motion.div>
             </div>
           );
