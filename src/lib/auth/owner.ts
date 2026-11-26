@@ -1,5 +1,6 @@
 import type { User } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAuthUserById } from "@/lib/supabase/adminUsers";
 
 /**
  * Owner = Betreiber-Konto. Hat unbegrenzte Tokens und braucht kein Stripe-Abo.
@@ -60,8 +61,8 @@ export async function isOwnerUserId(userId: string): Promise<boolean> {
  */
 export async function isPortalOperatorUserId(userId: string): Promise<boolean> {
   try {
-    const admin = createAdminClient();
-    const { data } = await admin.auth.admin.getUserById(userId);
+    // Pro Request dedupliziert (Workspace-Prüfung liest denselben Inhaber), nie über Requests hinweg.
+    const { data } = await getAuthUserById(userId);
     return hasAdminAccess(data?.user ?? null);
   } catch {
     return false;

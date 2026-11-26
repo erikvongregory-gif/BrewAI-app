@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { hydratePrivateAssets } from "@/lib/supabase/privateAssets";
 import type { User } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAuthUserById } from "@/lib/supabase/adminUsers";
 import { isPortalOperatorUserId } from "@/lib/auth/owner";
 import { planSeatLimit } from "@/lib/billing/planCatalog";
 import type { SubscriptionPlanKey } from "@/lib/billing/tokenState";
@@ -137,9 +138,6 @@ export const getWorkspace = cache(async (userId: string): Promise<{ ownerId: str
   if (position < 0 || position >= limit - 1) throw new WorkspaceAccessError("team_seat_unavailable", "Teamplatz im aktuellen Tarif nicht verfügbar.");
   return { ownerId: data.owner_id, role: data.role as DashboardTeamRole };
 });
-
-/** Auth-Nutzer per Admin-API, pro Server-Render dedupliziert (Layout-Gate und Page lesen denselben Inhaber). */
-export const getAuthUserById = cache((userId: string) => createAdminClient().auth.admin.getUserById(userId));
 
 /**
  * Resource context only. Never use this returned identity for login, 2FA or platform-admin checks.

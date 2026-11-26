@@ -1,5 +1,6 @@
 import { hydratePrivateAssets } from "@/lib/supabase/privateAssets";
-import { getAuthUserById, getWorkspace, orWorkspaceBlockedRedirect } from "@/lib/dashboard/workspace";
+import { getWorkspace, orWorkspaceBlockedRedirect } from "@/lib/dashboard/workspace";
+import { getAuthUserById } from "@/lib/supabase/adminUsers";
 import { getDashboardMetadata, type DashboardMetadata } from "@/lib/dashboard/metadata";
 import { readDashboardBeers } from "@/lib/dashboard/beer-store";
 
