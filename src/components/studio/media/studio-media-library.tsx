@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { DashboardTabLink } from "@/components/dashboard-shell/dashboard-tab-nav";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "framer-motion";
 import { Check, ChevronDown, ImagePlus, Search, X } from "lucide-react";
@@ -976,7 +977,7 @@ export function StudioMediaLibrary({
                   </p>
                 )}
                 <Button variant="outline" asChild>
-                  <Link href="/dashboard/brand">Markenprofil prüfen</Link>
+                  <DashboardTabLink href="/dashboard/brand">Markenprofil prüfen</DashboardTabLink>
                 </Button>
               </CardContent>
             </Card>
