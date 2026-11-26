@@ -225,7 +225,7 @@ function BrewAiNextSteps({
                     </Button>
                   ) : (
                     <Button asChild variant={variant}>
-                      <Link href="/inhalte-erstellen" prefetch={false}>
+                      <Link href="/inhalte-erstellen">
                         Bild erstellen
                       </Link>
                     </Button>
@@ -589,7 +589,7 @@ function BrewAiAssetsOverview({
             </div>
             {/* Outline: Die primäre Aktion steht oben in „Nächste Schritte“. */}
             <Button asChild size="sm" variant="outline">
-              <Link href="/inhalte-erstellen" prefetch={false}>
+              <Link href="/inhalte-erstellen">
                 Bild erstellen
               </Link>
             </Button>

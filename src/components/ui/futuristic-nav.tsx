@@ -108,7 +108,6 @@ export default function LumaBar() {
                   />
                 ) : null}
                 <Link
-                  prefetch={false}
                   href={item.href}
                   aria-current={isActive ? "page" : undefined}
                   aria-label={item.label}

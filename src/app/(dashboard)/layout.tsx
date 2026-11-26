@@ -2,10 +2,8 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import type { Viewport } from "next";
 import { cookies } from "next/headers";
-import {
-  BrewAiAdminLayoutFallback,
-  BrewAiAdminShell,
-} from "@/components/dashboard-shell/brewai-admin-shell";
+import { BrewAiAdminShell } from "@/components/dashboard-shell/brewai-admin-shell";
+import StudioDashboardLoading from "./loading";
 import { hasAdminAccess, isOwnerUser } from "@/lib/auth/owner";
 import { TWO_FACTOR_PAGE, hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { getShellGateDashboardMetadata } from "@/lib/dashboard/freshMetadata";
@@ -104,7 +102,8 @@ export default async function StudioDashboardLayout({ children }: { children: Re
         sidebarVariant={variant}
         sidebarCollapsible={collapsible}
       >
-        <Suspense fallback={<BrewAiAdminLayoutFallback />}>{children}</Suspense>
+        {/* Gleiches Skeleton wie loading.tsx statt 100dvh-Platzhalter unter der Kopfzeile (B-6). */}
+        <Suspense fallback={<StudioDashboardLoading />}>{children}</Suspense>
       </BrewAiAdminShell>
     </PreferencesStoreProvider>
   );

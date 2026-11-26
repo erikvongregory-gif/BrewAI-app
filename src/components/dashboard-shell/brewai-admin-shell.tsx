@@ -14,6 +14,7 @@ import {
   type ReactNode,
 } from "react";
 import { MotionConfig } from "framer-motion";
+import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 import { EvglabMark } from "@/components/studio/evglab-mark";
 import { AccountSwitcher } from "@/components/dashboard-shell/header/account-switcher";
@@ -90,7 +91,7 @@ function BrewAiSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link prefetch={false} href="/dashboard">
+              <Link href="/dashboard">
                 <EvglabMark size={18} />
                 <span className="font-semibold text-base">{APP_CONFIG.name}</span>
                 <span className="font-bold text-xs tracking-wide text-muted-foreground">Beta</span>
@@ -159,10 +160,33 @@ export function BrewAiAdminShell({
     [],
   );
 
+  // Kein Zurücksetzen von Padding/Full-Bleed im Effekt nach jedem Pfadwechsel mehr (B-4): Das lief nach dem
+  // Paint und nach den Effekten der neuen Seite. Alle Aufrufer von setContentPadding/setFullBleed räumen
+  // beim Unmount selbst auf.
+
+  // Offline würde der RSC-Abruf eines Links scheitern und Next auf eine harte Navigation ausweichen
+  // (weiße chrome-error-Seite). Dann lieber hierbleiben und Bescheid geben. Document-Capture läuft nach
+  // dem Window-Capture der Dashboard-Abschnitte (die brauchen keinen Server) und vor next/link.
   useEffect(() => {
-    setFullBleedOverride(null);
-    setContentPadding(undefined);
-  }, [pathname]);
+    const onClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || navigator.onLine !== false) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const anchor = (event.target as Element | null)?.closest?.("a[href]");
+      if (!(anchor instanceof HTMLAnchorElement)) return;
+      if ((anchor.target && anchor.target !== "_self") || anchor.hasAttribute("download")) return;
+      const url = new URL(anchor.href, window.location.href);
+      if (url.origin !== window.location.origin) return;
+      // Sprungmarken auf derselben Seite brauchen kein Netz.
+      if (url.pathname === window.location.pathname && url.search === window.location.search) return;
+      event.preventDefault();
+      toast.error("Keine Verbindung", {
+        id: "offline-nav",
+        description: "Prüfe deine Internetverbindung und versuche es dann erneut.",
+      });
+    };
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, []);
 
   // Bereichswechsel sanft einblenden. Dashboard-Tabs animiert StudioViewTransition selbst,
   // daher zählt /dashboard/* als ein Bereich. Web Animations statt key → kein Remount.

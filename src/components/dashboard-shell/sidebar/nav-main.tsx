@@ -125,7 +125,6 @@ export function NavMain({ items }: NavMainProps) {
               >
                 <Link
                   id="tour-create"
-                  prefetch={false}
                   href="/inhalte-erstellen"
                   onClick={closeMobileNav}
                 >
@@ -280,7 +279,6 @@ function NavLinkItem({ item, isActive, showIconFallback, unseen = 0 }: NavLinkIt
       >
         <Link
           id={`tour-nav-${item.id}`}
-          prefetch={false}
           href={item.url}
           target={item.newTab ? "_blank" : undefined}
           rel={item.newTab ? "noreferrer" : undefined}
@@ -413,7 +411,6 @@ function NavDropdownItem({ item, isActive, isSubItemActive }: NavDropdownItemPro
               return (
                 <DropdownMenuItem key={subItem.id} asChild disabled={subItem.disabled}>
                   <Link
-                    prefetch={false}
                     href={subItem.url}
                     target={subItem.newTab ? "_blank" : undefined}
                     rel={subItem.newTab ? "noreferrer" : undefined}
@@ -474,7 +471,6 @@ function NavCollapsibleItem({ item, isActive, defaultOpen, isSubItemActive }: Na
                     isActive={isSubItemActive(subItem.url)}
                   >
                     <Link
-                      prefetch={false}
                       href={subItem.url}
                       target={subItem.newTab ? "_blank" : undefined}
                       rel={subItem.newTab ? "noreferrer" : undefined}

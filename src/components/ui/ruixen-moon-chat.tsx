@@ -149,12 +149,23 @@ function beerMeta(beer: DashboardBeer) {
   return [stil, filtr, glas].filter(Boolean).join(" · ");
 }
 
+// Entwurf übersteht den Wechsel Erstellen → Mediathek → Erstellen (Client-Navigation), nicht einen Reload.
+// Wird nur im Effekt (Client) beschrieben, auf dem Server bleibt er leer: kein Teilen zwischen Requests,
+// keine Hydration-Abweichung beim ersten Laden.
+const draft: {
+  message: string;
+  activePresetId: string | null;
+  aspectRatio: Aspect;
+  requestQuality: RequestQuality;
+  photoStyle: PhotoStyle;
+} = { message: "", activePresetId: null, aspectRatio: "4:5", requestQuality: "medium", photoStyle: "reportage" };
+
 export default function RuixenMoonChat() {
-  const [message, setMessage] = useState("");
-  const [activePresetId, setActivePresetId] = useState<string | null>(null);
-  const [aspectRatio, setAspectRatio] = useState<Aspect>("4:5");
+  const [message, setMessage] = useState(draft.message);
+  const [activePresetId, setActivePresetId] = useState<string | null>(draft.activePresetId);
+  const [aspectRatio, setAspectRatio] = useState<Aspect>(draft.aspectRatio);
   const [formatPickerOpen, setFormatPickerOpen] = useState(false);
-  const [requestQuality, setRequestQuality] = useState<RequestQuality>("medium");
+  const [requestQuality, setRequestQuality] = useState<RequestQuality>(draft.requestQuality);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
   const [presetPickerOpen, setPresetPickerOpen] = useState(false);
   const [beers, setBeers] = useState<DashboardBeer[]>([]);
@@ -169,7 +180,7 @@ export default function RuixenMoonChat() {
   const [charactersError, setCharactersError] = useState<string | null>(null);
   const [genBusy, setGenBusy] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
-  const [photoStyle, setPhotoStyle] = useState<PhotoStyle>("reportage");
+  const [photoStyle, setPhotoStyle] = useState<PhotoStyle>(draft.photoStyle);
   const [runs, setRuns] = useState<CreateRun[]>([]);
   const [activeRunId, setActiveRunId] = useState<string | null>(null);
   const runPayloads = useRef(new Map<string, unknown>());
@@ -178,6 +189,15 @@ export default function RuixenMoonChat() {
     minHeight: 48,
     maxHeight: 150,
   });
+
+  useEffect(() => {
+    Object.assign(draft, { message, activePresetId, aspectRatio, requestQuality, photoStyle });
+  }, [message, activePresetId, aspectRatio, requestQuality, photoStyle]);
+
+  // Wiederhergestellten Entwurf auf die passende Höhe bringen (läuft nach dem Reset im Resize-Hook).
+  useEffect(() => {
+    if (draft.message) adjustHeight();
+  }, [adjustHeight]);
 
   const quickPresets = sortTemplatesForDate(OCCASION_TEMPLATES, new Date()).map(
     ({ template }) => template,

@@ -24,7 +24,7 @@ export function AssetsFolderButton({
       className={cn("overflow-visible", className)}
       aria-label="Mediathek / Assets öffnen"
     >
-      <Link href={href} prefetch={false} title="Mediathek" className="group">
+      <Link href={href} title="Mediathek" className="group">
         <Folder size="sm" showHint={false} />
         <span className="sr-only">Mediathek</span>
       </Link>

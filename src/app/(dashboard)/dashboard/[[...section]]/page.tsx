@@ -1,5 +1,5 @@
 import { workspaceResourceUser } from "@/lib/dashboard/workspace";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -39,6 +39,8 @@ export default async function DashboardPage({
   const routeParams = (await params) ?? {};
   const query = (await searchParams) ?? {};
   const section = routeParams.section?.[0]?.toLowerCase();
+  // Vor jedem await auf Supabase prüfen: So steht der 404-Status fest, bevor das Layout gestreamt wird.
+  if (section && !SECTION_TABS.has(section)) notFound();
 
   // Legacy ?tab=… → path-based routes
   const legacyTabRaw = query.tab;
@@ -119,16 +121,13 @@ export default async function DashboardPage({
       : "user";
   const isAdmin = userRole === "admin";
 
-  const forcedTab =
-    section && SECTION_TABS.has(section) ? section : section ? "dashboard" : undefined;
-
   return (
     <DashboardRedesignShell
       userEmail={user.email}
       initialProfileName={profileName}
       initialBreweryName={breweryName}
       isAdmin={isAdmin}
-      forcedTab={forcedTab}
+      forcedTab={section}
     />
   );
 }
