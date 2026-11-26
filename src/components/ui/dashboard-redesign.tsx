@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { StudioViewTransition } from "@/components/studio/studio-view-transition";
 import { MARKETING_SITE_URL } from "@/lib/siteConfig";
 import { useStudioShell } from "@/components/studio/studio-workspace-shell";
@@ -61,6 +61,15 @@ function tabFromPathname(pathname: string): DashboardTab | null {
   if (!match?.[1]) return null;
   const section = match[1].toLowerCase() as DashboardTab;
   return PATH_TABS.has(section) ? section : null;
+}
+
+/** Exakt die Abschnitte dieser Seite (nicht /dashboard/2fa-email o. ä.). */
+const DASHBOARD_TAB_PATH = /^\/dashboard(?:\/(media|team|brand|settings|pricing|assistant))?\/?$/i;
+
+/** Nur die Query ändern, ohne Server-Roundtrip; Pfad zum Aufrufzeitpunkt lesen, nicht aus einem alten Render. */
+function replaceQuery(params: URLSearchParams) {
+  const qs = params.toString();
+  window.history.replaceState(null, "", qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
 }
 
 function hrefForTab(tab: DashboardTab, searchParams: URLSearchParams) {
@@ -236,19 +245,78 @@ export function DashboardRedesignShell(props: {
   const searchParams = useSearchParams();
 
   const pathTab = tabFromPathname(pathname);
-  const tabParam = (forcedTab || pathTab || searchParams.get("tab") || "dashboard").toLowerCase();
+  // URL zuerst: Nach Zurück aus einer anderen Route kann das gecachte RSC-Payload ein älteres forcedTab tragen.
+  const tabParam = (pathTab || forcedTab || searchParams.get("tab") || "dashboard").toLowerCase();
   const initialTab: DashboardTab = PATH_TABS.has(tabParam as DashboardTab)
     ? (tabParam as DashboardTab)
     : "dashboard";
   const [tab, setTab] = useState<DashboardTab>(initialTab);
 
+  // Abschnittswechsel per History-API statt router.push: Die Route ist force-dynamic und der
+  // Catch-all-Parameter gehört zum Segment-Key, router.push mountet diese Komponente neu
+  // (Server-Roundtrip, alle Daten neu, Scroll weg). pushState hält Next-Router, usePathname und
+  // Zurück/Vor synchron; Reload und Deep-Links rendert der Server wie bisher.
+  const scrollByUrl = useRef(new Map<string, number>());
+  const restoreScrollRef = useRef(false);
+
+  const goToTabHref = useCallback((href: string) => {
+    const current = window.location.pathname + window.location.search;
+    scrollByUrl.current.set(current, window.scrollY);
+    restoreScrollRef.current = false;
+    const url = new URL(href, window.location.href);
+    setTab(tabFromPathname(url.pathname) ?? "dashboard");
+    const target = url.pathname + url.search + url.hash;
+    if (target !== current + window.location.hash) window.history.pushState(null, "", target);
+  }, []);
+
   const changeTab = useCallback(
     (next: DashboardTab) => {
-      setTab(next);
-      router.push(hrefForTab(next, new URLSearchParams(searchParams.toString())));
+      goToTabHref(hrefForTab(next, new URLSearchParams(window.location.search)));
     },
-    [router, searchParams],
+    [goToTabHref],
   );
+
+  // Links auf Abschnitte dieser Seite (Sidebar, mobile Leiste, Header, Übersicht) abfangen, solange
+  // die Seite gemountet ist. Window-Capture läuft vor dem onClick von next/link, das bei
+  // defaultPrevented nicht navigiert; andere onClick-Handler (z. B. Sheet schließen) laufen weiter.
+  useEffect(() => {
+    const onClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const anchor = (event.target as Element | null)?.closest?.("a[href]");
+      if (!(anchor instanceof HTMLAnchorElement)) return;
+      if ((anchor.target && anchor.target !== "_self") || anchor.hasAttribute("download")) return;
+      const url = new URL(anchor.href, window.location.href);
+      if (url.origin !== window.location.origin || !DASHBOARD_TAB_PATH.test(url.pathname)) return;
+      event.preventDefault();
+      goToTabHref(url.href);
+    };
+    const onPopState = () => {
+      restoreScrollRef.current = true;
+    };
+    window.addEventListener("click", onClick, true);
+    window.addEventListener("popstate", onPopState);
+    return () => {
+      window.removeEventListener("click", onClick, true);
+      window.removeEventListener("popstate", onPopState);
+    };
+  }, [goToTabHref]);
+
+  // Neuer Abschnitt per Klick: nach oben. Zurück/Vor: gemerkte Position (z. B. Mediathek) wiederherstellen.
+  const firstTabRenderRef = useRef(true);
+  useLayoutEffect(() => {
+    if (firstTabRenderRef.current) {
+      firstTabRenderRef.current = false;
+      return;
+    }
+    const y = restoreScrollRef.current
+      ? (scrollByUrl.current.get(window.location.pathname + window.location.search) ?? 0)
+      : 0;
+    restoreScrollRef.current = false;
+    window.scrollTo(0, y);
+    // Zweiter Versuch, nachdem nachgeladene Inhalte (Grid, Bilder) ihr Layout haben.
+    if (y > 0) requestAnimationFrame(() => window.scrollTo(0, y));
+  }, [tab]);
 
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [summaryLoaded, setSummaryLoaded] = useState(false);
@@ -323,7 +391,7 @@ export function DashboardRedesignShell(props: {
       p.delete("tab");
       const qs = p.toString();
       const target = tab === "dashboard" ? (qs ? `/dashboard?${qs}` : "/dashboard") : qs ? `/dashboard/${tab}?${qs}` : `/dashboard/${tab}`;
-      router.replace(target, { scroll: false });
+      window.history.replaceState(null, "", target);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
@@ -473,8 +541,7 @@ export function DashboardRedesignShell(props: {
         hasActiveSubscriptionFromState(displaySummary?.plan, displaySummary?.billingStatus));
     if (hasPaidPlan) {
       clearHomepageCheckoutParams(params);
-      const qs = params.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      replaceQuery(params);
       return;
     }
 
@@ -483,8 +550,7 @@ export function DashboardRedesignShell(props: {
       "Bitte bestätige unten die Widerrufs-Zustimmung und wähle danach deinen Tarif.",
     );
     clearHomepageCheckoutParams(params);
-    const qs = params.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    replaceQuery(params);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settingsLoaded, displaySummary, searchParams]);
 
@@ -603,8 +669,7 @@ export function DashboardRedesignShell(props: {
     setBrandProfileSetupOpen(true);
     const p = new URLSearchParams(searchParams.toString());
     p.delete("openBrand");
-    const qs = p.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    replaceQuery(p);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
