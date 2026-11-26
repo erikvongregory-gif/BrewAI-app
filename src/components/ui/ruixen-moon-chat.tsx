@@ -30,12 +30,17 @@ import { estimateStudioImageTokenCost } from "@/lib/billing/generationTokenCost"
 import { startStudioGeneration } from "@/lib/inhalte-erstellen/start-studio-generation";
 import { clearActiveGeneration, readActiveGeneration } from "@/lib/inhalte-erstellen/active-generation";
 import { pollGenerationJob } from "@/lib/inhalte-erstellen/poll-generation-job";
-import { CreateResultStage, type CreateRun } from "@/components/ui/create-result-stage";
+import dynamic from "next/dynamic";
+import type { CreateRun } from "@/components/ui/create-result-stage";
 import {
   CHARACTER_ASPECTS,
   effectiveAspectRatio,
   type Aspect,
 } from "@/lib/inhalte-erstellen/studio-config";
+
+// Ergebnisbühne erscheint erst nach dem ersten Auftrag: nicht im First-Load-Bundle, im Effekt unten vorgeladen.
+const loadCreateResultStage = () => import("@/components/ui/create-result-stage");
+const CreateResultStage = dynamic(() => loadCreateResultStage().then((m) => m.CreateResultStage));
 
 const PLACEHOLDER_ETIKETT = "https://example.com/placeholder.png";
 
@@ -198,6 +203,10 @@ export default function RuixenMoonChat() {
   useEffect(() => {
     if (draft.message) adjustHeight();
   }, [adjustHeight]);
+
+  useEffect(() => {
+    void loadCreateResultStage();
+  }, []);
 
   const quickPresets = sortTemplatesForDate(OCCASION_TEMPLATES, new Date()).map(
     ({ template }) => template,
