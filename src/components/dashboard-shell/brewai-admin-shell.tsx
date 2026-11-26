@@ -90,7 +90,7 @@ function BrewAiSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link prefetch={false} href="/dashboard">
+              <Link href="/dashboard">
                 <EvglabMark size={18} />
                 <span className="font-semibold text-base">{APP_CONFIG.name}</span>
                 <span className="font-bold text-xs tracking-wide text-muted-foreground">Beta</span>
