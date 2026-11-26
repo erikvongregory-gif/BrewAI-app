@@ -4,7 +4,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
-import { getWorkspace } from "@/lib/dashboard/workspace";
+import { getWorkspace, workspaceErrorResponse } from "@/lib/dashboard/workspace";
 import { ensureBillingRow } from "@/lib/billing/store";
 import { createWorkspaceInvite } from "@/lib/dashboard/teamInvites";
 import { enforceSameOrigin, enforceRateLimitPersistent } from "@/lib/security/requestGuards";
@@ -19,7 +19,8 @@ async function context(req: Request, manage = false) {
   if (!(await hasPassedTwoFactor(user))) return NextResponse.json({ error: "Zwei-Faktor-Prüfung erforderlich." }, { status: 403 });
   const limit = await enforceRateLimitPersistent(req,{ keyPrefix:"team",limit:30,windowMs:60000 },{identifierParts:[user.id]});
   if (limit) return limit;
-  const workspace = await getWorkspace(user.id);
+  let workspace: Awaited<ReturnType<typeof getWorkspace>>;
+  try { workspace = await getWorkspace(user.id); } catch (error) { return workspaceErrorResponse(error); }
   if (manage && !canManageTeam(workspace.role)) return NextResponse.json({ error: "Teamverwaltung nicht erlaubt." }, { status: 403 });
   return { ...workspace, user };
 }
@@ -58,7 +59,13 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const c=await context(req,true); if(c instanceof NextResponse)return c;
-    const input=z.object({email:z.string().email().max(200),name:z.string().max(120).optional(),role:role.default("editor")}).parse(await req.json());
+    const parsed=z.object({email:z.string().trim().email().max(200),name:z.string().max(120).optional(),role:role.default("editor")}).safeParse(await req.json().catch(()=>null));
+    if(!parsed.success){
+      const field=parsed.error.issues[0]?.path[0];
+      const message=field==="email"?"Bitte gib eine gültige E-Mail-Adresse ein.":field==="name"?"Der Name darf höchstens 120 Zeichen lang sein.":"Bitte prüf deine Eingaben.";
+      return NextResponse.json({error:message},{status:400});
+    }
+    const input=parsed.data;
     if(c.role!=="owner" && input.role==="admin")return NextResponse.json({error:"Nur der Inhaber darf Administratoren einladen."},{status:403});
     if(input.email.toLowerCase()===c.user.email?.toLowerCase()) return NextResponse.json({error:"Du bist bereits im Team."},{status:409});
     await ensureBillingRow(c.ownerId);
@@ -89,12 +96,16 @@ export async function POST(req: Request) {
         inviterEmail: c.user.email,
         workspaceName,
       });
-    } catch {
+    } catch (error) {
+      console.error("[dashboard/team] Einladungsmail fehlgeschlagen", error);
       await admin.from("workspace_invites").delete().eq("id", invite.id);
-      throw new Error("Einladung konnte nicht versendet werden.");
+      return NextResponse.json({ error: "Einladung konnte nicht versendet werden." }, { status: 400 });
     }
     return NextResponse.json({ok:true,members:await members(c.ownerId)});
-  } catch(error) { return NextResponse.json({error:error instanceof Error?error.message:"Einladung fehlgeschlagen."},{status:400}); }
+  } catch(error) {
+    console.error("[dashboard/team] Einladung fehlgeschlagen", error);
+    return NextResponse.json({error:"Einladung fehlgeschlagen. Bitte versuch es noch einmal."},{status:500});
+  }
 }
 export async function PATCH(req: Request) {
   try {
