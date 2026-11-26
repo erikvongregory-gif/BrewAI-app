@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 import { hydratePrivateAssets } from "@/lib/supabase/privateAssets";
@@ -103,7 +104,11 @@ async function isAccountMarkedForDeletion(admin: ReturnType<typeof createAdminCl
   return false;
 }
 
-export async function getWorkspace(userId: string): Promise<{ ownerId: string; role: DashboardTeamRole }> {
+/**
+ * Pro Server-Render (Layout + Page desselben Requests) nur einmal geprüft. React `cache()` gilt nur für den
+ * laufenden Request, nie über Requests oder Nutzer hinweg; in Route Handlern läuft die Prüfung jedes Mal.
+ */
+export const getWorkspace = cache(async (userId: string): Promise<{ ownerId: string; role: DashboardTeamRole }> => {
   const admin = createAdminClient();
   if (await isAccountMarkedForDeletion(admin, userId)) {
     throw new WorkspaceAccessError("account_deleted", "Konto ist zur Löschung vorgemerkt oder nicht verfügbar.");
@@ -131,7 +136,10 @@ export async function getWorkspace(userId: string): Promise<{ ownerId: string; r
   const position = (members.data ?? []).findIndex(m => m.user_id === userId);
   if (position < 0 || position >= limit - 1) throw new WorkspaceAccessError("team_seat_unavailable", "Teamplatz im aktuellen Tarif nicht verfügbar.");
   return { ownerId: data.owner_id, role: data.role as DashboardTeamRole };
-}
+});
+
+/** Auth-Nutzer per Admin-API, pro Server-Render dedupliziert (Layout-Gate und Page lesen denselben Inhaber). */
+export const getAuthUserById = cache((userId: string) => createAdminClient().auth.admin.getUserById(userId));
 
 /**
  * Resource context only. Never use this returned identity for login, 2FA or platform-admin checks.
@@ -145,7 +153,7 @@ export async function workspaceResourceUser(user: User, write = false, { hydrate
   }
   const sign = (meta: User["user_metadata"], ownerId: string) => (hydrate ? hydratePrivateAssets(meta, ownerId) : meta);
   if (workspace.ownerId === user.id) return { ...user, user_metadata: await sign(user.user_metadata,user.id) };
-  const { data, error } = await createAdminClient().auth.admin.getUserById(workspace.ownerId);
+  const { data, error } = await getAuthUserById(workspace.ownerId);
   if (error || !data.user) throw new WorkspaceAccessError("lookup_failed", "Teamkonto nicht gefunden.");
   // Preserve actor app_metadata so a team member never inherits platform administrator privileges.
   return { ...data.user, app_metadata: user.app_metadata, user_metadata: await sign(data.user.user_metadata,workspace.ownerId) };

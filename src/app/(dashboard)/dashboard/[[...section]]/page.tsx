@@ -1,7 +1,7 @@
 import { orWorkspaceBlockedRedirect, workspaceResourceUser } from "@/lib/dashboard/workspace";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { getServerUser } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { MARKETING_SITE_URL } from "@/lib/siteConfig";
 import { getDashboardMetadata } from "@/lib/dashboard/metadata";
@@ -72,10 +72,7 @@ export default async function DashboardPage({
     );
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getServerUser();
 
   if (!user) {
     const loginQuery = new URLSearchParams();

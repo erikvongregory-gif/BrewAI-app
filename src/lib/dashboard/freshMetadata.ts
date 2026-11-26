@@ -1,6 +1,5 @@
 import { hydratePrivateAssets } from "@/lib/supabase/privateAssets";
-import { getWorkspace, orWorkspaceBlockedRedirect } from "@/lib/dashboard/workspace";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { getAuthUserById, getWorkspace, orWorkspaceBlockedRedirect } from "@/lib/dashboard/workspace";
 import { getDashboardMetadata, type DashboardMetadata } from "@/lib/dashboard/metadata";
 import { readDashboardBeers } from "@/lib/dashboard/beer-store";
 
@@ -15,8 +14,7 @@ export async function getFreshUserMetadataRaw(
   const workspace = await getWorkspace(userId);
   const ownerId = workspace.ownerId;
   try {
-    const admin = createAdminClient();
-    const { data: adminUser } = await admin.auth.admin.getUserById(ownerId);
+    const { data: adminUser } = await getAuthUserById(ownerId);
     if (adminUser?.user?.user_metadata) return adminUser.user.user_metadata;
   } catch {
     /* Fallback auf Session-Metadata */
@@ -29,8 +27,7 @@ export async function getFreshUserMetadata(userId: string, fallbackMetadata: unk
   const workspace = await getWorkspace(userId);
   userId = workspace.ownerId;
   try {
-    const admin = createAdminClient();
-    const { data: adminUser } = await admin.auth.admin.getUserById(userId);
+    const { data: adminUser } = await getAuthUserById(userId);
     if (adminUser?.user?.user_metadata) return hydratePrivateAssets(adminUser.user.user_metadata,userId);
   } catch {
     /* Fallback auf Session-Metadata */

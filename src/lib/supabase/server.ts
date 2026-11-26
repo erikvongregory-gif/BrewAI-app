@@ -1,5 +1,6 @@
 import { createServerClient, parseCookieHeader } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { cache } from "react";
 import type { NextResponse } from "next/server";
 import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/supabase/env";
 import { STALE_AUTH_SESSION_COOKIE } from "@/lib/supabase/clearAuthCookies";
@@ -50,6 +51,16 @@ export async function createClient() {
     },
   });
 }
+
+/**
+ * Angemeldeter Nutzer für Server-Komponenten: pro Request nur ein Auth-Aufruf, auch wenn Layout und Page fragen.
+ * `getUser()` prüft das Token weiter bei Supabase; `cache()` gilt nur für den laufenden Request.
+ */
+export const getServerUser = cache(async () => {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  return data.user;
+});
 
 /**
  * Supabase-Client für Auth-Route-Handler.
