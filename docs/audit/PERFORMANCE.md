@@ -42,3 +42,55 @@ Vorher pro Seite (auch „Weitere Motive laden“): alle Zeilen des Nutzers in 1
 | 2.000 Motive | 2.000 in 2 Roundtrips | 48 in 1 Roundtrip |
 
 Ohne Index sortiert Postgres weiterhin alle Zeilen des Nutzers (aber in der DB, ohne Transfer). Mit dem optionalen Index aus `docs/audit/migrations-proposed.sql` wird die Seite per Index-Scan gelesen. Nachher-Messung: `explain analyze` vor/nach Index, Antwortzeit `GET /api/dashboard/media?limit=48`.
+
+## Welle 2
+
+„Erwartet“ ist aus dem Welle-1-Build (`.next` am Stand `6827279`) und dem Code abgeleitet, nicht gemessen (kein `next build` im Worktree). „Nachher“ trägt der Orchestrator ein.
+
+### A-5 Doppelte Auth- und Workspace-Abfragen pro Seitenaufruf
+
+React `cache()` (siehe `node_modules/next/dist/docs/01-app/02-guides/caching-without-cache-components.md`, Abschnitt „Deduplicating requests“) dedupliziert innerhalb **eines** Server-Renders, also für Layout und Page desselben Requests. Es gibt keinen Cache über Requests oder Nutzer hinweg. In Route Handlern wirkt `cache()` nicht (der React-Server-Build ohne Dispatcher ruft die Funktion direkt auf), dort läuft jede Prüfung wie bisher.
+
+| Funktion | Datei | Pro Request gecacht |
+|---|---|---|
+| `getWorkspace(userId)` | `src/lib/dashboard/workspace.ts` | ja, einschließlich geworfener `WorkspaceAccessError` (gleicher Request, gleiche Antwort) |
+| `getAuthUserById(userId)` | neu: `src/lib/supabase/adminUsers.ts` | ja; genutzt von `workspaceResourceUser`, `freshMetadata.ts` und `isPortalOperatorUserId` |
+| `getServerUser()` | `src/lib/supabase/server.ts` | ja; genutzt von den Pages `/dashboard`, `/inhalte-erstellen` und `/videos-erstellen` |
+
+Roundtrips im Render (ohne Proxy) bei einem harten Load von `/inhalte-erstellen`:
+
+| Nutzer | Vorher | Erwartet |
+|---|---|---|
+| Inhaber ohne Team | getUser 2 · Workspace 2 × 2 Queries · getUserById 1 · Asset-Signierung N · Billing 2 = **9 + N** | getUser 2 · Workspace 2 · getUserById 1 · Billing 2 = **7** |
+| Teammitglied (Inhaber mit Abo) | getUser 2 · Workspace 2 × (5 Queries + Portal-Check) · getUserById 2 · Signierung N · Billing 2 = **18 + N** | getUser 2 · Workspace 5 + 1 · getUserById 0 (geteilt mit dem Portal-Check) · Billing 2 = **10** |
+
+`getUser` bleibt bei 2, solange `src/app/(dashboard)/layout.tsx` (Datei des navigation-specialist) noch `createClient().auth.getUser()` aufruft statt `getServerUser()`. Nach der Umstellung dort ist es 1. N ist die Anzahl privater Asset-URLs in `user_metadata` (Etiketten, Charaktere, Referenzen); jede kostet einen Storage-Aufruf.
+
+### A-6 Studio-Seiten ohne Asset-Signierung und ohne Stripe im Render
+
+- `/inhalte-erstellen` und `/videos-erstellen` rufen `workspaceResourceUser(..., { hydrate: false })` auf. Gelesen werden dort nur der Onboarding-Status und der Brauereiname.
+- Der Stripe-Abgleich für Nutzer ohne Guthaben läuft jetzt in `src/lib/dashboard/studioBillingGate.ts` per `after()`, also **nach** der Redirect-Antwort. Ob der Nutzer Zugang bekommt oder zur Preisseite geht, entscheidet allein die DB-Zeile. Bisher wartete die Weiterleitung auf `stripe.customers.list` und `subscriptions.list` (2 Stripe-Aufrufe).
+- `/dashboard` hat Stripe im Render nie aufgerufen und nutzte schon `hydrate: false`.
+
+### Bundle `/inhalte-erstellen` und `/dashboard`
+
+Ursache der +28 KB nach Welle 1: Im Welle-1-Build liegt der Root-`error.tsx` (mit `Button`) im Chunk `1jragn8ta9un3.js` (16 KB roh / 6 KB gzip), den alle 19 Routen laden. Dazu kommen 2 KB `(dashboard)/error.tsx` und die Änderungen an der Shell. Diese Dateien gehören dem navigation-specialist und wurden hier nicht geändert. Stattdessen wurde an anderer Stelle gekürzt:
+
+| Änderung | Chunk im Welle-1-Build | roh / gzip | Routen |
+|---|---|---:|---|
+| zod entfernt: `studio-config.ts` importierte die Schemas nur für das ungenutzte `parseStudioPayload`. `brandProfile.ts` holt die Belegkonstanten jetzt aus dem zod-freien `brand-evidence-status.ts` | `3egp5dhrczj4q.js` | 105 / 30 KB | `/inhalte-erstellen`, `/dashboard`, `/onboarding` (statisch nachgeprüft: kein Client-Importpfad führt mehr zu `zod`) |
+| `CreateResultStage` per `next/dynamic`, nach dem Mount vorgeladen (erscheint erst ab dem ersten Auftrag) | `1pitcmszglc6l.js` | 32 / 9 KB | `/inhalte-erstellen` |
+
+| Route | Welle 1 roh / gzip | Erwartet roh / gzip | Nachher |
+|---|---:|---:|---:|
+| `/inhalte-erstellen` | 1127 / 348 KB | ~990 / ~309 KB | |
+| `/dashboard/[[...section]]` | 1213 / 375 KB | ~1108 / ~345 KB | |
+| `/onboarding` | 832 KB / nicht gemessen | ~727 KB / nicht gemessen | |
+
+Nicht verschoben, weil sofort sichtbar oder in einer fremden Datei: `motion`/`framer-motion` (Shell, Navigation, Icons) und `MagneticText`. Kandidat für den navigation-specialist: `dashboard-product-tour.tsx` in `brewai-admin-shell.tsx` nur laden, wenn `uiTourSeen` false ist (liegt im 154-KB-Chunk `04scmlg9jd3dc.js`). `embla` und Charts kommen in keinem Client-Pfad dieser Routen vor.
+
+### Aufräumen
+
+- `geist` aus `package.json`/`package-lock.json` entfernt (die Schriften kommen aus `next/font/google`, das Paket wird nirgends importiert).
+- `TOKEN_STATE_SECRET` in `.env.example` und `docs/go-live-checklist.md` als „nicht mehr benötigt“ markiert.
+- Keine neuen Indizes nötig: `workspace_members` (PK `user_id`, Index `owner_id`), `account_deletion_jobs` (PK `user_id`) und `billing_subscriptions` (PK `user_id`) decken die Abfragen in `getWorkspace` bereits ab.
