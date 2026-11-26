@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { Search } from "lucide-react";
 
+import { navigateDashboardTab } from "@/components/dashboard-shell/dashboard-tab-nav";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -120,7 +121,7 @@ export function SearchDialog() {
     handleOpenChange(false);
     if (item.newTab) {
       window.open(item.url, "_blank", "noopener,noreferrer");
-    } else {
+    } else if (!navigateDashboardTab(item.url)) {
       router.push(item.url);
     }
   };

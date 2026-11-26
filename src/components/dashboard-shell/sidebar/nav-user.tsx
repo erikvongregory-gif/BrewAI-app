@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { DashboardTabLink } from "@/components/dashboard-shell/dashboard-tab-nav";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CircleUser, CreditCard, EllipsisVertical, Loader2, LogOut, RotateCcw, Settings2 } from "lucide-react";
@@ -112,22 +112,22 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link href="/dashboard/settings">
+                <DashboardTabLink href="/dashboard/settings">
                   <CircleUser className="group-hover/dropdown-menu-item:-rotate-6 group-focus/dropdown-menu-item:-rotate-6" />
                   Profil
-                </Link>
+                </DashboardTabLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/dashboard/pricing">
+                <DashboardTabLink href="/dashboard/pricing">
                   <CreditCard className="group-hover/dropdown-menu-item:-rotate-3 group-focus/dropdown-menu-item:-rotate-3" />
                   Abonnement
-                </Link>
+                </DashboardTabLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/dashboard/settings">
+                <DashboardTabLink href="/dashboard/settings">
                   <Settings2 className="group-hover/dropdown-menu-item:rotate-45 group-focus/dropdown-menu-item:rotate-45" />
                   Einstellungen
-                </Link>
+                </DashboardTabLink>
               </DropdownMenuItem>
               <DropdownMenuItem
                 disabled={restartingOnboarding}

@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useBillingCredits } from "@/components/dashboard-shell/billing-credits-provider";
-import Link from "next/link";
+import { DashboardTabLink } from "@/components/dashboard-shell/dashboard-tab-nav";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
@@ -139,9 +139,9 @@ export function TokenBalanceMenuBlock() {
     <div className="px-2 py-2">
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-xs text-muted-foreground">Tokens</span>
-        <Link href="/dashboard/pricing" className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
+        <DashboardTabLink href="/dashboard/pricing" className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
           Aufladen
-        </Link>
+        </DashboardTabLink>
       </div>
       <p className="mt-0.5 text-sm font-medium tabular-nums">
         {snapshot == null

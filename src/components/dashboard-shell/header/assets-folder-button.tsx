@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { DashboardTabLink } from "@/components/dashboard-shell/dashboard-tab-nav";
 
 import { Folder } from "@/components/ui/folder";
 import { Button } from "@/components/ui/button";
@@ -24,10 +24,10 @@ export function AssetsFolderButton({
       className={cn("overflow-visible", className)}
       aria-label="Mediathek / Assets öffnen"
     >
-      <Link href={href} title="Mediathek" className="group">
+      <DashboardTabLink href={href} title="Mediathek" className="group">
         <Folder size="sm" showHint={false} />
         <span className="sr-only">Mediathek</span>
-      </Link>
+      </DashboardTabLink>
     </Button>
   );
 }

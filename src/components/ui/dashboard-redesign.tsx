@@ -38,12 +38,13 @@ import {
   getHomepageCheckoutPlan,
 } from "@/lib/billing/checkoutClient";
 import { useBillingCredits } from "@/components/dashboard-shell/billing-credits-provider";
+import { registerDashboardTabNavigator } from "@/components/dashboard-shell/dashboard-tab-nav";
 import { setBillingCredits, type ClientBillingState } from "@/lib/billing/creditsCache";
 import { markDashboardPerf } from "@/lib/dashboard/dashboardPerf";
 import { buildGenericBrandProfilePatch, isBrandProfileCompleteFromSettings } from "@/lib/dashboard/brandProfile";
 import { mergeDashboardSettings, sanitizeDashboardSettings } from "@/lib/dashboard/settingsPayload";
 import { canWriteWithRole } from "@/lib/dashboard/teamRoles";
-import { fetchWithRetry } from "@/lib/http/fetchWithRetry";
+import { fetchWithRetry, parseRetryAfterMs } from "@/lib/http/fetchWithRetry";
 import { signOutAndRedirect } from "@/lib/auth/signOutClient";
 
 type DashboardTab =
@@ -72,9 +73,6 @@ function tabFromPathname(pathname: string): DashboardTab | null {
   const section = match[1].toLowerCase() as DashboardTab;
   return PATH_TABS.has(section) ? section : null;
 }
-
-/** Exakt die Abschnitte dieser Seite (nicht /dashboard/2fa-email o. ä.). */
-const DASHBOARD_TAB_PATH = /^\/dashboard(?:\/(media|team|brand|settings|pricing|assistant))?\/?$/i;
 
 /** Nur die Query ändern, ohne Server-Roundtrip; Pfad zum Aufrufzeitpunkt lesen, nicht aus einem alten Render. */
 function replaceQuery(params: URLSearchParams) {
@@ -288,31 +286,16 @@ export function DashboardRedesignShell(props: {
     [goToTabHref],
   );
 
-  // Links auf Abschnitte dieser Seite (Sidebar, mobile Leiste, Header, Übersicht) abfangen, solange
-  // die Seite gemountet ist. Window-Capture läuft vor dem onClick von next/link, das bei
-  // defaultPrevented nicht navigiert; andere onClick-Handler (z. B. Sheet schließen) laufen weiter.
+  // Solange die Seite gemountet ist, wechseln Shell-Links (DashboardTabLink, Suche) den Abschnitt hierüber.
+  useEffect(() => registerDashboardTabNavigator(goToTabHref), [goToTabHref]);
+
   useEffect(() => {
-    const onClick = (event: MouseEvent) => {
-      if (event.defaultPrevented || event.button !== 0) return;
-      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      const anchor = (event.target as Element | null)?.closest?.("a[href]");
-      if (!(anchor instanceof HTMLAnchorElement)) return;
-      if ((anchor.target && anchor.target !== "_self") || anchor.hasAttribute("download")) return;
-      const url = new URL(anchor.href, window.location.href);
-      if (url.origin !== window.location.origin || !DASHBOARD_TAB_PATH.test(url.pathname)) return;
-      event.preventDefault();
-      goToTabHref(url.href);
-    };
     const onPopState = () => {
       restoreScrollRef.current = true;
     };
-    window.addEventListener("click", onClick, true);
     window.addEventListener("popstate", onPopState);
-    return () => {
-      window.removeEventListener("click", onClick, true);
-      window.removeEventListener("popstate", onPopState);
-    };
-  }, [goToTabHref]);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   // Neuer Abschnitt per Klick: nach oben. Zurück/Vor: gemerkte Position (z. B. Mediathek) wiederherstellen.
   const firstTabRenderRef = useRef(true);
@@ -489,7 +472,8 @@ export function DashboardRedesignShell(props: {
       }
     })();
 
-    void (async () => {
+    let teamRetryTimer: number | undefined;
+    const loadTeam = async (allowRetry: boolean) => {
       try {
         const res = await load("/api/dashboard/team");
         if (!res || ignore) return;
@@ -500,6 +484,15 @@ export function DashboardRedesignShell(props: {
             setMyTeamRole(json.role);
           }
           setTeamError(null);
+        } else if (res.status === 429) {
+          // C-3: Server-Meldung zeigen und einmal nach Retry-After selbst neu laden.
+          const json = (await res.json().catch(() => null)) as { error?: string } | null;
+          if (ignore) return;
+          setTeamError(json?.error ?? "Zu viele Anfragen. Teamdaten werden gleich neu geladen.");
+          if (allowRetry) {
+            const waitMs = Math.min(parseRetryAfterMs(res.headers.get("Retry-After")) ?? 5_000, 60_000);
+            teamRetryTimer = window.setTimeout(() => void loadTeam(false), waitMs);
+          }
         } else {
           setTeamError("Teamdaten konnten nicht geladen werden.");
         }
@@ -508,7 +501,8 @@ export function DashboardRedesignShell(props: {
       } finally {
         if (!ignore) setTeamLoaded(true);
       }
-    })();
+    };
+    void loadTeam(true);
 
     void (async () => {
       try {
@@ -533,6 +527,7 @@ export function DashboardRedesignShell(props: {
 
     return () => {
       ignore = true;
+      window.clearTimeout(teamRetryTimer);
     };
   }, []);
 
