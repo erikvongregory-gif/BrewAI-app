@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
 /** Platzhalter nur im Inhaltsbereich: Shell bleibt stehen, kein heller Vollbild-Flash, keine Überhöhe. */
-export default function StudioDashboardLoading() {
+export function ContentSkeleton() {
   return (
     <div role="status" aria-busy="true" aria-label="Inhalt wird geladen" className="flex flex-col gap-6">
       <Skeleton className="h-8 w-48" />

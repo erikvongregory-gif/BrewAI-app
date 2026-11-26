@@ -1,9 +1,7 @@
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
 import type { Viewport } from "next";
 import { cookies } from "next/headers";
 import { BrewAiAdminShell } from "@/components/dashboard-shell/brewai-admin-shell";
-import StudioDashboardLoading from "./loading";
 import { hasAdminAccess, isOwnerUser } from "@/lib/auth/owner";
 import { TWO_FACTOR_PAGE, hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { getShellGateDashboardMetadata } from "@/lib/dashboard/freshMetadata";
@@ -102,8 +100,9 @@ export default async function StudioDashboardLayout({ children }: { children: Re
         sidebarVariant={variant}
         sidebarCollapsible={collapsible}
       >
-        {/* Gleiches Skeleton wie loading.tsx statt 100dvh-Platzhalter unter der Kopfzeile (B-6). */}
-        <Suspense fallback={<StudioDashboardLoading />}>{children}</Suspense>
+        {/* Keine Suspense-Grenze hier: Ladezustände liefern die loading.tsx der einzelnen Segmente. Eine Grenze
+            über allen Seiten würde notFound() aus dashboard/[[...section]]/layout.tsx mit 200 streamen (B-5). */}
+        {children}
       </BrewAiAdminShell>
     </PreferencesStoreProvider>
   );

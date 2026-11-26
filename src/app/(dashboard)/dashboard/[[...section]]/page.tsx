@@ -1,5 +1,5 @@
 import { orWorkspaceBlockedRedirect, workspaceResourceUser } from "@/lib/dashboard/workspace";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -39,8 +39,7 @@ export default async function DashboardPage({
   const routeParams = (await params) ?? {};
   const query = (await searchParams) ?? {};
   const section = routeParams.section?.[0]?.toLowerCase();
-  // Vor jedem await auf Supabase prüfen: So steht der 404-Status fest, bevor das Layout gestreamt wird.
-  if (section && !SECTION_TABS.has(section)) notFound();
+  // Unbekannte Abschnitte beantwortet schon ./layout.tsx mit 404.
 
   // Legacy ?tab=… → path-based routes
   const legacyTabRaw = query.tab;
