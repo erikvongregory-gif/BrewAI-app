@@ -1,4 +1,4 @@
-import { workspaceResourceUser } from "@/lib/dashboard/workspace";
+import { orWorkspaceBlockedRedirect, workspaceResourceUser } from "@/lib/dashboard/workspace";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
@@ -87,7 +87,7 @@ export default async function DashboardPage({
     redirect(qs ? `/anmelden?${qs}` : "/anmelden");
   }
 
-  const resourceUser = await workspaceResourceUser(user, false, { hydrate: false });
+  const resourceUser = await orWorkspaceBlockedRedirect(workspaceResourceUser(user, false, { hydrate: false }));
   const onboardingState = sanitizeStudioOnboardingState(
     getDashboardMetadata(resourceUser.user_metadata).onboarding,
   );

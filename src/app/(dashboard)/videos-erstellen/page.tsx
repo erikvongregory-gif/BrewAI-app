@@ -12,7 +12,7 @@ import { needsFullOnboardingFlow, sanitizeStudioOnboardingState } from "@/lib/da
 import { isVideosCreateEnabled } from "@/lib/featureFlags";
 import { CreateVideosComingSoonView } from "@/components/studio/create-videos-coming-soon-view";
 import { CreateVideosView } from "@/components/studio/create-videos-view";
-import { workspaceResourceUser } from "@/lib/dashboard/workspace";
+import { orWorkspaceBlockedRedirect, workspaceResourceUser } from "@/lib/dashboard/workspace";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -48,7 +48,7 @@ export default async function VideosErstellenPage() {
     redirect("/anmelden");
   }
 
-  const resourceUser = await workspaceResourceUser(user);
+  const resourceUser = await orWorkspaceBlockedRedirect(workspaceResourceUser(user));
 
   if (
     needsFullOnboardingFlow(
