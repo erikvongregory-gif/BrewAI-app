@@ -14,6 +14,10 @@ import { getStripeClient, mapPriceIdToPlan, syncBillingFromStripe } from "@/lib/
 import { enforceRateLimit, enforceSameOrigin } from "@/lib/security/requestGuards";
 import { type SubscriptionPlanKey } from "@/lib/billing/tokenState";
 
+// Stripe-/DB-Details nur ins Server-Log. Die Gutschrift ist idempotent, Neuladen bucht nichts doppelt.
+const CONFIRM_FAILED_MESSAGE =
+  "Deine Zahlung konnte gerade nicht bestätigt werden. Lade die Seite bitte in einem Moment neu, dabei geht nichts verloren.";
+
 export async function POST(req: Request) {
   try {
     const rateError = enforceRateLimit(req, {
@@ -98,8 +102,8 @@ export async function POST(req: Request) {
             : null,
         });
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Token-Session-Bestätigung fehlgeschlagen.";
-        return NextResponse.json({ error: message }, { status: 500 });
+        console.error("[billing/confirm-session] Token-Gutschrift fehlgeschlagen", error);
+        return NextResponse.json({ error: CONFIRM_FAILED_MESSAGE }, { status: 500 });
       }
     }
 
@@ -162,8 +166,8 @@ export async function POST(req: Request) {
         : null,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Session-Bestätigung fehlgeschlagen.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[billing/confirm-session] Bestätigung fehlgeschlagen", error);
+    return NextResponse.json({ error: CONFIRM_FAILED_MESSAGE }, { status: 500 });
   }
 }
 
