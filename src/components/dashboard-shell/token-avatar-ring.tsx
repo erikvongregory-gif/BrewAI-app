@@ -97,7 +97,7 @@ export function TokenAvatarRing({ children, className, size = 36 }: TokenAvatarR
           cy={vb / 2}
           r={radius}
           fill="none"
-          stroke="var(--color-acc, #C7691E)"
+          stroke="var(--color-acc)"
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -153,7 +153,7 @@ export function TokenBalanceMenuBlock() {
       {snapshot && !snapshot.unlimited ? (
         <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden>
           <div
-            className={cn("h-full rounded-full", progress < 0.15 ? "bg-destructive" : "bg-[var(--color-acc,#C7691E)]")}
+            className={cn("h-full rounded-full", progress < 0.15 ? "bg-destructive" : "bg-acc")}
             style={{ width: `${Math.round(progress * 100)}%` }}
           />
         </div>

@@ -536,7 +536,7 @@
 }
 
 .evg-studio .studio-create-link--accent {
-  color: #c7691e;
+  color: var(--color-acc);
   font-weight: 600;
   text-decoration: none;
 }
@@ -613,7 +613,7 @@
 
 .evg-studio .studio-create-status.is-busy::before {
   background: var(--ac);
-  box-shadow: 0 0 0 0 rgba(199, 105, 30, 0.45);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-acc) 45%, transparent);
   animation: studio-create-status-pulse 1.4s ease-out infinite;
 }
 
@@ -786,9 +786,9 @@
   background: linear-gradient(
     105deg,
     transparent 40%,
-    color-mix(in srgb, var(--ac-tint, #FBEFE0) 55%, transparent) 48%,
+    color-mix(in srgb, var(--ac-tint, var(--color-acc-dim)) 55%, transparent) 48%,
     rgba(255, 255, 255, 0.35) 50%,
-    color-mix(in srgb, var(--ac-tint, #FBEFE0) 55%, transparent) 52%,
+    color-mix(in srgb, var(--ac-tint, var(--color-acc-dim)) 55%, transparent) 52%,
     transparent 60%
   );
   mix-blend-mode: soft-light;
@@ -804,10 +804,10 @@
   position: absolute;
   bottom: -16px;
   border-radius: 999px;
-  background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.95), color-mix(in srgb, var(--ac, #C7691E) 38%, transparent) 60%, color-mix(in srgb, var(--ac, #C7691E) 18%, transparent) 100%);
+  background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.95), color-mix(in srgb, var(--ac, var(--color-acc)) 38%, transparent) 60%, color-mix(in srgb, var(--ac, var(--color-acc)) 18%, transparent) 100%);
   box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--ac, #C7691E) 45%, rgba(255, 255, 255, 0.5)),
-    0 0 8px color-mix(in srgb, var(--ac, #C7691E) 30%, transparent);
+    inset 0 0 0 1px color-mix(in srgb, var(--ac, var(--color-acc)) 45%, rgba(255, 255, 255, 0.5)),
+    0 0 8px color-mix(in srgb, var(--ac, var(--color-acc)) 30%, transparent);
   opacity: 0;
   animation-name: studio-image-gen-bubble;
   animation-timing-function: cubic-bezier(0.35, 0, 0.65, 1);
@@ -839,10 +839,10 @@
   width: 22px;
   height: 22px;
   border-radius: 999px;
-  background: radial-gradient(circle at 35% 30%, #fff, var(--ac, #C7691E) 70%);
+  background: radial-gradient(circle at 35% 30%, #fff, var(--ac, var(--color-acc)) 70%);
   box-shadow:
-    0 0 24px color-mix(in srgb, var(--ac, #C7691E) 70%, transparent),
-    0 0 60px color-mix(in srgb, var(--ac, #C7691E) 40%, transparent);
+    0 0 24px color-mix(in srgb, var(--ac, var(--color-acc)) 70%, transparent),
+    0 0 60px color-mix(in srgb, var(--ac, var(--color-acc)) 40%, transparent);
   animation: studio-image-gen-breathe 2.4s ease-in-out infinite;
 }
 
@@ -850,7 +850,7 @@
   position: absolute;
   inset: 0;
   border-radius: 999px;
-  border: 1.5px solid color-mix(in srgb, var(--ac, #C7691E) 55%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--ac, var(--color-acc)) 55%, transparent);
   animation: studio-image-gen-ripple 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
 }
 
@@ -893,8 +893,8 @@
   inset: 0;
   transform-origin: left center;
   border-radius: inherit;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--ac, #C7691E) 60%, transparent), var(--ac, #C7691E));
-  box-shadow: 0 0 12px var(--ac, #C7691E);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ac, var(--color-acc)) 60%, transparent), var(--ac, var(--color-acc)));
+  box-shadow: 0 0 12px var(--ac, var(--color-acc));
 }
 
 .studio-image-gen__bar-fill::after {
@@ -1066,13 +1066,13 @@
 
 @keyframes studio-create-status-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(199, 105, 30, 0.4);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-acc) 40%, transparent);
   }
   70% {
-    box-shadow: 0 0 0 8px rgba(199, 105, 30, 0);
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-acc) 0%, transparent);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(199, 105, 30, 0);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-acc) 0%, transparent);
   }
 }
 
@@ -1114,8 +1114,8 @@
 }
 
 .evg-studio .studio-create-variant-dots__btn.is-active {
-  border-color: #c7691e;
-  box-shadow: 0 0 0 1px #c7691e;
+  border-color: var(--color-acc);
+  box-shadow: 0 0 0 1px var(--color-acc);
 }
 
 .evg-studio .studio-create-variant-dots__btn img {
@@ -1362,7 +1362,7 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #c7691e;
+  color: var(--color-acc);
 }
 
 @media (max-width: 1100px) {

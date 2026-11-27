@@ -264,7 +264,7 @@ export function DashboardProductTour({
                       className="absolute -inset-1/2"
                       style={{
                         background:
-                          "conic-gradient(from 0deg, #18140F, #C7691E 70deg, #F6D2AE 120deg, #18140F 190deg, #7A3E10 260deg, #18140F)",
+                          "conic-gradient(from 0deg, #18140F, var(--color-acc) 70deg, #F6D2AE 120deg, #18140F 190deg, #7A3E10 260deg, #18140F)",
                         filter: "blur(40px)",
                       }}
                       animate={reduce ? undefined : { rotate: 360 }}
@@ -292,7 +292,7 @@ export function DashboardProductTour({
 
                   <div className="p-6 pt-5">
                     <motion.p
-                      className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#C7691E]"
+                      className="text-[11px] font-semibold uppercase tracking-[0.1em] text-acc"
                       initial={reduce ? false : { opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, ease: EASE_OUT, delay: 0.25 }}
@@ -332,7 +332,7 @@ export function DashboardProductTour({
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.45, ease: EASE_OUT, delay: 0.7 + i * 0.09 }}
                           >
-                            <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#F6D2AE] to-[#E9A25F] text-[#5A2D08]">
+                            <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#F6D2AE] to-acc-light text-[#5A2D08]">
                               <Icon className="size-4" aria-hidden />
                             </span>
                             <p className="mt-2 text-[13px] font-semibold text-zinc-900 dark:text-zinc-50">{point.title}</p>
@@ -359,7 +359,7 @@ export function DashboardProductTour({
                         type="button"
                         autoFocus
                         onClick={beginSpotlight}
-                        className="group inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-black/20 transition-[background-color,transform] hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C7691E] focus-visible:ring-offset-2 active:scale-[0.97] dark:bg-white dark:text-zinc-900"
+                        className="group inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-black/20 transition-[background-color,transform] hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-acc focus-visible:ring-offset-2 active:scale-[0.97] dark:bg-white dark:text-zinc-900"
                       >
                         Rundgang starten
                         <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
@@ -391,13 +391,13 @@ export function DashboardProductTour({
                         ))
                       : null}
                     <motion.span
-                      className="absolute inset-0 rounded-full bg-[#C7691E]/20"
+                      className="absolute inset-0 rounded-full bg-acc/20"
                       initial={reduce ? false : { scale: 0.6, opacity: 0 }}
                       animate={reduce ? undefined : { scale: [0.6, 1.5], opacity: [0.8, 0] }}
                       transition={{ duration: 1.2, ease: "easeOut", delay: 0.15 }}
                     />
                     <motion.span
-                      className="relative flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#E9A25F] to-[#C7691E] text-white shadow-[0_12px_36px_-8px_rgba(199,105,30,0.8)]"
+                      className="relative flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-acc-light to-acc text-white shadow-[0_12px_36px_-8px_rgba(199,105,30,0.8)]"
                       initial={reduce ? false : { scale: 0.3, rotate: -30 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ type: "spring", stiffness: 380, damping: 14, delay: 0.1 }}
@@ -416,7 +416,7 @@ export function DashboardProductTour({
                       href="/inhalte-erstellen"
                       autoFocus
                       onClick={() => setPhase("idle")}
-                      className="group inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm font-medium text-white shadow-lg shadow-black/20 transition-[background-color,transform] hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C7691E] focus-visible:ring-offset-2 active:scale-[0.98] dark:bg-white dark:text-zinc-900"
+                      className="group inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm font-medium text-white shadow-lg shadow-black/20 transition-[background-color,transform] hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-acc focus-visible:ring-offset-2 active:scale-[0.98] dark:bg-white dark:text-zinc-900"
                     >
                       <ImagePlus className="size-4" aria-hidden />
                       Erstes Motiv erstellen

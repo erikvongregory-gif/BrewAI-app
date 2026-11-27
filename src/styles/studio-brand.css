@@ -196,7 +196,7 @@
   --fg-2: var(--foreground);
   --fg-4: var(--muted-foreground);
   --fg-6: var(--muted-foreground);
-  --ac-tint: rgba(199, 105, 30, 0.18);
+  --ac-tint: color-mix(in srgb, var(--color-acc) 18%, transparent);
   --sh-card: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
@@ -588,9 +588,9 @@
   --t1: var(--foreground, #18140f);
   --t2: color-mix(in oklab, var(--foreground, #18140f) 78%, var(--muted-foreground, #5e574e));
   --t3: var(--muted-foreground, #5e574e);
-  --ac: var(--primary, #c7691e);
-  --ac-tint: color-mix(in oklab, var(--primary, #c7691e) 12%, transparent);
-  --ac-line: color-mix(in oklab, var(--primary, #c7691e) 34%, transparent);
+  --ac: var(--primary, var(--color-acc));
+  --ac-tint: color-mix(in oklab, var(--primary, var(--color-acc)) 12%, transparent);
+  --ac-line: color-mix(in oklab, var(--primary, var(--color-acc)) 34%, transparent);
   --err: var(--destructive, #c0392b);
   --err-dim: color-mix(in oklab, var(--destructive, #c0392b) 10%, transparent);
   --ok: #2f7a4a;

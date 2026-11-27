@@ -68,6 +68,22 @@
 
 /* Admin/Template: --font-sans folgt data-font (Default Geist). Marketing nutzt --font-main = Inter. */
 /* Studio-Semantik: Flächen/Akzent für Utilities unter .evg-studio */
+/* BrewAI-Akzent: einzige Quelle für das Orange. `static`, damit die Variablen immer auf :root
+   stehen (auch für var()-Nutzung in studio-*.css, SVG-Attributen und Inline-Styles).
+   acc       Flächen, Ringe, Fortschritt (weißer Text darauf nur ab 18 px/fett, 3,8:1)
+   acc-deep  Akzent-TEXT auf hellem Grund und Druckzustand (5,3:1, WCAG AA)
+   acc-hover Hover auf Akzentflächen, Akzenttext im Dunkelmodus
+   acc-light heller Verlaufston (Progress, Tour-Grafiken)
+   acc-dim   getönte Hintergrundfläche */
+@theme static {
+  --color-acc: #C7691E;
+  --color-acc-deep: #A85518;
+  --color-acc-hover: #D4782A;
+  --color-acc-light: #E9A25F;
+  --color-acc-fg: #FFFFFF;
+  --color-acc-dim: #FBEFE0;
+}
+
 @theme {
   --font-sans: var(--font-sans);
   --font-display: var(--font-serif), Georgia, "Times New Roman", serif;
@@ -90,15 +106,10 @@
   /* Nicht --color-muted: kollidiert mit Shadcn bg-muted (helle Icon-Flächen) */
   --color-studio-muted: #4A4339;
   --color-faint: #5E574E;
-  --color-acc: #C7691E;
-  --color-acc-deep: #A85518;
-  --color-acc-hover: #D4782A;
-  --color-acc-fg: #FFFFFF;
-  --color-acc-dim: #FBEFE0;
   --color-ok: #2F7A4A;
   --color-warn: #B86A1C;
   --color-err: #C0392B;
-  --color-mode-hyperreal: #C7691E;
+  --color-mode-hyperreal: var(--color-acc);
   --color-mode-studio: #7E96AE;
   --color-mode-isolate: #8E82B0;
   --color-mode-campaign: #B0808C;
@@ -123,8 +134,8 @@
   --ui-radius-lg: 1rem;
   --ui-shadow-soft: 0 10px 24px -16px rgba(0, 0, 0, 0.22);
   --ui-shadow-soft-hover: 0 14px 30px -16px rgba(0, 0, 0, 0.28);
-  --ui-shadow-accent: 0 16px 34px -20px rgba(198, 90, 32, 0.32);
-  --ui-shadow-accent-hover: 0 18px 36px -20px rgba(198, 90, 32, 0.38);
+  --ui-shadow-accent: 0 16px 34px -20px color-mix(in srgb, var(--color-acc) 32%, transparent);
+  --ui-shadow-accent-hover: 0 18px 36px -20px color-mix(in srgb, var(--color-acc) 38%, transparent);
   --ui-motion-fast: 220ms;
   --ui-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -619,7 +630,7 @@ html:has(.brewai-admin) {
     color: #4a4a4a !important;
   }
   footer#contact p.mt-1 {
-    color: #c65a20 !important;
+    color: var(--color-acc) !important;
   }
   footer#contact p.text-center {
     color: #6b6b6b !important;
@@ -634,7 +645,7 @@ html:has(.brewai-admin) {
   footer#contact a[href="/impressum"]:hover,
   footer#contact a[href="/datenschutz"]:hover,
   footer#contact a[href="/agb"]:hover {
-    color: #c65a20 !important;
+    color: var(--color-acc) !important;
   }
   footer#contact span {
     color: #999 !important;
@@ -723,9 +734,9 @@ html:has(.brewai-admin) {
 
 /* Glow CTA — BrewAI Markenakzent (statt Default-Blau) */
 .glow-btn {
-  --glow-acc: var(--color-acc, #c7691e);
-  --glow-acc-hover: var(--color-acc-hover, #d4782a);
-  --glow-acc-deep: var(--color-acc-deep, #a85518);
+  --glow-acc: var(--color-acc);
+  --glow-acc-hover: var(--color-acc-hover);
+  --glow-acc-deep: var(--color-acc-deep);
   position: relative;
   display: inline-flex;
   height: 2.25rem;
@@ -738,7 +749,7 @@ html:has(.brewai-admin) {
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1;
-  color: var(--color-acc-fg, #fff);
+  color: var(--color-acc-fg);
   cursor: pointer;
   background:
     linear-gradient(

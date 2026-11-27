@@ -38,7 +38,7 @@
   padding: 20px 64px 18px 24px;
   border-bottom: 1px solid var(--line);
   background:
-    radial-gradient(120% 140% at 0% 0%, var(--ac-tint2, rgba(199, 105, 30, 0.14)) 0%, transparent 46%),
+    radial-gradient(120% 140% at 0% 0%, var(--ac-tint2, color-mix(in srgb, var(--color-acc) 14%, transparent)) 0%, transparent 46%),
     var(--s1);
 }
 
@@ -78,7 +78,7 @@
   height: 6px;
   border-radius: 50%;
   background: var(--ac);
-  box-shadow: 0 0 0 3px var(--ac-tint, rgba(199, 105, 30, 0.12));
+  box-shadow: 0 0 0 3px var(--ac-tint, color-mix(in srgb, var(--color-acc) 12%, transparent));
 }
 
 .studio-beer-create-title {
@@ -128,7 +128,7 @@
 
 .studio-beer-create-manual-btn:hover:not(:disabled) {
   color: var(--t1);
-  border-color: var(--ac-line, rgba(199, 105, 30, 0.3));
+  border-color: var(--ac-line, color-mix(in srgb, var(--color-acc) 30%, transparent));
   background: var(--s2);
 }
 
@@ -184,9 +184,9 @@
   max-height: clamp(200px, calc(90vh - 360px), 400px);
   min-height: 200px;
   border-radius: 14px;
-  border: 1.5px dashed var(--ac-line, rgba(199, 105, 30, 0.35));
+  border: 1.5px dashed var(--ac-line, color-mix(in srgb, var(--color-acc) 35%, transparent));
   background:
-    radial-gradient(90% 70% at 50% 35%, var(--ac-tint, rgba(199, 105, 30, 0.1)), transparent 70%),
+    radial-gradient(90% 70% at 50% 35%, var(--ac-tint, color-mix(in srgb, var(--color-acc) 10%, transparent)), transparent 70%),
     var(--s1);
   display: flex;
   align-items: center;
@@ -212,8 +212,8 @@
   border-style: solid;
   transform: scale(1.012);
   box-shadow:
-    0 0 0 4px var(--ac-tint, rgba(199, 105, 30, 0.12)),
-    0 16px 36px -14px rgba(199, 105, 30, 0.45);
+    0 0 0 4px var(--ac-tint, color-mix(in srgb, var(--color-acc) 12%, transparent)),
+    0 16px 36px -14px color-mix(in srgb, var(--color-acc) 45%, transparent);
 }
 
 .studio-beer-create-drop-empty {
@@ -238,7 +238,7 @@
   border-radius: 20px;
   background: var(--s1);
   border: 1px solid var(--line);
-  box-shadow: 0 10px 24px -14px rgba(199, 105, 30, 0.55);
+  box-shadow: 0 10px 24px -14px color-mix(in srgb, var(--color-acc) 55%, transparent);
   transition: transform 320ms var(--beer-create-spring);
 }
 
@@ -286,7 +286,7 @@
 }
 
 .studio-beer-create-drop-empty:hover .studio-beer-create-file-btn {
-  background: var(--ac-2, #d4782a);
+  background: var(--ac-2, var(--color-acc-hover));
 }
 
 .studio-beer-create-drop-empty:active .studio-beer-create-file-btn {
@@ -411,8 +411,8 @@
   background: linear-gradient(
     180deg,
     transparent 0%,
-    var(--ac-tint2, rgba(199, 105, 30, 0.14)) 45%,
-    rgba(199, 105, 30, 0.32) 50%,
+    var(--ac-tint2, color-mix(in srgb, var(--color-acc) 14%, transparent)) 45%,
+    color-mix(in srgb, var(--color-acc) 32%, transparent) 50%,
     transparent 52%
   );
   background-size: 100% 220%;
@@ -482,8 +482,8 @@
 }
 
 .studio-beer-create-token.is-strong {
-  background: var(--ac-tint, rgba(199, 105, 30, 0.12));
-  color: var(--ac-3, #a85518);
+  background: var(--ac-tint, color-mix(in srgb, var(--color-acc) 12%, transparent));
+  color: var(--ac-3, var(--color-acc-deep));
   font-weight: 600;
 }
 
@@ -598,7 +598,7 @@
 .studio-beer-create-input:focus,
 .studio-beer-create-input:focus-visible {
   border-color: var(--ac);
-  box-shadow: 0 0 0 4px var(--ac-tint, rgba(199, 105, 30, 0.12));
+  box-shadow: 0 0 0 4px var(--ac-tint, color-mix(in srgb, var(--color-acc) 12%, transparent));
 }
 
 .studio-beer-create-input[aria-invalid="true"] {
@@ -687,8 +687,8 @@
   z-index: -1;
   border-radius: inherit;
   border: 1px solid var(--ac);
-  background: var(--ac-tint, rgba(199, 105, 30, 0.12));
-  box-shadow: 0 4px 12px -6px rgba(199, 105, 30, 0.55);
+  background: var(--ac-tint, color-mix(in srgb, var(--color-acc) 12%, transparent));
+  box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--color-acc) 55%, transparent);
 }
 
 .studio-beer-create-chip-label {
@@ -924,7 +924,7 @@
   overflow: hidden;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 6px 16px -8px rgba(199, 105, 30, 0.8);
+    0 6px 16px -8px color-mix(in srgb, var(--color-acc) 80%, transparent);
   transition:
     background 160ms var(--beer-create-ease),
     box-shadow 200ms var(--beer-create-ease),
@@ -941,10 +941,10 @@
 }
 
 .studio-beer-create-save:hover:not(:disabled) {
-  background: var(--ac-2, #d4782a);
+  background: var(--ac-2, var(--color-acc-hover));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 10px 22px -10px rgba(199, 105, 30, 0.9);
+    0 10px 22px -10px color-mix(in srgb, var(--color-acc) 90%, transparent);
 }
 
 .studio-beer-create-save:hover:not(:disabled)::before {
@@ -954,7 +954,7 @@
 
 .studio-beer-create-save:active:not(:disabled) {
   transform: scale(0.975);
-  background: var(--ac-3, #a85518);
+  background: var(--ac-3, var(--color-acc-deep));
 }
 
 .studio-beer-create-save:focus-visible {
@@ -1102,10 +1102,10 @@
 @keyframes studio-beer-create-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(199, 105, 30, 0.35);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-acc) 35%, transparent);
   }
   50% {
-    box-shadow: 0 0 0 4px rgba(199, 105, 30, 0);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-acc) 0%, transparent);
   }
 }
 

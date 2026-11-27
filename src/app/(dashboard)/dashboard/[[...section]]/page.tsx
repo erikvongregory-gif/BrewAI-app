@@ -65,7 +65,7 @@ export default async function DashboardPage({
           <code className="rounded bg-zinc-100 px-1">NEXT_PUBLIC_SUPABASE_URL</code> und{" "}
           <code className="rounded bg-zinc-100 px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> an.
         </p>
-        <a href={MARKETING_SITE_URL} className="mt-6 inline-block text-sm font-medium text-[#c65a20] hover:underline">
+        <a href={MARKETING_SITE_URL} className="mt-6 inline-block text-sm font-medium text-acc-deep hover:underline">
           Zur Startseite
         </a>
       </main>

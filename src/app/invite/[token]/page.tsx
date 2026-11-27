@@ -122,7 +122,7 @@ export default async function InviteTokenPage({ params, searchParams }: InvitePa
                   href="https://brewai.de/agb"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-[#c65a20] hover:underline"
+                  className="font-medium text-acc-deep hover:underline"
                 >
                   AGB
                 </a>{" "}
@@ -131,7 +131,7 @@ export default async function InviteTokenPage({ params, searchParams }: InvitePa
                   href="https://brewai.de/datenschutz"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-[#c65a20] hover:underline"
+                  className="font-medium text-acc-deep hover:underline"
                 >
                   Datenschutzerklärung
                 </a>
@@ -140,7 +140,7 @@ export default async function InviteTokenPage({ params, searchParams }: InvitePa
             </div>
             <button
               type="submit"
-              className="inline-flex w-full items-center justify-center rounded-lg bg-[#c65a20] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#b14f1c]"
+              className="inline-flex w-full items-center justify-center rounded-lg bg-acc px-4 py-2.5 text-sm font-semibold text-white hover:bg-acc-deep"
             >
               Einladung annehmen und Konto erstellen
             </button>
@@ -153,7 +153,7 @@ export default async function InviteTokenPage({ params, searchParams }: InvitePa
 
         <p className="mt-4 text-sm text-zinc-600">
           Du hast schon ein Konto?{" "}
-          <Link href="/anmelden" className="font-medium text-[#c65a20] hover:underline">
+          <Link href="/anmelden" className="font-medium text-acc-deep hover:underline">
             Jetzt anmelden
           </Link>
         </p>

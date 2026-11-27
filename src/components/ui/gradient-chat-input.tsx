@@ -214,7 +214,7 @@ export default function GradientChatInput({
               autoComplete="off"
               className={cn(
                 "h-auto min-w-0 flex-1 border-0 bg-transparent py-0 pl-1 pr-0 text-base shadow-none",
-                "caret-[var(--color-acc,#C7691E)]",
+                "caret-acc",
                 "focus-visible:border-transparent focus-visible:ring-0 dark:bg-transparent md:text-sm",
               )}
             />

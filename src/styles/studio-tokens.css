@@ -41,13 +41,13 @@
   --fg-6: #7A736A;
 
   /* ── Brand Accent (BrewAI Orange) ──────────────────────── */
-  --ac: #C7691E;
-  --ac-2: #D4782A;
-  --ac-3: #A85518;
+  --ac: var(--color-acc);
+  --ac-2: var(--color-acc-hover);
+  --ac-3: var(--color-acc-deep);
   --ac-ink: #FFFFFF;
-  --ac-tint: #FBEFE0;
-  --ac-tint2: rgba(199, 105, 30, 0.14);
-  --ac-line: rgba(199, 105, 30, 0.3);
+  --ac-tint: var(--color-acc-dim);
+  --ac-tint2: color-mix(in srgb, var(--color-acc) 14%, transparent);
+  --ac-line: color-mix(in srgb, var(--color-acc) 30%, transparent);
 
   /* Bridge → bestehende Akzentnamen */
   --acc: var(--ac);

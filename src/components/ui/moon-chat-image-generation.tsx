@@ -64,7 +64,7 @@ export function MoonChatImageGeneration({
           className="bg-[length:200%_100%] bg-clip-text text-sm font-medium text-transparent"
           style={{
             backgroundImage:
-              "linear-gradient(110deg, #5E574E, 35%, #C7691E, 50%, #18140F, 65%, #5E574E, 85%, #5E574E)",
+              "linear-gradient(110deg, #5E574E, 35%, var(--color-acc), 50%, #18140F, 65%, #5E574E, 85%, #5E574E)",
           }}
           initial={{ backgroundPosition: "200% 0" }}
           animate={{
@@ -125,7 +125,7 @@ export function MoonChatImageGeneration({
           />
           <div
             aria-hidden
-            className="absolute -right-8 -bottom-10 size-48 rounded-full bg-[#C7691E]/35 blur-3xl motion-safe:animate-pulse"
+            className="absolute -right-8 -bottom-10 size-48 rounded-full bg-acc/35 blur-3xl motion-safe:animate-pulse"
           />
           <div
             aria-hidden

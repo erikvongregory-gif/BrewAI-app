@@ -94,7 +94,7 @@ function comet(tail: string, head: string, tip: string, midAlpha: number, start:
 }
 
 function ringGradient(beams: 1 | 2, colors: [string, string?] | undefined): string {
-  const tail0 = colors?.[0] ?? "var(--ac, #C7691E)";
+  const tail0 = colors?.[0] ?? "var(--color-acc)";
   const head0 = colors?.[0] ?? "var(--ac-2, #D4782A)";
   const stops = ["transparent 0deg", comet(tail0, head0, `color-mix(in srgb, ${head0} 22%, #ffffff)`, 55, 0)];
   if (beams === 2) {

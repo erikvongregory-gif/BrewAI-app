@@ -192,13 +192,13 @@
   opacity: 0;
   background: conic-gradient(
     from var(--brew-glow-angle),
-    #c7691e 0deg,
+    var(--color-acc) 0deg,
     #e8b87a 55deg,
-    #a85518 110deg,
-    #c7691e 170deg,
+    var(--color-acc-deep) 110deg,
+    var(--color-acc) 170deg,
     #7a4a28 230deg,
-    #d4782a 290deg,
-    #c7691e 360deg
+    var(--color-acc-hover) 290deg,
+    var(--color-acc) 360deg
   );
   transition: opacity 0.35s ease;
 }

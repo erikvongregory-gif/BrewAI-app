@@ -593,8 +593,8 @@ export default function RuixenMoonChat() {
                   <span
                     className={cn(
                       "inline-flex max-w-full items-center gap-2 rounded-full border px-3 py-1.5",
-                      "border-[#C7691E]/40 bg-[#C7691E]/10 text-[#A85518]",
-                      "dark:border-[#C7691E]/40 dark:bg-[#C7691E]/15 dark:text-[#D4782A]",
+                      "border-acc/40 bg-acc/10 text-acc-deep",
+                      "dark:border-acc/40 dark:bg-acc/15 dark:text-acc-hover",
                     )}
                   >
                     <StudioIcon name={activePreset.icon} size={14} />

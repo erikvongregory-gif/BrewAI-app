@@ -52,7 +52,7 @@
   border-radius: 50%;
   background: linear-gradient(
     to top,
-    color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 5%, transparent),
+    color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 5%, transparent),
     var(--card, #fff)
   );
   display: grid;
@@ -91,7 +91,7 @@
 }
 
 .evg-hopfenhugo-status.is-busy {
-  background: var(--ac, #c7691e);
+  background: var(--ac, var(--color-acc));
   animation: hbDotPulse 1.2s ease-in-out infinite;
 }
 
@@ -377,7 +377,7 @@
   /* Wie Dashboard-KPI-Cards: primary/5 → card, soft shadow */
   background: linear-gradient(
     to top,
-    color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 5%, transparent),
+    color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 5%, transparent),
     var(--card, var(--s1, #fff))
   );
   box-shadow: 0 1px 2px rgba(24, 20, 15, 0.05);
@@ -401,12 +401,12 @@
 .evg-brewai-history-item.is-active {
   background: linear-gradient(
     to top,
-    color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 10%, transparent),
+    color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 10%, transparent),
     var(--card, var(--s1, #fff))
   );
   box-shadow: 0 1px 2px rgba(24, 20, 15, 0.06);
   color: var(--foreground, var(--t1));
-  outline: 1px solid color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 18%, transparent);
+  outline: 1px solid color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 18%, transparent);
 }
 
 :is(.dark, .dark *) .evg-brewai-history {
@@ -420,13 +420,13 @@
 }
 
 :is(.dark, .dark *) .evg-brewai-history-item:hover:not(:disabled) {
-  background: color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 8%, var(--card));
+  background: color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 8%, var(--card));
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
 }
 
 :is(.dark, .dark *) .evg-brewai-history-item.is-active {
-  background: color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 12%, var(--card));
-  outline-color: color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 28%, transparent);
+  background: color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 12%, var(--card));
+  outline-color: color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 28%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -742,7 +742,7 @@
   overflow: hidden;
   background: linear-gradient(
     to top,
-    color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 5%, transparent),
+    color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 5%, transparent),
     var(--card, #fff)
   );
   box-shadow: 0 1px 2px rgba(24, 20, 15, 0.05);
@@ -778,7 +778,7 @@
   overflow: hidden;
   background: linear-gradient(
     to top,
-    color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 5%, transparent),
+    color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 5%, transparent),
     var(--card, #fff)
   );
   box-shadow: 0 1px 2px rgba(24, 20, 15, 0.05);
