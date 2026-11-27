@@ -36,7 +36,7 @@ import {
   getHomepageCheckoutPlan,
 } from "@/lib/billing/checkoutClient";
 import { useBillingCredits } from "@/components/dashboard-shell/billing-credits-provider";
-import { registerDashboardTabNavigator } from "@/components/dashboard-shell/dashboard-tab-nav";
+import { canNavigateDashboardTab, registerDashboardTabNavigator } from "@/components/dashboard-shell/dashboard-tab-nav";
 import { setBillingCredits, type ClientBillingState } from "@/lib/billing/creditsCache";
 import { markDashboardPerf } from "@/lib/dashboard/dashboardPerf";
 import { buildGenericBrandProfilePatch, isBrandProfileCompleteFromSettings } from "@/lib/dashboard/brandProfile";
@@ -166,13 +166,15 @@ export function DashboardRedesignShell(props: {
   // (Server-Roundtrip, alle Daten neu, Scroll weg). pushState hält Next-Router, usePathname und
   // Zurück/Vor synchron; Reload und Deep-Links rendert der Server wie bisher.
   const scrollByUrl = useRef(new Map<string, number>());
-  const restoreScrollRef = useRef(false);
+  // Zuletzt per Klick angesteuerte URL. Bewusst kein popstate-Flag: Nexts popstate-Listener läuft vor
+  // unserem, und React rendert dessen Update sofort, also bevor ein Flag gesetzt wäre.
+  const clickedUrlRef = useRef<string | null>(null);
 
   const goToTabHref = useCallback((href: string) => {
     const current = window.location.pathname + window.location.search;
     scrollByUrl.current.set(current, window.scrollY);
-    restoreScrollRef.current = false;
     const url = new URL(href, window.location.href);
+    clickedUrlRef.current = url.pathname + url.search;
     // Transition: Muss ein Tab-Chunk (next/dynamic) erst laden, bleibt der alte Tab stehen, statt dass
     // die Seite in den loading.tsx-Fallback fällt (das trennte die Effekte und lud alle Daten neu).
     startTransition(() => setTab(tabFromPathname(url.pathname) ?? "dashboard"));
@@ -192,7 +194,10 @@ export function DashboardRedesignShell(props: {
 
   useEffect(() => {
     const onPopState = () => {
-      restoreScrollRef.current = true;
+      // Tab direkt aus der URL: Ein noch laufender Klick-Wechsel (Transition) darf Zurück nicht überholen.
+      if (canNavigateDashboardTab(window.location.href)) {
+        startTransition(() => setTab(tabFromPathname(window.location.pathname) ?? "dashboard"));
+      }
     };
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
@@ -205,10 +210,8 @@ export function DashboardRedesignShell(props: {
       firstTabRenderRef.current = false;
       return;
     }
-    const y = restoreScrollRef.current
-      ? (scrollByUrl.current.get(window.location.pathname + window.location.search) ?? 0)
-      : 0;
-    restoreScrollRef.current = false;
+    const here = window.location.pathname + window.location.search;
+    const y = here === clickedUrlRef.current ? 0 : (scrollByUrl.current.get(here) ?? 0);
     window.scrollTo(0, y);
     // Zweiter Versuch, nachdem nachgeladene Inhalte (Grid, Bilder) ihr Layout haben.
     if (y > 0) requestAnimationFrame(() => window.scrollTo(0, y));
