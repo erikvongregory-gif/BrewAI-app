@@ -73,7 +73,8 @@ const serverEnv: Record<string, string> = {
   // Stripe: nur Test-Key, kein Webhook lokal
   STRIPE_SECRET_KEY: stripeTestKey(),
   STRIPE_WEBHOOK_SECRET: "whsec_e2e_no_webhook_locally",
-  NEXT_PUBLIC_LOGIN_WAITLIST_ENABLED: "0",
+  // Produktions-Build wertet nur "off"/"false" als aus (src/lib/featureFlags.ts).
+  NEXT_PUBLIC_LOGIN_WAITLIST_ENABLED: process.env.E2E_PROD ? "off" : "0",
 };
 
 export default defineConfig({
