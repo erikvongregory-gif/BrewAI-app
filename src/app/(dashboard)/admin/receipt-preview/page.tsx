@@ -16,11 +16,7 @@ export default async function AdminReceiptPreviewPage() {
     <>
       <StudioPageHeader
         eyebrow="Administration"
-        title={
-          <>
-            Receipt-<em>Preview</em>
-          </>
-        }
+        title="Beleg-Vorschau"
         subtitle="Visueller Test der Beleg-Animation ohne Stripe, Tokens oder DB-Mutationen"
       />
       <AdminReceiptPreviewClient />

@@ -1,7 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { StudioButton, StudioCard, StudioChip } from "@/components/studio/ui";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 type AdminTab = "users" | "billing" | "team" | "content";
 
@@ -131,73 +135,46 @@ export function AdminDashboard() {
   }, [q, tab]);
 
   const tabButton = (value: AdminTab, label: string) => (
-    <StudioChip active={tab === value} onClick={() => setTab(value)} type="button">
+    <Button
+      type="button"
+      size="sm"
+      variant={tab === value ? "secondary" : "ghost"}
+      aria-pressed={tab === value}
+      onClick={() => setTab(value)}
+    >
       {label}
-    </StudioChip>
+    </Button>
   );
 
-  const inputStyle: React.CSSProperties = {
-    height: 40,
-    width: "100%",
-    borderRadius: 8,
-    border: "1px solid var(--rule-strong, rgba(255,255,255,0.12))",
-    background: "var(--bg-1, #1a1918)",
-    color: "var(--tx-0, #f5f0e8)",
-    padding: "0 12px",
-    fontSize: 14,
-  };
-
-  const tableWrapStyle: React.CSSProperties = {
-    overflowX: "auto",
-    borderRadius: 12,
-    border: "1px solid var(--rule, rgba(255,255,255,0.08))",
-  };
-
-  const thStyle: React.CSSProperties = {
-    padding: "10px 12px",
-    textAlign: "left",
-    fontSize: 12,
-    fontWeight: 600,
-    color: "var(--tx-2, #a89f92)",
-    borderBottom: "1px solid var(--rule, rgba(255,255,255,0.08))",
-  };
-
-  const tdStyle: React.CSSProperties = {
-    padding: "10px 12px",
-    fontSize: 13,
-    color: "var(--tx-1, #d9d0c4)",
-    borderTop: "1px solid var(--rule, rgba(255,255,255,0.06))",
-  };
-
   const usersView = (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <input
-        className="studio-admin-search"
+    <div className="flex flex-col gap-3">
+      <Input
+        type="search"
+        aria-label="Nutzer suchen"
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Suche nach E-Mail, Rolle, Brauerei..."
-        style={inputStyle}
+        placeholder="Suche nach E-Mail, Rolle, Brauerei …"
       />
-      <div className="studio-admin-table-wrap" style={tableWrapStyle}>
-        <table className="studio-admin-table" style={{ minWidth: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ background: "var(--bg-2, #201f1d)" }}>
-              <th style={thStyle}>E-Mail</th>
-              <th style={thStyle}>Rolle</th>
-              <th style={thStyle}>Brauerei</th>
-              <th style={thStyle}>Aktion</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="rounded-lg border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>E-Mail</TableHead>
+              <TableHead>Rolle</TableHead>
+              <TableHead>Brauerei</TableHead>
+              <TableHead>Aktion</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {users.map((user) => (
-              <tr key={user.id}>
-                <td data-label="E-Mail" style={tdStyle}>{user.email}</td>
-                <td data-label="Rolle" style={tdStyle}>{user.role}</td>
-                <td data-label="Brauerei" style={tdStyle}>{user.brewery || "—"}</td>
-                <td data-label="Aktion" style={tdStyle}>
-                  <StudioButton
+              <TableRow key={user.id}>
+                <TableCell data-label="E-Mail">{user.email}</TableCell>
+                <TableCell data-label="Rolle">{user.role}</TableCell>
+                <TableCell data-label="Brauerei">{user.brewery || "—"}</TableCell>
+                <TableCell data-label="Aktion">
+                  <Button
                     size="sm"
-                    variant="soft"
+                    variant="outline"
                     onClick={async () => {
                       const nextRole = user.role === "admin" ? "user" : "admin";
                       const res = await fetch("/api/admin/users", {
@@ -214,51 +191,59 @@ export function AdminDashboard() {
                     }}
                   >
                     {user.role === "admin" ? "Admin entfernen" : "Zu Admin machen"}
-                  </StudioButton>
-                </td>
-              </tr>
+                  </Button>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+            {users.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
+                  Keine Nutzer gefunden.
+                </TableCell>
+              </TableRow>
+            ) : null}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
 
   const billingView = (
-    <div className="studio-admin-table-wrap" style={tableWrapStyle}>
-      <table className="studio-admin-table" style={{ minWidth: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr style={{ background: "var(--bg-2, #201f1d)" }}>
-            <th style={thStyle}>User ID</th>
-            <th style={thStyle}>E-Mail</th>
-            <th style={thStyle}>Plan</th>
-            <th style={thStyle}>Monatlich</th>
-            <th style={thStyle}>Verbraucht</th>
-            <th style={thStyle}>Verfügbar</th>
-            <th style={thStyle}>Status</th>
-            <th style={thStyle}>Periode bis</th>
-            <th style={thStyle}>Aktion</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div className="rounded-lg border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>User-ID</TableHead>
+            <TableHead>E-Mail</TableHead>
+            <TableHead>Plan</TableHead>
+            <TableHead>Monatlich</TableHead>
+            <TableHead>Verbraucht</TableHead>
+            <TableHead>Verfügbar</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Periode bis</TableHead>
+            <TableHead>Aktion</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {billingRows.map((row) => (
-            <tr key={row.userId}>
-              <td data-label="User ID" style={{ ...tdStyle, fontFamily: "monospace", fontSize: 11 }}>{row.userId}</td>
-              <td data-label="E-Mail" style={tdStyle}>{row.email || "—"}</td>
-              <td data-label="Plan" style={tdStyle}>{row.plan ?? "—"}</td>
-              <td data-label="Monatlich" style={tdStyle}>{row.monthlyTokens.toLocaleString("de-DE")}</td>
-              <td data-label="Verbraucht" style={tdStyle}>{row.usedTokens.toLocaleString("de-DE")}</td>
-              <td data-label="Verfügbar" style={{ ...tdStyle, fontWeight: 600, color: "var(--acc, #c9a227)" }}>
+            <TableRow key={row.userId}>
+              <TableCell data-label="User-ID" className="font-mono text-xs">{row.userId}</TableCell>
+              <TableCell data-label="E-Mail">{row.email || "—"}</TableCell>
+              <TableCell data-label="Plan">{row.plan ?? "—"}</TableCell>
+              <TableCell data-label="Monatlich" className="tabular-nums">{row.monthlyTokens.toLocaleString("de-DE")}</TableCell>
+              <TableCell data-label="Verbraucht" className="tabular-nums">{row.usedTokens.toLocaleString("de-DE")}</TableCell>
+              <TableCell data-label="Verfügbar" className="font-semibold tabular-nums">
                 {row.remainingTokens.toLocaleString("de-DE")}
-              </td>
-              <td data-label="Status" style={tdStyle}>{row.status}</td>
-              <td data-label="Periode bis" style={tdStyle}>
+              </TableCell>
+              <TableCell data-label="Status">{row.status}</TableCell>
+              <TableCell data-label="Periode bis">
                 {row.currentPeriodEnd ? new Date(row.currentPeriodEnd).toLocaleString("de-DE") : "—"}
-              </td>
-              <td data-label="Aktion" style={tdStyle}>
-                <div className="studio-admin-billing-actions" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, minWidth: "15rem" }}>
-                  <select
-                    className="studio-admin-plan-select"
+              </TableCell>
+              <TableCell data-label="Aktion">
+                <div className="flex min-w-60 flex-wrap items-center gap-2">
+                  <NativeSelect
+                    size="sm"
+                    aria-label={`Plan für ${row.email || row.userId}`}
                     value={billingPlanDrafts[row.userId] ?? "start"}
                     onChange={(e) =>
                       setBillingPlanDrafts((prev) => ({
@@ -266,97 +251,80 @@ export function AdminDashboard() {
                         [row.userId]: e.target.value as PlanOption,
                       }))
                     }
-                    style={{ ...inputStyle, height: 32, width: "auto", fontSize: 12 }}
                     disabled={billingSavingUserId === row.userId}
                   >
-                    <option value="start">Start</option>
-                    <option value="growth">Growth</option>
-                    <option value="pro">Pro</option>
-                    <option value="enterprise">Enterprise</option>
-                  </select>
-                  <StudioButton
+                    <NativeSelectOption value="start">Start</NativeSelectOption>
+                    <NativeSelectOption value="growth">Growth</NativeSelectOption>
+                    <NativeSelectOption value="pro">Pro</NativeSelectOption>
+                    <NativeSelectOption value="enterprise">Enterprise</NativeSelectOption>
+                  </NativeSelect>
+                  <Button
                     size="sm"
-                    variant="soft"
+                    variant="outline"
                     disabled={billingSavingUserId === row.userId}
                     onClick={() => updateUserPlan(row.userId, billingPlanDrafts[row.userId] ?? "start")}
                   >
                     Freischalten
-                  </StudioButton>
-                  <StudioButton
+                  </Button>
+                  <Button
                     size="sm"
                     variant="ghost"
                     disabled={billingSavingUserId === row.userId}
                     onClick={() => updateUserPlan(row.userId, null)}
                   >
                     Entziehen
-                  </StudioButton>
+                  </Button>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
           {billingRows.length === 0 ? (
-            <tr>
-              <td data-empty="true" colSpan={9} style={{ ...tdStyle, textAlign: "center", color: "var(--tx-2)" }}>
+            <TableRow>
+              <TableCell colSpan={9} className="py-8 text-center text-muted-foreground">
                 Keine Billing-Daten gefunden.
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ) : null}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 
   const genericTable = (rows: Array<Record<string, unknown>>) => (
-    <div className="studio-admin-json-wrap" style={tableWrapStyle}>
-      <pre
-        className="studio-admin-json"
-        style={{
-          maxHeight: "60vh",
-          overflow: "auto",
-          padding: 12,
-          fontSize: 11,
-          color: "var(--tx-1)",
-          margin: 0,
-        }}
-      >
-        {JSON.stringify(rows, null, 2)}
-      </pre>
-    </div>
+    <pre
+      tabIndex={0}
+      aria-label="Rohdaten"
+      className="max-h-[60vh] overflow-auto rounded-lg border bg-muted/40 p-3 font-mono text-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+    >
+      {JSON.stringify(rows, null, 2)}
+    </pre>
   );
 
   return (
-    <StudioCard pad className="studio-admin-card" style={{ marginTop: 22 }}>
-      <div className="studio-admin-tabs" style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
-        {tabButton("users", "Nutzer")}
-        {tabButton("billing", "Billing")}
-        {tabButton("team", "Team/Invites")}
-        {tabButton("content", "Inhalte")}
-      </div>
-      {loading ? <p style={{ fontSize: 14, color: "var(--tx-2)" }}>Lade Daten…</p> : null}
-      {error ? (
-        <p
-          style={{
-            marginBottom: 12,
-            borderRadius: 8,
-            border: "1px solid rgba(239,68,68,0.35)",
-            background: "rgba(239,68,68,0.08)",
-            padding: "10px 12px",
-            fontSize: 14,
-            color: "#fca5a5",
-          }}
-        >
-          {error}
-        </p>
-      ) : null}
-      {!loading && tab === "users" ? usersView : null}
-      {!loading && tab === "billing" ? billingView : null}
-      {!loading && tab === "team" ? genericTable(teamRows) : null}
-      {!loading && tab === "content" ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {contentRows.length > 0 ? (
-            <StudioButton
+    <Card className="mt-2">
+      <CardContent className="flex flex-col gap-4">
+        <div role="group" aria-label="Bereich" className="flex flex-wrap gap-1">
+          {tabButton("users", "Nutzer")}
+          {tabButton("billing", "Billing")}
+          {tabButton("team", "Team/Einladungen")}
+          {tabButton("content", "Inhalte")}
+        </div>
+        {loading ? <p className="text-muted-foreground text-sm">Daten werden geladen …</p> : null}
+        {error ? (
+          <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-destructive-foreground text-sm">
+            {error}
+          </p>
+        ) : null}
+        {!loading && tab === "users" ? usersView : null}
+        {!loading && tab === "billing" ? billingView : null}
+        {!loading && tab === "team" ? genericTable(teamRows) : null}
+        {!loading && tab === "content" ? (
+          <div className="flex flex-col gap-3">
+            {contentRows.length > 0 ? (
+            <Button
               size="sm"
-              variant="soft"
+              variant="outline"
+              className="self-start"
               onClick={async () => {
                 const first = contentRows[0] as { ownerUserId?: string; id?: string };
                 if (!first?.ownerUserId || !first?.id) return;
@@ -374,11 +342,12 @@ export function AdminDashboard() {
               }}
             >
               Erstes Element entfernen (MVP)
-            </StudioButton>
-          ) : null}
-          {genericTable(contentRows)}
-        </div>
-      ) : null}
-    </StudioCard>
+            </Button>
+            ) : null}
+            {genericTable(contentRows)}
+          </div>
+        ) : null}
+      </CardContent>
+    </Card>
   );
 }
