@@ -69,6 +69,7 @@ export type AdminHomeViewProps = {
   summaryLoaded: boolean;
   summaryError?: string | null;
   media: DashboardHomeMediaItem[];
+  mediaTotal?: number;
   mediaLoaded: boolean;
   mediaError?: string | null;
   settings: DashboardHomeSettings | null;
@@ -497,6 +498,7 @@ function BrewAiActivityOverview({
 
 function BrewAiAssetsOverview({
   media,
+  mediaTotal,
   mediaLoaded,
   mediaError,
   onRetryMedia,
@@ -506,6 +508,7 @@ function BrewAiAssetsOverview({
   mediaLoaded: boolean;
   mediaError?: string | null;
   onRetryMedia?: () => void;
+  mediaTotal?: number;
   onOpenMedia: () => void;
 }) {
   const [query, setQuery] = useState("");
@@ -525,7 +528,7 @@ function BrewAiAssetsOverview({
       <CardHeader>
         <CardTitle className="leading-none">
           {mediaLoaded
-            ? `${formatDeNumber(media.length)} ${media.length === 1 ? "Motiv" : "Motive"}`
+            ? `${formatDeNumber(Math.max(mediaTotal ?? 0, media.length))} ${Math.max(mediaTotal ?? 0, media.length) === 1 ? "Motiv" : "Motive"}`
             : "Motive"}
         </CardTitle>
         <CardDescription>Zuletzt erstellte Motive mit Format, Auflösung und Erstellungszeit.</CardDescription>
@@ -662,6 +665,7 @@ export function AdminHomeView({
   summaryLoaded,
   summaryError,
   media,
+  mediaTotal,
   mediaLoaded,
   mediaError,
   settings,
@@ -710,6 +714,7 @@ export function AdminHomeView({
       />
       <BrewAiAssetsOverview
         media={media}
+        mediaTotal={mediaTotal}
         mediaLoaded={mediaLoaded}
         mediaError={mediaError}
         onRetryMedia={onRetryMedia}

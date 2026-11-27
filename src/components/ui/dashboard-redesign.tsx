@@ -678,6 +678,7 @@ export function DashboardRedesignShell(props: {
           summaryLoaded={summaryLoaded}
           summaryError={summaryError}
           media={media}
+          mediaTotal={mediaTotal}
           mediaLoaded={mediaLoaded}
           mediaError={mediaError}
           settings={settings}
