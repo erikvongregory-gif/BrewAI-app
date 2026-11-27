@@ -605,7 +605,7 @@ export default function RuixenMoonChat() {
                     </span>
                     <button
                       type="button"
-                      aria-label="Preset entfernen"
+                      aria-label="Vorlage entfernen"
                       onClick={clearPreset}
                       className="ml-0.5 rounded-full p-0.5 opacity-70 outline-none transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring/60"
                     >
@@ -1029,7 +1029,7 @@ export default function RuixenMoonChat() {
                   <Button
                     type="button"
                     variant="ghost"
-                    aria-label="Preset wählen"
+                    aria-label="Vorlage wählen"
                     className={cn(
                       "h-9 shrink-0 gap-2 bg-transparent px-2 text-foreground hover:bg-transparent",
                       "dark:bg-transparent dark:text-white dark:hover:bg-transparent",
@@ -1043,7 +1043,7 @@ export default function RuixenMoonChat() {
                       </span>
                     ) : (
                       <span className="hidden text-xs text-muted-foreground sm:inline dark:text-neutral-400">
-                        Preset
+                        Vorlage
                       </span>
                     )}
                   </Button>
@@ -1055,7 +1055,7 @@ export default function RuixenMoonChat() {
                   onOpenAutoFocus={(event) => event.preventDefault()}
                 >
                   <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-                    Preset wählen
+                    Vorlage wählen
                   </div>
                   <div className="max-h-72 overflow-y-auto">
                     <div className="flex flex-col gap-0.5">
@@ -1076,7 +1076,7 @@ export default function RuixenMoonChat() {
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-sm font-medium">
-                            Kein Preset
+                            Keine Vorlage
                           </span>
                           <span className="block truncate text-xs text-muted-foreground">
                             Freier Prompt ohne Vorlage

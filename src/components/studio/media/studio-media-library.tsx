@@ -919,7 +919,7 @@ export function StudioMediaLibrary({
                 </PopoverContent>
               </Popover>
               <Badge variant="secondary">
-                Bilder · {beerFilter || search.trim() ? visibleItems.length : (mediaTotal ?? items.length)}
+                Motive · {beerFilter || search.trim() ? visibleItems.length : (mediaTotal ?? items.length)}
               </Badge>
             </div>
           </div>

@@ -1127,7 +1127,7 @@ export function InhalteErstellenStudio({
     : etikettModus === "marke" && !hasProductImage
       ? "Biersorte mit Flaschenfoto wählen — das Sortenfoto ist die Produkt-Referenz."
       : !userPrompt.trim() && !activePreset
-        ? "Bitte Freitext oder Preset angeben."
+        ? "Bitte Freitext oder Vorlage angeben."
         : "";
 
   return (
@@ -1583,7 +1583,7 @@ export function InhalteErstellenStudio({
               </button>
             ) : (
               <button type="button" className="studio-create-chip studio-create-chip--ghost" onClick={() => setPresetModalOpen(true)}>
-                Preset wählen
+                Vorlage wählen
               </button>
             )}
             {activePreset ? (
@@ -1884,11 +1884,11 @@ export function InhalteErstellenStudio({
       ) : null}
 
       {presetModalOpen ? (
-        <div className="studio-create-modal" role="dialog" aria-modal="true" aria-label="Preset wählen">
+        <div className="studio-create-modal" role="dialog" aria-modal="true" aria-label="Vorlage wählen">
           <button type="button" className="studio-create-modal__backdrop" aria-label="Schließen" onClick={() => setPresetModalOpen(false)} />
           <div className="studio-create-modal__panel">
             <div className="studio-create-modal__head">
-              <h2>Presets</h2>
+              <h2>Vorlagen</h2>
               <button type="button" className="studio-create-modal__close" onClick={() => setPresetModalOpen(false)}>
                 ×
               </button>
