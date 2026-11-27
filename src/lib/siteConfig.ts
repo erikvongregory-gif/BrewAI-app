@@ -26,6 +26,8 @@ export function getSharedCookieDomain(): string | undefined {
   if (process.env.NODE_ENV !== "production") return undefined;
   const configured =
     typeof process !== "undefined" ? process.env.NEXT_PUBLIC_COOKIE_DOMAIN?.trim() : undefined;
+  // "none": Host-only-Cookies für Produktions-Builds außerhalb von brewai.de (lokaler Prod-Test, Previews).
+  if (configured === "none") return undefined;
   if (configured) return configured.replace(/^\./, "") || undefined;
   return "brewai.de";
 }

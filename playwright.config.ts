@@ -36,7 +36,7 @@ const serverEnv: Record<string, string> = {
   NEXT_PUBLIC_APP_BASE_URL: BASE_URL,
   NEXT_PUBLIC_MARKETING_SITE_URL: BASE_URL,
   NEXT_PUBLIC_SITE_URL: BASE_URL,
-  NEXT_PUBLIC_COOKIE_DOMAIN: "",
+  NEXT_PUBLIC_COOKIE_DOMAIN: process.env.E2E_PROD ? "none" : "",
   KIE_DOWNLOAD_ALLOWED_HOSTS: "",
   // KI: ungültige Keys (Fail-closed) + serverseitiger Mock im Preload
   OPENAI_API_KEY: "sk-e2e-invalid-key-no-cost",
