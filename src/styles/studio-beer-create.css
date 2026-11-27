@@ -1,4 +1,4 @@
-﻿/* „Neue Sorte anlegen“ / „Sorte bearbeiten“ — namespace: .studio-beer-create-*
+/* „Neue Sorte anlegen“ / „Sorte bearbeiten“ — namespace: .studio-beer-create-*
    Dashboard-Sprache: helle Flächen, Mono-Rubriken, BrewAI-Orange als einziger Akzent. */
 
 .studio-beer-create {
@@ -1082,53 +1082,6 @@
 
 /* ── Liste / Host (Onboarding & Studio) ───────────────── */
 
-.studio-beer-create-list-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.studio-beer-create-host {
-  width: 100%;
-  max-width: 920px;
-  margin-top: 4px;
-}
-
-.studio-beer-create-add {
-  align-self: flex-start;
-  height: 34px;
-  padding: 0 14px;
-  border-radius: 8px;
-  border: 1px solid var(--ac-line, rgba(199, 105, 30, 0.4));
-  background: var(--ac-tint, rgba(199, 105, 30, 0.1));
-  color: var(--ac);
-  font-size: 12.5px;
-  font-weight: 560;
-  font-family: inherit;
-  cursor: pointer;
-  transition:
-    background 140ms var(--beer-create-ease),
-    transform 80ms ease;
-}
-
-.studio-beer-create-add:hover:not(:disabled) {
-  background: var(--ac-tint2, rgba(199, 105, 30, 0.18));
-}
-
-.studio-beer-create-add:active:not(:disabled) {
-  transform: scale(0.985);
-}
-
-.studio-beer-create-add:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
-.evg-onb-beer-row.is-fresh,
-.studio-beer-card.is-fresh {
-  animation: studio-beer-create-fresh 700ms var(--beer-create-ease);
-}
-
 /* ── Keyframes ────────────────────────────────────────── */
 
 @keyframes studio-beer-create-spin {
@@ -1181,15 +1134,6 @@
   }
   100% {
     transform: scale(1);
-  }
-}
-
-@keyframes studio-beer-create-fresh {
-  0% {
-    background: var(--ac-tint, rgba(199, 105, 30, 0.16));
-  }
-  100% {
-    background: transparent;
   }
 }
 
@@ -1314,9 +1258,7 @@
   .studio-beer-create-status.is-dirty .studio-beer-create-status-dot,
   .studio-beer-create-input[aria-invalid="true"],
   .studio-beer-create-delete.is-confirm,
-  .studio-beer-create-drop-scan,
-  .evg-onb-beer-row.is-fresh,
-  .studio-beer-card.is-fresh {
+  .studio-beer-create-drop-scan {
     animation: none !important;
   }
 

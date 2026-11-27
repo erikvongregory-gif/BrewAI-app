@@ -7,10 +7,6 @@
   display: none;
 }
 
-.evg-studio .evg-top__mobile-brand {
-  display: none;
-}
-
 @media (max-width: 767px), (hover: none) and (pointer: coarse) and (max-width: 1023px) {
   .evg-studio {
     --gutter: 12px;
@@ -20,191 +16,9 @@
 
   /* ── App shell & safe areas ───────────────────────────── */
 
-  .evg-studio.evg-app {
-    width: 100%;
-    min-height: 100dvh;
-    min-height: -webkit-fill-available;
-    grid-template-columns: minmax(0, 1fr) !important;
-    overflow: hidden;
-  }
-
-  .evg-studio .evg-rail {
-    display: none !important;
-  }
-
-  .evg-studio .evg-main-wrap {
-    width: 100%;
-    height: -webkit-fill-available;
-    height: 100dvh;
-    min-height: 0;
-    overflow: hidden;
-    /* Landscape-Notch / Dynamic Island seitlich */
-    padding-left: env(safe-area-inset-left, 0px);
-    padding-right: env(safe-area-inset-right, 0px);
-  }
-
-  .evg-studio .evg-top {
-    /* Sticky ist hier unnötig (Scroll liegt in .evg-main) und clippt unter Safari */
-    position: relative;
-    top: auto;
-    box-sizing: border-box;
-    /* constant() = ältere iOS-Safari; env() überschreibt modern */
-    height: calc(var(--topbar-h-mobile) + constant(safe-area-inset-top));
-    height: calc(var(--topbar-h-mobile) + env(safe-area-inset-top, 0px));
-    min-height: calc(var(--topbar-h-mobile) + constant(safe-area-inset-top));
-    min-height: calc(var(--topbar-h-mobile) + env(safe-area-inset-top, 0px));
-    padding-top: constant(safe-area-inset-top);
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-right: 12px;
-    padding-bottom: 0;
-    padding-left: 12px;
-    gap: 8px;
-    overflow: visible;
-  }
-
-  .evg-studio .evg-top .evg-rail__mark {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-  }
-
-  .evg-studio .evg-top__mobile-brand {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    min-width: 0;
-    flex: 1;
-  }
-
-  .evg-studio .evg-top__desktop-brand,
-  .evg-studio .evg-top__desktop-only {
-    display: none !important;
-  }
-
-  .evg-studio .evg-top__spacer {
-    flex: 0 0 0 !important;
-  }
-
-  .evg-studio .evg-main {
-    min-height: 0;
-    overscroll-behavior: contain;
-    scroll-padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 20px);
-    padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 12px);
-  }
-
-  .evg-studio .evg-main__inner {
-    max-width: none;
-    padding: 14px 12px 18px !important;
-  }
-
-  .evg-studio .evg-bottom-nav {
-    display: flex !important;
-    height: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));
-    padding: 0 2px env(safe-area-inset-bottom, 0px);
-    background: color-mix(in srgb, var(--s1) 94%, transparent);
-    box-shadow: 0 -8px 28px rgba(24, 20, 15, 0.08);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-  }
-
-  .evg-studio .evg-bottom-nav__item {
-    position: relative;
-    min-height: var(--bottom-nav-h);
-    gap: 3px;
-    padding: 6px 2px;
-    font-size: 10px;
-    line-height: 1.1;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .evg-studio .evg-bottom-nav__item::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 30%;
-    right: 30%;
-    height: 2px;
-    border-radius: 0 0 2px 2px;
-    background: transparent;
-  }
-
-  .evg-studio .evg-bottom-nav__item[aria-current="page"]::before,
-  .evg-studio .evg-bottom-nav__item[data-active="true"]::before {
-    background: var(--ac);
-  }
-
-  .evg-studio .evg-bottom-nav__item[data-nav-key="create"] > .evg-ico {
-    width: 22px;
-    height: 22px;
-  }
-
   /* Topbar bleibt auf schmalen Geräten bedienbar. */
-  .evg-studio .evg-shell-topbar-search-trigger {
-    display: inline-flex !important;
-    width: 40px;
-    height: 40px;
-    flex: 0 0 40px;
-  }
-
-  .evg-studio .evg-tokens {
-    min-height: 40px;
-    height: 40px;
-    padding: 0 9px;
-    gap: 6px;
-  }
-
-  .evg-studio .evg-tokens__bar,
-  .evg-studio .evg-tokens__meta {
-    display: none;
-  }
-
-  .evg-studio .evg-tokens__label {
-    font-size: 9px;
-  }
-
-  .evg-studio .evg-tokens__val {
-    font-size: 12px;
-  }
-
-  .evg-studio .evg-top .evg-pop {
-    position: fixed !important;
-    top: calc(var(--topbar-h-mobile) + env(safe-area-inset-top, 0px) + 6px) !important;
-    left: 12px !important;
-    right: 12px !important;
-    width: auto !important;
-    min-width: 0 !important;
-    max-height: calc(100dvh - var(--topbar-h-mobile) - var(--bottom-nav-h) - 32px);
-  }
 
   /* Suche als echtes Vollflächen-Overlay. */
-  .evg-studio .evg-shell-search-mobile-panel {
-    height: 100dvh;
-    padding:
-      calc(env(safe-area-inset-top, 0px) + 10px)
-      10px
-      calc(env(safe-area-inset-bottom, 0px) + 10px);
-  }
-
-  .evg-studio .evg-shell-search-mobile-panel-inner {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: none;
-    max-height: 100%;
-    padding: 10px;
-    border-radius: 14px;
-  }
-
-  .evg-studio .evg-shell-search-dropdown--mobile {
-    flex: 1;
-    min-height: 0;
-    max-height: none;
-  }
-
-  .evg-studio .evg-shell-search-item {
-    min-height: 48px;
-  }
 
   /* „Mehr“ bleibt kurz: zwei Spalten statt einer langen Linkliste. */
   .stu-dialog.evg-studio.stu-dialog--sheet-mobile {
@@ -241,25 +55,6 @@
     right: 8px;
   }
 
-  .evg-studio .evg-more-sheet-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
-  }
-
-  .evg-studio .evg-more-sheet-list .stu-label {
-    grid-column: 1 / -1;
-    padding: 4px 4px 2px;
-  }
-
-  .evg-studio .evg-more-sheet-list a,
-  .evg-studio .evg-more-sheet-list button {
-    min-height: 52px;
-    padding: 8px 10px;
-    border: 1px solid var(--line);
-    background: var(--s2);
-  }
-
   /* ── Mobile interaction baseline ──────────────────────── */
 
   .evg-studio :is(button, a, input, select, textarea, label) {
@@ -269,57 +64,6 @@
 
   .evg-studio :is(input, select, textarea) {
     font-size: 16px !important;
-  }
-
-  .evg-studio :is(
-    .stu-btn,
-    .evg-btn,
-    .studio-btn,
-    .studio-create-banner__btn,
-    .studio-chip,
-    .evg-pill,
-    .studio-create-tabs__btn,
-    .studio-create-segment__btn,
-    .studio-modal-tab
-  ) {
-    min-height: 44px;
-    height: auto;
-  }
-
-  .evg-studio :is(
-    .stu-icon-btn,
-    .studio-modal-close,
-    .studio-create-modal__close,
-    .evg-hopfenhugo-close,
-  ) {
-    min-width: 44px;
-    min-height: 44px;
-  }
-
-  .evg-studio :is(
-    .stu-input,
-    .stu-select,
-    .studio-field,
-    .studio-field-with-icon,
-    .studio-create-select,
-    .studio-create-copy-input,
-    .studio-create-input,
-    .evg-input
-  ) {
-    min-height: 44px;
-    height: auto;
-  }
-
-  .evg-studio :is(
-    .stu-btn,
-    .evg-btn,
-    .studio-btn,
-    .studio-create-banner__btn,
-    .studio-create-generate,
-    .studio-create-mobile-next,
-    .studio-create-mobile-panel-actions button
-  ):active:not(:disabled) {
-    transform: scale(0.98);
   }
 
 
@@ -402,33 +146,9 @@
     max-width: none;
   }
 
-  .evg-studio .studio-brand-empty-card {
-    padding: 22px 14px;
-  }
-
-  .evg-studio .studio-brand-id,
-  .evg-studio .studio-brand-layout,
-  .evg-studio .studio-brand-21st,
   .evg-studio .studio-brand-skeleton,
   .evg-studio .studio-brand-review-rules {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .evg-studio .studio-brand-aside {
-    order: -1;
-  }
-
-  .evg-studio .studio-brand-id__type {
-    border-right: 0;
-    min-height: 140px;
-  }
-
-  .evg-studio .studio-brand-rule-row {
-    grid-template-columns: 72px minmax(0, 1fr);
-  }
-
-  .evg-studio .studio-brand-ref-tile {
-    min-width: 0;
   }
 
   .evg-studio.studio-brand-modal,
@@ -445,20 +165,6 @@
     border-radius: 16px 16px 0 0 !important;
   }
 
-  .evg-studio .studio-modal-tabs {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-  }
-
-  .evg-studio .studio-modal-tab {
-    min-width: max-content;
-  }
-
-  .evg-studio .studio-modal-ref-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-  }
-
-  .evg-studio .studio-modal-foot,
   .evg-studio .studio-brand-review-foot {
     position: sticky;
     bottom: 0;
@@ -516,39 +222,6 @@
     font-size: 22px;
   }
 
-  .evg-studio .studio-create-mobile-switch {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-    margin-bottom: 12px;
-    padding: 3px;
-    border-radius: var(--r-md);
-    background: var(--s3);
-  }
-
-  .evg-studio .studio-create-mobile-switch button {
-    min-height: 40px;
-    border: 0;
-    border-radius: calc(var(--r-md) - 2px);
-    background: transparent;
-    color: var(--t3);
-    font: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  .evg-studio .studio-create-mobile-switch button.is-active {
-    background: var(--s1);
-    color: var(--t1);
-  }
-
-  .evg-studio .studio-create-chip--hyperreal {
-    min-height: 44px;
-    padding-inline: 14px;
-    font-size: 13px;
-  }
-
   .evg-studio .studio-create-page-head__actions {
     align-items: flex-start;
     flex-direction: column;
@@ -573,12 +246,6 @@
     min-height: 42px;
   }
 
-  .evg-studio .studio-create-field--switch .stu-switch-row {
-    position: relative;
-    width: 100%;
-    min-height: 48px;
-  }
-
   .evg-studio .studio-create-mobile-nav {
     display: none;
   }
@@ -588,47 +255,6 @@
     flex-direction: column;
     gap: 16px;
     padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 84px);
-  }
-
-  .evg-studio .studio-create-editor,
-  .evg-studio .studio-create-stage {
-    display: none;
-  }
-
-  .evg-studio .studio-create-editor[data-mobile-active="true"],
-  .evg-studio .studio-create-stage[data-mobile-active="true"] {
-    display: flex;
-  }
-
-  .evg-studio .studio-create-editor {
-    position: static;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .evg-studio .studio-create-editor-controls .studio-create-generate {
-    display: none;
-  }
-
-  .evg-studio .studio-create-templates {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .evg-studio .studio-create-product__photo,
-  .evg-studio .studio-create-product__empty {
-    max-height: 180px;
-  }
-
-  .evg-studio .studio-create-ref-card,
-  .evg-studio .studio-create-ref-add {
-    flex: 0 0 64px;
-    width: 64px;
-  }
-
-  .evg-studio .studio-create-ref-card img,
-  .evg-studio .studio-create-ref-add {
-    height: 80px;
   }
 
   .evg-studio .studio-create-tabs {
@@ -652,34 +278,6 @@
 
   .evg-studio .studio-create-preview-stage[data-aspect="9:16"] {
     max-height: 52dvh;
-  }
-
-  .evg-studio .studio-create-col-generate {
-    display: none;
-  }
-
-  .evg-studio .studio-create-dock {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    position: fixed;
-    left: env(safe-area-inset-left, 0px);
-    right: env(safe-area-inset-right, 0px);
-    bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));
-    z-index: 12;
-    margin: 0;
-    padding: 10px 12px;
-    background: color-mix(in srgb, var(--s1) 94%, transparent);
-    border-top: 1px solid var(--line2);
-    border-radius: 0;
-  }
-
-  .evg-studio .studio-create-dock .studio-create-generate {
-    position: static;
-    flex: 1;
-    min-height: 48px;
-    box-shadow: none;
-    display: block;
   }
 
   .evg-studio .studio-create-modal {
@@ -730,10 +328,6 @@
     white-space: nowrap;
   }
 
-  .evg-studio .evg-hopfenhugo-input {
-    font-size: 16px;
-  }
-
 
   .stu-toaster {
     right: 10px;
@@ -741,153 +335,10 @@
     width: calc(100vw - 20px);
   }
 
-  .evg-studio .evg-video-create {
-    width: 100%;
-    max-width: none !important;
-    min-width: 0;
-    margin-top: 16px !important;
-  }
-
-  .evg-studio .evg-video-create__result,
-  .evg-studio .evg-video-create__summary,
-  .evg-studio .evg-video-create__generate {
-    min-width: 0;
-    padding: 14px;
-    border-radius: var(--r-lg);
-  }
-
-  .evg-studio .evg-video-create__result-head,
-  .evg-studio .evg-video-create__result-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .evg-studio .evg-video-create__prompt {
-    max-width: 100%;
-    overflow-x: auto;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-  }
-
-  .evg-studio .evg-video-create__icon-btn,
-  .evg-studio .evg-video-create__back,
-  .evg-studio .evg-video-create__download {
-    min-width: 44px;
-    min-height: 44px;
-  }
-
   /* ── Admin: Datentabellen werden zu bedienbaren Karten ── */
-
-  .evg-studio .studio-admin-card {
-    min-width: 0;
-    margin-top: 14px !important;
-    padding: 14px !important;
-  }
-
-  .evg-studio .studio-admin-tabs {
-    flex-wrap: nowrap !important;
-    margin: 0 -14px 14px !important;
-    padding: 0 14px 4px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .evg-studio .studio-admin-tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .evg-studio .studio-admin-tabs > * {
-    flex: none;
-    min-height: 44px;
-  }
-
-  .evg-studio .studio-admin-table-wrap {
-    overflow: visible !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-  }
-
-  .evg-studio .studio-admin-table,
-  .evg-studio .studio-admin-table tbody {
-    display: block;
-    width: 100%;
-    min-width: 0 !important;
-  }
-
-  .evg-studio .studio-admin-table thead {
-    display: none;
-  }
-
-  .evg-studio .studio-admin-table tr {
-    display: block;
-    margin-bottom: 10px;
-    padding: 8px;
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: var(--s2);
-  }
-
-  .evg-studio .studio-admin-table td {
-    display: grid;
-    grid-template-columns: minmax(84px, 0.36fr) minmax(0, 0.64fr);
-    gap: 10px;
-    padding: 8px !important;
-    border: 0 !important;
-    overflow-wrap: anywhere;
-  }
-
-  .evg-studio .studio-admin-table td::before {
-    content: attr(data-label);
-    font-family: var(--f-mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--t3);
-  }
-
-  .evg-studio .studio-admin-table td[data-label="Aktion"] {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .evg-studio .studio-admin-table td[data-empty="true"]::before {
-    display: none;
-  }
-
-  .evg-studio .studio-admin-table td .stu-btn {
-    width: 100%;
-  }
-
-  .evg-studio .studio-admin-billing-actions {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr);
-    min-width: 0 !important;
-    width: 100%;
-  }
-
-  .evg-studio .studio-admin-plan-select {
-    width: 100% !important;
-    min-height: 44px;
-  }
-
-  .evg-studio .studio-admin-json-wrap {
-    max-width: 100%;
-    overflow: hidden !important;
-  }
-
-  .evg-studio .studio-admin-json {
-    max-width: 100%;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-  }
 }
 
 @media (max-width: 350px) {
-  .evg-studio .evg-tokens__label {
-    display: none;
-  }
 
 
   .evg-studio .studio-create-mobile-nav button {

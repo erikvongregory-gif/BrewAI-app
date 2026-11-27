@@ -19,18 +19,6 @@
   justify-content: center;
 }
 
-.studio-create-dock {
-  width: 100%;
-  max-width: 52rem;
-  margin: 0 auto;
-}
-
-.studio-create-dock__inner {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
 .brewai-admin .studio-media-page {
   display: flex;
   flex-direction: column;
