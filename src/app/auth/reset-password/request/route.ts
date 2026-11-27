@@ -1,5 +1,5 @@
 import { type NextResponse } from "next/server";
-import { PASSWORD_RESET_NEXT } from "@/lib/auth/passwordResetPaths";
+import { buildRecoveryConfirmUrl, PASSWORD_RESET_NEXT } from "@/lib/auth/passwordResetPaths";
 import { sendPasswordResetEmail } from "@/lib/email/passwordReset";
 import {
   extractResendSandboxAllowedEmail,
@@ -13,7 +13,12 @@ import { getOrCreateRequestId, logAuthEvent } from "@/lib/security/authObservabi
 import { createNoStoreRedirect } from "@/lib/security/authResponses";
 import { buildCompositeIdentifier, enforceRateLimitPersistent, enforceSameOrigin } from "@/lib/security/requestGuards";
 
-async function generateRecoveryLink(email: string, redirectTo: string) {
+/**
+ * Link auf die eigene Bestätigungsseite statt auf Supabases Verify-URL: Mail-Scanner, die Links vorab öffnen,
+ * verbrauchen den Einmal-Token sonst, bevor der Nutzer klickt (Ergebnis: otp_expired, Login-Seite ohne Hinweis).
+ * Erst der Klick auf der Seite löst /auth/callback?token_hash=… (verifyOtp) aus.
+ */
+async function generateRecoveryLink(email: string, redirectTo: string, origin: string) {
   const admin = createAdminClient();
   const { data, error } = await admin.auth.admin.generateLink({
     type: "recovery",
@@ -21,11 +26,11 @@ async function generateRecoveryLink(email: string, redirectTo: string) {
     options: { redirectTo },
   });
 
-  const actionLink = data?.properties?.action_link;
-  if (error || !actionLink) {
+  const hashedToken = data?.properties?.hashed_token;
+  if (error || !hashedToken) {
     throw new Error(error?.message ?? "recovery_link_failed");
   }
-  return actionLink;
+  return buildRecoveryConfirmUrl(origin, hashedToken);
 }
 
 async function sendViaSupabase(
@@ -81,7 +86,7 @@ export async function POST(request: Request) {
   if (resendReady) {
     let actionLink: string | null = null;
     try {
-      actionLink = await generateRecoveryLink(email, redirectTo);
+      actionLink = await generateRecoveryLink(email, redirectTo, origin);
       recoveryLinkCreated = true;
       await sendPasswordResetEmail({ to: email, actionLink });
       logAuthEvent({

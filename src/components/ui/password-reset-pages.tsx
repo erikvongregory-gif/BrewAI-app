@@ -151,6 +151,19 @@ export function ForgotPasswordPage({ notice, error }: FeedbackProps) {
   );
 }
 
+export function ConfirmPasswordResetPage({ tokenHash }: { tokenHash: string }) {
+  return (
+    <AuthShell title="Passwort zurücksetzen" lead="Bestätige kurz, dann legst du dein neues Passwort fest.">
+      <form method="get" action="/auth/callback" className="space-y-4">
+        <input type="hidden" name="token_hash" value={tokenHash} />
+        <input type="hidden" name="type" value="recovery" />
+        <input type="hidden" name="next" value="/passwort-zuruecksetzen" />
+        <SubmitButton label="Neues Passwort festlegen" pendingLabel="Einen Moment …" />
+      </form>
+    </AuthShell>
+  );
+}
+
 export function ResetPasswordPage({ notice, error }: FeedbackProps) {
   const [showPw, setShowPw] = useState(false);
   const [showPwConfirm, setShowPwConfirm] = useState(false);
