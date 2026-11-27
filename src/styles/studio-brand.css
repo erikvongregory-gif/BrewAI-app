@@ -359,6 +359,12 @@
   outline: none;
 }
 
+/* Sichtbarer Fokus (outline ist oben entfernt) */
+.evg-studio .studio-brand-review-tone-input:focus-visible {
+  border-color: var(--ac);
+  box-shadow: 0 0 0 3px var(--ac-tint);
+}
+
 .evg-studio .studio-brand-review-add-chip {
   display: inline-flex;
   align-items: center;

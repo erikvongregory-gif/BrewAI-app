@@ -577,6 +577,8 @@ export default function RuixenMoonChat() {
               className={cn(
                 "brew-composer__surface rounded-xl border",
                 "border-border bg-background shadow-sm",
+                // Das Textfeld selbst hat keinen Ring; der Fokus wird an der Composer-Fläche sichtbar.
+                "has-[textarea:focus-visible]:border-ring has-[textarea:focus-visible]:ring-[3px] has-[textarea:focus-visible]:ring-ring/50",
                 "dark:border-sidebar-border dark:bg-sidebar",
               )}
             >
@@ -605,7 +607,7 @@ export default function RuixenMoonChat() {
                       type="button"
                       aria-label="Preset entfernen"
                       onClick={clearPreset}
-                      className="ml-0.5 rounded-full p-0.5 opacity-70 transition-opacity hover:opacity-100"
+                      className="ml-0.5 rounded-full p-0.5 opacity-70 outline-none transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring/60"
                     >
                       <StudioIcon name="x" size={12} />
                     </button>
