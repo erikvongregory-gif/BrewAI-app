@@ -118,11 +118,14 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `node --max-http-header-size=524288 ./node_modules/next/dist/bin/next dev --turbopack --port ${E2E_PORT}`,
+    // E2E_PROD=1: Produktions-Build (next build && next start) statt Dev-Server, z. B. für Prefetch und echte Ladezeiten.
+    command: process.env.E2E_PROD
+      ? `node ./node_modules/next/dist/bin/next build && node --max-http-header-size=524288 ./node_modules/next/dist/bin/next start --port ${E2E_PORT}`
+      : `node --max-http-header-size=524288 ./node_modules/next/dist/bin/next dev --turbopack --port ${E2E_PORT}`,
     url: `${BASE_URL}/anmelden`,
     // Nie einen fremden Server wiederverwenden (könnte mit Produktions-Env laufen).
     reuseExistingServer: false,
-    timeout: 300_000,
+    timeout: process.env.E2E_PROD ? 900_000 : 300_000,
     env: serverEnv,
     stdout: "pipe",
     stderr: "pipe",

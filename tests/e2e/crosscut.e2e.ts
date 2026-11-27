@@ -22,7 +22,9 @@ const PAGES: Array<{ path: string; user: AccountKey | null }> = [
 ];
 
 // Bekanntes Rauschen, das kein App-Fehler ist (dev-only).
-const IGNORE = [/Download the React DevTools/, /\[Fast Refresh\]/, /\[HMR\]/, /webpack-hmr|turbopack-hmr/];
+const IGNORE = [/Download the React DevTools/, /\[Fast Refresh\]/, /\[HMR\]/, /webpack-hmr|turbopack-hmr/,
+  // Manche Chromium-Builds (Linux) kennen das Feature nicht; der Header bleibt bewusst streng.
+  /Permissions-Policy header: Unrecognized feature: .bluetooth./];
 
 for (const p of PAGES) {
   test(`Querschnitt ${p.path}`, async ({ as }, testInfo) => {
