@@ -297,9 +297,10 @@ export function AdminTeamView({
                             <Avatar size="sm">
                               <AvatarFallback>{getInitials(label)}</AvatarFallback>
                             </Avatar>
-                            <div className="flex min-w-0 flex-col">
-                              <span className="truncate font-medium text-sm">{label}</span>
-                              <span className="truncate text-muted-foreground text-xs">
+                            {/* Mobil kürzen, damit Rolle und Status ohne Querscrollen sichtbar bleiben. */}
+                            <div className="flex min-w-0 max-w-[9.5rem] flex-col sm:max-w-none">
+                              <span className="truncate font-medium text-sm" title={label}>{label}</span>
+                              <span className="truncate text-muted-foreground text-xs" title={m.email}>
                                 {m.email}
                               </span>
                             </div>

@@ -23,8 +23,9 @@ const FEATURES = [
 ] as const;
 
 export function CreateVideosComingSoonView() {
+  // Die Shell rendert diese Route randlos (wie die Erstellen-Seite), daher eigener Innenabstand.
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-6 sm:px-6">
       <header className="space-y-3">
         <Badge variant="secondary" className="rounded-md px-2.5 py-0.5 text-xs font-medium">
           Demnächst verfügbar

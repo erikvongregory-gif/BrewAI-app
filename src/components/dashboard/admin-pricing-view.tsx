@@ -261,7 +261,7 @@ export function AdminPricingView({
             if (v === true) setCheckoutError(null);
           }}
         />
-        <Label htmlFor="billing-consent" className="text-sm font-normal leading-relaxed">
+        <Label htmlFor="billing-consent" className="block text-sm font-normal leading-relaxed">
           Ich stimme zu, dass BrewAI mit der digitalen Leistung vor Ablauf der 14-tägigen Widerrufsfrist beginnt, und
           weiß, dass ich mein Widerrufsrecht bei Beginn der Ausführung verliere. Details:{" "}
           <a href="https://brewai.de/widerruf" target="_blank" rel="noopener noreferrer" className="underline">
