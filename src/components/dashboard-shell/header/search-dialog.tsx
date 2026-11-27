@@ -159,7 +159,7 @@ export function SearchDialog() {
         <Search data-icon="inline-start" />
         Suchen
         {showAppleShortcut ? (
-          <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-medium text-[10px]">
+          <kbd className="inline-flex h-5 select-none items-center gap-1 rounded-sm border bg-muted px-1.5 font-medium text-[10px]">
             <span className="text-xs">⌘</span>J
           </kbd>
         ) : null}

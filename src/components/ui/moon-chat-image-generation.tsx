@@ -53,7 +53,7 @@ export function MoonChatImageGeneration({
   return (
     <div
       className={cn(
-        "flex w-full flex-col overflow-hidden rounded-2xl border shadow-sm",
+        "flex w-full flex-col overflow-hidden rounded-xl border shadow-sm",
         "border-border bg-background/90",
         "dark:border-sidebar-border dark:bg-sidebar",
         className,

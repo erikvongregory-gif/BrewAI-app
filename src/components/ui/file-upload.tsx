@@ -187,7 +187,7 @@ export default function FileUpload({
         whileHover={{ scale: 1.01 }}
         transition={{ duration: 0.2 }}
         className={clsx(
-          "relative rounded-2xl p-8 md:p-10 text-center cursor-pointer bg-secondary/50 shadow-sm hover:shadow-md backdrop-blur group",
+          "relative rounded-xl p-8 md:p-10 text-center cursor-pointer bg-secondary/50 shadow-sm hover:shadow-md backdrop-blur group",
           isDragging && "ring-4 ring-blue-400/30",
         )}
       >

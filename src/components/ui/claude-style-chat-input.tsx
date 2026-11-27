@@ -287,7 +287,7 @@ function SortenPopup({
                     ))}
                     {onSaveProduct && !query.trim() ? (
                       <button type="button" onClick={() => setCreating(true)} className="group text-left">
-                        <div className="flex aspect-[4/5] items-center justify-center rounded-2xl border border-dashed border-cc-bg-300 bg-cc-bg-200 text-cc-text-400 group-hover:border-cc-text-400 group-hover:text-cc-text-300">
+                        <div className="flex aspect-[4/5] items-center justify-center rounded-xl border border-dashed border-cc-bg-300 bg-cc-bg-200 text-cc-text-400 group-hover:border-cc-text-400 group-hover:text-cc-text-300">
                           <Plus className="h-6 w-6" />
                         </div>
                         <div className="mt-2 truncate px-0.5 text-[13px] font-medium text-cc-text-400">Neue Sorte</div>
@@ -324,7 +324,7 @@ function SortenCard({
     <button type="button" onClick={onClick} className="group text-left">
       <div
         className={cn(
-          "aspect-[4/5] overflow-hidden rounded-2xl bg-cc-bg-200 outline outline-[2.5px] -outline-offset-[2.5px]",
+          "aspect-[4/5] overflow-hidden rounded-xl bg-cc-bg-200 outline outline-[2.5px] -outline-offset-[2.5px]",
           selected ? "outline-cc-accent" : "outline-transparent group-hover:outline-cc-bg-300",
         )}
       >
@@ -395,7 +395,7 @@ function MenuSelect({
           sideOffset={8}
           collisionPadding={12}
           role="listbox"
-          className="cc-portal cc-menu-popover z-50 w-[260px] rounded-2xl shadow-2xl overflow-hidden flex flex-col p-1.5"
+          className="cc-portal cc-menu-popover z-50 w-[260px] rounded-xl shadow-2xl overflow-hidden flex flex-col p-1.5"
           onKeyDown={(event) => {
             if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
             event.preventDefault();
@@ -483,7 +483,7 @@ function AttachCard({
       ) : (
         <div className="w-full h-full p-3 flex flex-col justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-cc-bg-300 rounded">
+            <div className="p-1.5 bg-cc-bg-300 rounded-sm">
               <Icons.FileText className="w-4 h-4 text-cc-text-300" />
             </div>
           </div>
@@ -498,7 +498,7 @@ function AttachCard({
           type="button"
           onClick={item.onLabelClick}
           disabled={!item.onLabelClick}
-          className="absolute bottom-1 left-1 px-1.5 py-[2px] rounded border border-[#E5E5E5] bg-white/95 text-[9px] font-bold text-[#6B7280] uppercase tracking-wider"
+          className="absolute bottom-1 left-1 px-1.5 py-[2px] rounded-sm border border-[#E5E5E5] bg-white/95 text-[9px] font-bold text-[#6B7280] uppercase tracking-wider"
         >
           {item.label}
         </button>
@@ -689,7 +689,7 @@ export function ClaudeChatInput({
       }
     >
       <div className={cn(
-        "!box-content flex flex-col mx-2 md:mx-0 items-stretch relative z-10 rounded-2xl cursor-text border border-cc-bg-300 dark:border-transparent shadow-[0_0_15px_rgba(0,0,0,0.08)] hover:shadow-[0_0_20px_rgba(0,0,0,0.12)] focus-within:shadow-[0_0_25px_rgba(0,0,0,0.15)] bg-white dark:bg-[#30302E] font-sans antialiased cc-prompt-shell",
+        "!box-content flex flex-col mx-2 md:mx-0 items-stretch relative z-10 rounded-xl cursor-text border border-cc-bg-300 dark:border-transparent shadow-[0_0_15px_rgba(0,0,0,0.08)] hover:shadow-[0_0_20px_rgba(0,0,0,0.12)] focus-within:shadow-[0_0_25px_rgba(0,0,0,0.15)] bg-white dark:bg-[#30302E] font-sans antialiased cc-prompt-shell",
         isDragging && "ring-2 ring-cc-accent/40",
       )}>
         <div className="flex flex-col px-3 pt-3 pb-2 gap-2">
@@ -746,7 +746,7 @@ export function ClaudeChatInput({
                 )}
               >
                 {selectedProductPreview ? (
-                  <img src={selectedProductPreview} alt="" className="h-4 w-4 rounded object-cover" />
+                  <img src={selectedProductPreview} alt="" className="h-4 w-4 rounded-sm object-cover" />
                 ) : null}
                 <span className="select-none font-medium text-[14px] leading-none max-w-[7rem] truncate">{productTriggerLabel}</span>
                 <Icons.SelectArrow className={cn("h-5 w-5 opacity-75 cc-menu-arrow", sortenOpen && "rotate-180")} />
@@ -794,7 +794,7 @@ export function ClaudeChatInput({
                       align="start"
                       sideOffset={8}
                       collisionPadding={12}
-                      className="cc-portal cc-menu-popover z-50 w-[180px] rounded-2xl shadow-2xl overflow-hidden flex flex-col p-1.5"
+                      className="cc-portal cc-menu-popover z-50 w-[180px] rounded-xl shadow-2xl overflow-hidden flex flex-col p-1.5"
                       role="listbox"
                       aria-label="Seitenverhältnis"
                     >
@@ -847,7 +847,7 @@ export function ClaudeChatInput({
                       align="start"
                       sideOffset={8}
                       collisionPadding={12}
-                      className="cc-portal cc-menu-popover z-50 w-[140px] rounded-2xl shadow-2xl overflow-hidden flex flex-col p-1.5"
+                      className="cc-portal cc-menu-popover z-50 w-[140px] rounded-xl shadow-2xl overflow-hidden flex flex-col p-1.5"
                       role="listbox"
                       aria-label="Varianten"
                     >
@@ -921,7 +921,7 @@ export function ClaudeChatInput({
       />
 
       {isDragging ? (
-        <div className="absolute inset-0 bg-cc-bg-200/90 border-2 border-dashed border-cc-accent rounded-2xl z-50 flex flex-col items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 bg-cc-bg-200/90 border-2 border-dashed border-cc-accent rounded-xl z-50 flex flex-col items-center justify-center pointer-events-none">
           <Icons.Archive className="w-10 h-10 text-cc-accent mb-2" />
           <p className="text-cc-accent font-medium">Bilder hier ablegen</p>
         </div>

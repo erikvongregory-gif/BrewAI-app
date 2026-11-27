@@ -13,7 +13,7 @@
   max-height: min(560px, calc(100dvh - 96px));
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: var(--r-lg, 10px);
+  border-radius: var(--r-lg);
   background: var(--s1);
   color: var(--t1);
   box-shadow: var(--sh-card, 0 1px 2px rgba(24, 20, 15, 0.04));
@@ -143,7 +143,7 @@
   flex: none;
   padding: 6px 10px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   background: var(--s2);
   color: var(--t2);
   font-size: 12px;
@@ -190,13 +190,13 @@
 
 .evg-hopfenhugo-messages::-webkit-scrollbar-thumb {
   background: var(--line2);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
 }
 
 .evg-hopfenhugo-dot {
   width: 5px;
   height: 5px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: var(--t3);
   animation: evg-hopfenhugo-bounce 1.2s ease-in-out infinite;
 }
@@ -220,7 +220,7 @@
 .evg-hopfenhugo-chip {
   height: 30px;
   padding: 0 12px;
-  border-radius: 20px;
+  border-radius: var(--r-xl);
   border: 1px solid var(--line2);
   background: var(--s2);
   color: var(--t2);
@@ -318,7 +318,7 @@
   flex-direction: column;
   min-height: 0;
   border: none;
-  border-radius: var(--r-lg, 12px);
+  border-radius: var(--r-lg);
   background: var(--background, var(--s2, #f6f6f4));
   overflow: hidden;
 }
@@ -373,7 +373,7 @@
   width: 100%;
   padding: 12px 28px 12px 12px;
   border: none;
-  border-radius: 0.75rem;
+  border-radius: var(--r-xl);
   /* Wie Dashboard-KPI-Cards: primary/5 → card, soft shadow */
   background: linear-gradient(
     to top,
@@ -488,7 +488,7 @@
   height: 22px;
   padding: 0;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   background: transparent;
   color: var(--t3);
   font-size: 16px;
@@ -530,7 +530,7 @@
   max-height: none;
   display: flex;
   flex-direction: column;
-  border-radius: var(--r-lg, 10px);
+  border-radius: var(--r-lg);
   border: 1px solid var(--line);
   background: var(--s1);
   box-shadow: var(--sh-card, none);
@@ -611,7 +611,7 @@
     min-height: 0;
     width: 100%;
     border: none;
-    border-radius: 16px;
+    border-radius: var(--r-xl);
     background: var(--background, var(--s2, #f6f6f4));
     box-shadow: none;
     overflow: hidden;
@@ -649,7 +649,7 @@
     width: 100%;
     max-width: none;
     border: none;
-    border-radius: var(--r-md, 8px);
+    border-radius: var(--r-md);
   }
 
   .evg-hopfenhugo-head-actions {
@@ -679,7 +679,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  border-radius: var(--r-lg, 10px);
+  border-radius: var(--r-lg);
   border: 1px solid var(--line);
   background: var(--s1);
   box-shadow: var(--sh-card, none);

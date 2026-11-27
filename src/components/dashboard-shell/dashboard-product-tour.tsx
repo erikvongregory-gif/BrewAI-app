@@ -252,7 +252,7 @@ export function DashboardProductTour({
               {phase === "intro" ? (
                 <motion.div
                   key="intro"
-                  className="relative w-full max-w-[460px] overflow-hidden rounded-3xl border border-white/10 bg-card shadow-[0_40px_120px_-30px_rgba(0,0,0,0.6)]"
+                  className="relative w-full max-w-[460px] overflow-hidden rounded-xl border border-white/10 bg-card shadow-[0_40px_120px_-30px_rgba(0,0,0,0.6)]"
                   initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 24 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: -12, transition: { duration: 0.22 } }}
@@ -284,7 +284,7 @@ export function DashboardProductTour({
                       animate={{ scale: 1, opacity: 1, rotate: 0 }}
                       transition={{ type: "spring", stiffness: 260, damping: 16, delay: 0.15 }}
                     >
-                      <span className="flex size-16 items-center justify-center rounded-2xl bg-white/95 shadow-[0_0_60px_rgba(233,162,95,0.65)]">
+                      <span className="flex size-16 items-center justify-center rounded-xl bg-white/95 shadow-[0_0_60px_rgba(233,162,95,0.65)]">
                         <EvglabMark size={34} />
                       </span>
                     </motion.div>
@@ -370,7 +370,7 @@ export function DashboardProductTour({
               ) : (
                 <motion.div
                   key="outro"
-                  className="relative w-full max-w-[400px] rounded-3xl border border-white/10 bg-card p-7 text-center shadow-[0_40px_120px_-30px_rgba(0,0,0,0.6)]"
+                  className="relative w-full max-w-[400px] rounded-xl border border-white/10 bg-card p-7 text-center shadow-[0_40px_120px_-30px_rgba(0,0,0,0.6)]"
                   initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.9, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, transition: { duration: 0.2 } }}
@@ -382,7 +382,7 @@ export function DashboardProductTour({
                           <motion.span
                             key={i}
                             aria-hidden
-                            className="absolute left-1/2 top-1/2 rounded-[2px]"
+                            className="absolute left-1/2 top-1/2 rounded-xs"
                             style={{ width: c.w, height: c.w * 0.45, background: c.color, marginLeft: -c.w / 2 }}
                             initial={{ x: 0, y: 0, opacity: 0, rotate: 0, scale: 0.4 }}
                             animate={{ x: c.x, y: [0, c.y, c.y + 60], opacity: [0, 1, 0], rotate: c.r * 4, scale: 1 }}
@@ -397,7 +397,7 @@ export function DashboardProductTour({
                       transition={{ duration: 1.2, ease: "easeOut", delay: 0.15 }}
                     />
                     <motion.span
-                      className="relative flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-acc-light to-acc text-white shadow-[0_12px_36px_-8px_rgba(199,105,30,0.8)]"
+                      className="relative flex size-16 items-center justify-center rounded-xl bg-gradient-to-br from-acc-light to-acc text-white shadow-[0_12px_36px_-8px_rgba(199,105,30,0.8)]"
                       initial={reduce ? false : { scale: 0.3, rotate: -30 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ type: "spring", stiffness: 380, damping: 14, delay: 0.1 }}

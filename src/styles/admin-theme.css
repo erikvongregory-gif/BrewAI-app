@@ -3,14 +3,22 @@
 @import "./presets/soft-pop.css";
 @import "./presets/tangerine.css";
 
+/* Radius-Skala (--radius = 10px), verbindlich für Shell und Studio:
+   rounded-xs  2px  Mikroelemente (Legendenpunkte, Fortschrittssegmente, Tooltip-Pfeil)
+   rounded-sm  6px  kleine Elemente (Checkbox, Kbd, Code, Thumbnails unter 24px)
+   rounded-md  8px  verschachtelt (Menüeinträge, Chips/Thumbnails in Controls)
+   rounded-lg 10px  Controls (Buttons, Inputs, Selects, Popover, Tabellenrahmen)
+   rounded-xl 14px  Karten, Dialoge, Panels, Bildkacheln
+   rounded-full     Pills, Badges, Avatare, Statuspunkte, Spinner
+   2xl–4xl sind bewusst auf xl gedeckelt, damit Ausreißer nicht wieder entstehen. */
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
+  --radius-2xl: var(--r-xl);
+  --radius-3xl: var(--r-xl);
+  --radius-4xl: var(--r-xl);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

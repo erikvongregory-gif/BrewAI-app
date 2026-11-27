@@ -718,7 +718,7 @@ export function BrandProfileSetupModal({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          "evg-studio studio-brand-modal fixed left-1/2 top-1/2 z-[130] flex max-h-[min(92vh,820px)] w-[min(100%,36rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-0 overflow-hidden rounded-3xl border border-border bg-card p-0 text-foreground shadow-2xl sm:max-w-xl",
+          "evg-studio studio-brand-modal fixed left-1/2 top-1/2 z-[130] flex max-h-[min(92vh,820px)] w-[min(100%,36rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-0 overflow-hidden rounded-xl border border-border bg-card p-0 text-foreground shadow-2xl sm:max-w-xl",
           step === "review" && "max-w-2xl sm:max-w-2xl",
         )}
         onPointerDownOutside={(e) => {
@@ -779,7 +779,7 @@ export function BrandProfileSetupModal({
         ) : (
           <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4 sm:p-6 lg:p-8">
             <div className="mb-6 flex items-start gap-3 pr-10 sm:gap-4">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground sm:size-12">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground sm:size-12">
                 <StudioIcon name="brand" size={22} />
               </div>
               <div className="min-w-0 flex-1">

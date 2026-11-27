@@ -179,11 +179,11 @@ const AIMessage = ({
         <div
           className={cn(
             "w-fit max-w-prose text-sm leading-relaxed",
-            bubble && "rounded-2xl px-3.5 py-2.5",
+            bubble && "rounded-xl px-3.5 py-2.5",
             bubble && isUser && "rounded-br-md bg-foreground text-background",
             bubble &&
               !isUser &&
-              "rounded-2xl rounded-bl-md border-0 bg-linear-to-t from-primary/5 to-card text-foreground shadow-xs dark:bg-card dark:from-transparent",
+              "rounded-xl rounded-bl-md border-0 bg-linear-to-t from-primary/5 to-card text-foreground shadow-xs dark:bg-card dark:from-transparent",
             !bubble && "text-foreground",
           )}
         >

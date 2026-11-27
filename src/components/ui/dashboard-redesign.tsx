@@ -158,7 +158,7 @@ function Placeholder({
       className="relative shrink-0 overflow-hidden rounded-lg border border-dashed bg-muted"
       style={{ width: w, height: h }}
     >
-      <span className="absolute bottom-1.5 left-1.5 rounded bg-background/80 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide text-muted-foreground">
+      <span className="absolute bottom-1.5 left-1.5 rounded-sm bg-background/80 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide text-muted-foreground">
         {label}
       </span>
     </div>

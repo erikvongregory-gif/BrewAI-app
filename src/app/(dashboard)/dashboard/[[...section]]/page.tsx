@@ -61,9 +61,9 @@ export default async function DashboardPage({
         <h1 className="font-display text-2xl font-semibold text-foreground">Dashboard</h1>
         <p className="mt-4 text-muted-foreground">
           Supabase ist noch nicht konfiguriert. Lege in Vercel (und lokal in{" "}
-          <code className="rounded bg-muted px-1">.env.local</code>){" "}
-          <code className="rounded bg-muted px-1">NEXT_PUBLIC_SUPABASE_URL</code> und{" "}
-          <code className="rounded bg-muted px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> an.
+          <code className="rounded-sm bg-muted px-1">.env.local</code>){" "}
+          <code className="rounded-sm bg-muted px-1">NEXT_PUBLIC_SUPABASE_URL</code> und{" "}
+          <code className="rounded-sm bg-muted px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> an.
         </p>
         <a href={MARKETING_SITE_URL} className="mt-6 inline-block text-sm font-medium text-acc-deep hover:underline">
           Zur Startseite

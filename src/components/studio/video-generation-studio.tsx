@@ -366,7 +366,7 @@ export function VideoGenerationStudio({ breweryName }: Props) {
               {tiles.map((tile) => (
                 <article
                   key={tile.id}
-                  className="overflow-hidden rounded-2xl border border-border bg-background shadow-sm dark:border-sidebar-border dark:bg-sidebar"
+                  className="overflow-hidden rounded-xl border border-border bg-background shadow-sm dark:border-sidebar-border dark:bg-sidebar"
                 >
                   <div className="aspect-video bg-muted">
                     {tile.status === "completed" && tile.videoUrl ? (
@@ -417,7 +417,7 @@ export function VideoGenerationStudio({ breweryName }: Props) {
             <div className="brew-composer__ring" aria-hidden />
             <div
               className={cn(
-                "brew-composer__surface rounded-2xl border",
+                "brew-composer__surface rounded-xl border",
                 "border-border bg-background shadow-sm",
                 "dark:border-sidebar-border dark:bg-sidebar",
               )}

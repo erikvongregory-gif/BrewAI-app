@@ -31,13 +31,13 @@
     max-height: min(82dvh, 620px);
     padding: 18px 14px calc(14px + env(safe-area-inset-bottom, 0px));
     transform: none;
-    border-radius: 16px 16px 0 0;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
     animation: stu-sheet-in 240ms var(--ease);
   }
 
   .stu-dialog.evg-studio.stu-dialog--sheet-mobile.stu-dialog--beer {
     max-height: min(92dvh, 900px);
-    border-radius: 16px 16px 0 0;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
     padding: 0;
     border: 0;
     background: transparent;
@@ -114,7 +114,7 @@
   .evg-studio .studio-media-detail {
     width: 100%;
     max-height: 92dvh;
-    border-radius: 16px 16px 0 0;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(180px, 42dvh) auto;
     gap: 0;
@@ -162,7 +162,7 @@
     max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 8px) !important;
     padding: 16px 14px 0 !important;
     transform: none !important;
-    border-radius: 16px 16px 0 0 !important;
+    border-radius: var(--r-xl) var(--r-xl) 0 0 !important;
   }
 
   .evg-studio .studio-brand-review-foot {
@@ -196,7 +196,7 @@
     max-width: none;
     max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 8px);
     overflow-y: auto;
-    border-radius: 16px 16px 0 0;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
   }
 
   .evg-studio .studio-brand-choice__body {
@@ -289,7 +289,7 @@
   .evg-studio .studio-create-modal__panel--beer {
     width: 100%;
     max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 8px);
-    border-radius: 16px 16px 0 0;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
@@ -312,7 +312,7 @@
   }
 
   .evg-studio .evg-hopfenhugo-panel--page {
-    border-radius: 12px;
+    border-radius: var(--r-xl);
   }
 
   .evg-studio .evg-hopfenhugo-suggestions {

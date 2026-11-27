@@ -48,7 +48,7 @@
 
 .brewai-claude-create .cc-scroll::-webkit-scrollbar-thumb {
   background: var(--cc-bg-300);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
 }
 
 @keyframes cc-fade-in {
@@ -120,7 +120,7 @@
   max-height: min(68vh, 560px);
   flex-direction: column;
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: var(--r-xl);
   background: var(--cc-bg-100);
   color: var(--cc-text-100);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18);
@@ -145,7 +145,7 @@
     max-width: none;
     max-height: min(88vh, 720px);
     transform: none;
-    border-radius: 24px 24px 0 0;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
   }
 }
 
@@ -179,7 +179,7 @@
 .brew-composer {
   position: relative;
   isolation: isolate;
-  border-radius: 1rem;
+  border-radius: var(--r-xl);
 }
 
 .brew-composer__glow,

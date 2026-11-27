@@ -341,7 +341,7 @@ export function Tour({
 
             <motion.div
               ref={cardRef}
-              className="pointer-events-auto absolute w-[340px] max-w-[calc(100vw-24px)] overflow-hidden rounded-2xl border border-border/80 bg-card/95 shadow-[0_24px_70px_-20px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+              className="pointer-events-auto absolute w-[340px] max-w-[calc(100vw-24px)] overflow-hidden rounded-xl border border-border/80 bg-card/95 shadow-[0_24px_70px_-20px_rgba(0,0,0,0.45)] backdrop-blur-xl"
               initial={reduce ? false : { opacity: 0, scale: 0.94, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0, left, top }}
               exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: 4, transition: { duration: 0.18 } }}
@@ -431,8 +431,8 @@ export function Tour({
                     </div>
                   ) : (
                     <span className="hidden text-[11px] text-muted-foreground sm:inline">
-                      <kbd className="rounded border border-border px-1 font-sans">←</kbd>{" "}
-                      <kbd className="rounded border border-border px-1 font-sans">→</kbd> navigieren
+                      <kbd className="rounded-sm border border-border px-1 font-sans">←</kbd>{" "}
+                      <kbd className="rounded-sm border border-border px-1 font-sans">→</kbd> navigieren
                     </span>
                   )}
 

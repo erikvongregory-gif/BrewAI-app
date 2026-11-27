@@ -94,7 +94,7 @@ function RunFrame({ run }: { run: CreateRun }) {
     <div className="flex min-h-0 flex-1 items-center justify-center [container-type:size]">
       <motion.div
         layout
-        className="relative overflow-hidden rounded-2xl border border-border bg-muted shadow-[0_1px_2px_rgb(0_0_0/0.04),0_24px_60px_-28px_rgb(0_0_0/0.35)]"
+        className="relative overflow-hidden rounded-xl border border-border bg-muted shadow-[0_1px_2px_rgb(0_0_0/0.04),0_24px_60px_-28px_rgb(0_0_0/0.35)]"
         style={{ aspectRatio: String(ratio), width: `min(100cqw, calc(100cqh * ${ratio}))` }}
         transition={{ duration: 0.5, ease: EASE_OUT }}
       >

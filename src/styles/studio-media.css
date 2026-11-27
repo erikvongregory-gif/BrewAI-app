@@ -252,7 +252,7 @@
 .evg-studio .studio-media-skeleton-card__line {
   height: 9px;
   margin-top: 9px;
-  border-radius: 5px;
+  border-radius: var(--r-sm);
   background: var(--s3);
 }
 

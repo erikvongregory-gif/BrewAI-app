@@ -35,7 +35,7 @@ export default async function InviteTokenPage({ params, searchParams }: InvitePa
 
   return (
     <main className="mx-auto my-10 w-full max-w-md px-4">
-      <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+      <section className="rounded-xl border border-border bg-card p-6 shadow-sm">
         <h1 className="text-xl font-semibold text-foreground">Einladung zum Dashboard</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Registriere dich mit deiner eingeladenen E-Mail-Adresse, um Zugang zum Dashboard zu erhalten.
