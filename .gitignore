@@ -67,3 +67,6 @@ tests/e2e/.state/
 tests/e2e/.artifacts/
 /test-results/
 /playwright-report/
+
+# UI-Screenshots fuer Motion-Video (lokal)
+ui-screenshots/
