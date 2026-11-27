@@ -43,6 +43,9 @@ const loadCreateResultStage = () => import("@/components/ui/create-result-stage"
 const CreateResultStage = dynamic(() => loadCreateResultStage().then((m) => m.CreateResultStage));
 
 const PLACEHOLDER_ETIKETT = "https://example.com/placeholder.png";
+/** Grenze für zusatzWunsch (siehe Payload unten); der Zähler erscheint ab 80 %. */
+const PROMPT_MAX = 800;
+const PROMPT_HINT_FROM = 640;
 
 const ASPECT_OPTIONS: { value: Aspect; hint: string }[] = [
   { value: "1:1", hint: "Quadrat" },
@@ -493,7 +496,7 @@ export default function RuixenMoonChat() {
       keepLabel: usesProductPhoto,
       photoStyle,
       beerName: beer?.name?.trim() || undefined,
-      zusatzWunsch: intentParts.join(". ").slice(0, 800),
+      zusatzWunsch: intentParts.join(". ").slice(0, PROMPT_MAX),
       characterName: selectedCharacter?.name?.trim() || undefined,
       characterRole: selectedCharacter?.role?.trim() || undefined,
       characterReferenceImages: selectedCharacter
@@ -631,7 +634,22 @@ export default function RuixenMoonChat() {
                 activePreset && "pt-1",
               )}
               style={{ overflow: "hidden" }}
+              aria-describedby={message.length >= PROMPT_HINT_FROM ? "prompt-length-hint" : undefined}
             />
+            {/* Gesendet werden höchstens 800 Zeichen (zusatzWunsch); ab 80 % zeigen wir den Stand. */}
+            {message.length >= PROMPT_HINT_FROM ? (
+              <p
+                id="prompt-length-hint"
+                aria-live="polite"
+                className={cn(
+                  "px-4 text-xs tabular-nums",
+                  message.length > PROMPT_MAX ? "text-destructive-foreground" : "text-muted-foreground",
+                )}
+              >
+                {message.length.toLocaleString("de-DE")} / {PROMPT_MAX} Zeichen
+                {message.length > PROMPT_MAX ? " · Max. 800 Zeichen, der Rest wird nicht berücksichtigt." : null}
+              </p>
+            ) : null}
 
             <div className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
               <div className="flex min-w-0 items-center gap-0.5 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
