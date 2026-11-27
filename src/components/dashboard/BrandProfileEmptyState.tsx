@@ -129,7 +129,7 @@ export function BrandProfileEmptyState({
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2" aria-label="Beispiel eines Markenprofils">
           <BrandingCard
             category="Branding"
-            title="Typography"
+            title="Typografie"
             subtitle="Deine Hausschrift"
             displayElement={<span>Aa<span className="text-white/40">Bb</span></span>}
             className="!h-auto border-neutral-800 bg-[#1c1c1c] text-white shadow-none hover:shadow-xl [&_.text-muted-foreground]:text-neutral-400"

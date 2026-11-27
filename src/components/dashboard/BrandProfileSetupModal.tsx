@@ -818,7 +818,7 @@ export function BrandProfileSetupModal({
                     >
                       <StudioIcon name="image" size={15} />
                       <span className="hidden sm:inline">Screenshots</span>
-                      <span className="sm:hidden">Upload</span>
+                      <span className="sm:hidden">Bilder</span>
                     </TabsTrigger>
                   </TabsList>
 

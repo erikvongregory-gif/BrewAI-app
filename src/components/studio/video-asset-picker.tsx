@@ -306,7 +306,7 @@ export function VideoAssetPicker({
                 ) : (
                   <StudioIcon name="plus" size={18} />
                 )}
-                <span className="text-[10px] font-medium">Upload</span>
+                <span className="text-[10px] font-medium">Hochladen</span>
               </button>
             ) : null}
             {assets.map((asset) => {
