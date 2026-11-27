@@ -26,8 +26,8 @@ export default async function InhalteErstellenPage() {
   if (!isSupabaseConfigured()) {
     return (
       <main className="relative z-10 mx-auto max-w-lg px-4 py-16">
-        <h1 className="font-display text-2xl font-semibold text-zinc-900">Bilder erstellen</h1>
-        <p className="mt-4 text-zinc-600">Supabase ist noch nicht konfiguriert.</p>
+        <h1 className="font-display text-2xl font-semibold text-foreground">Bilder erstellen</h1>
+        <p className="mt-4 text-muted-foreground">Supabase ist noch nicht konfiguriert.</p>
         <a href={MARKETING_SITE_URL} className="mt-6 inline-block text-sm font-medium text-acc-deep hover:underline">
           Zur Startseite
         </a>

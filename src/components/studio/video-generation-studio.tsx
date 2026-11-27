@@ -357,7 +357,7 @@ export function VideoGenerationStudio({ breweryName }: Props) {
                 hoverText="BrewAI"
                 textClassName="text-4xl font-semibold tracking-normal drop-shadow-sm 2xl:text-5xl"
               />
-              <p className="mt-2 text-neutral-600 dark:text-neutral-200">
+              <p className="mt-2 text-muted-foreground">
                 {breweryName ? `Videos für ${breweryName}` : "Ideen brauen. Videos zapfen."}
               </p>
             </div>

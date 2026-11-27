@@ -219,20 +219,20 @@ export default function FileUpload({
                 "w-16 h-16 md:w-20 md:h-20 drop-shadow-sm",
                 isDragging
                   ? "text-blue-500"
-                  : "text-zinc-700 dark:text-zinc-300 group-hover:text-blue-500 transition-colors duration-300",
+                  : "text-muted-foreground group-hover:text-blue-500 transition-colors duration-300",
               )}
             />
           </motion.div>
 
           <div className="space-y-2">
-            <h3 className="text-xl md:text-2xl font-semibold text-zinc-800 dark:text-zinc-100">
+            <h3 className="text-xl md:text-2xl font-semibold text-foreground">
               {isDragging
                 ? titleDragging
                 : files.length
                   ? titleHasFiles
                   : titleIdle}
             </h3>
-            <p className="text-zinc-600 dark:text-zinc-300 md:text-lg max-w-md mx-auto">
+            <p className="text-muted-foreground md:text-lg max-w-md mx-auto">
               {isDragging ? (
                 <span className="font-medium text-blue-500">
                   {hint || "Release to upload"}
@@ -244,7 +244,7 @@ export default function FileUpload({
                 </>
               )}
             </p>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">{supportHint}</p>
+            <p className="text-sm text-muted-foreground">{supportHint}</p>
           </div>
 
           <input
@@ -266,14 +266,14 @@ export default function FileUpload({
               animate={{ opacity: 1 }}
               className="flex justify-between items-center mb-3 px-2"
             >
-              <h3 className="font-semibold text-lg text-zinc-800 dark:text-zinc-200">
+              <h3 className="font-semibold text-lg text-foreground">
                 {uploadedLabel} ({files.length})
               </h3>
               {files.length > 1 && (
                 <button
                   type="button"
                   onClick={clearAll}
-                  className="text-sm font-medium px-3 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-700 dark:hover:bg-zinc-600 rounded-md text-zinc-700 hover:text-red-600 dark:text-zinc-300 dark:hover:text-red-400 transition-colors duration-200"
+                  className="text-sm font-medium px-3 py-1 bg-muted hover:bg-muted rounded-md text-muted-foreground hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
                 >
                   {clearAllLabel}
                 </button>
@@ -297,7 +297,7 @@ export default function FileUpload({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -20, scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 300, damping: 24 }}
-                className="px-4 py-4 flex items-start gap-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/80 shadow hover:shadow-md transition-all duration-200"
+                className="px-4 py-4 flex items-start gap-4 rounded-xl bg-muted shadow hover:shadow-md transition-all duration-200"
               >
                 <div className="relative flex-shrink-0">
                   {file.type.startsWith("image/") ? (
@@ -305,12 +305,12 @@ export default function FileUpload({
                     <img
                       src={file.preview}
                       alt={file.name}
-                      className="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover border dark:border-zinc-700 shadow-sm"
+                      className="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover border shadow-sm"
                     />
                   ) : file.type.startsWith("video/") ? (
                     <video
                       src={file.preview}
-                      className="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover border dark:border-zinc-700 shadow-sm"
+                      className="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover border shadow-sm"
                       controls={false}
                       muted
                       loop
@@ -318,13 +318,13 @@ export default function FileUpload({
                       preload="metadata"
                     />
                   ) : (
-                    <FileIcon className="w-16 h-16 md:w-20 md:h-20 text-zinc-400" />
+                    <FileIcon className="w-16 h-16 md:w-20 md:h-20 text-muted-foreground" />
                   )}
                   {file.progress === 100 && (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.5 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="absolute -right-2 -bottom-2 bg-white dark:bg-zinc-800 rounded-full shadow-sm"
+                      className="absolute -right-2 -bottom-2 bg-card rounded-full shadow-sm"
                     >
                       <CheckCircle className="w-5 h-5 text-emerald-500" />
                     </motion.div>
@@ -336,14 +336,14 @@ export default function FileUpload({
                     <div className="flex items-center gap-2 min-w-0">
                       <FileIcon className="w-5 h-5 flex-shrink-0 text-blue-500 dark:text-blue-400" />
                       <h4
-                        className="font-medium text-base truncate text-zinc-800 dark:text-zinc-200"
+                        className="font-medium text-base truncate text-foreground"
                         title={file.name}
                       >
                         {file.name}
                       </h4>
                     </div>
 
-                    <div className="flex items-center justify-between gap-3 text-sm text-zinc-500 dark:text-zinc-400">
+                    <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
                       <span className="text-xs md:text-sm">{formatFileSize(file.size)}</span>
                       <span className="flex items-center gap-1.5">
                         <span className="font-medium">{Math.round(file.progress)}%</span>
@@ -351,7 +351,7 @@ export default function FileUpload({
                           <Loader className="w-4 h-4 animate-spin text-blue-500" />
                         ) : (
                           <Trash2
-                            className="w-4 h-4 cursor-pointer text-zinc-400 hover:text-red-500 dark:text-zinc-500 dark:hover:text-red-400 transition-colors duration-200"
+                            className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200"
                             onClick={(e) => {
                               e.stopPropagation();
                               removeFile(file);
@@ -368,7 +368,7 @@ export default function FileUpload({
                     ) : null}
                   </div>
 
-                  <div className="w-full h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden mt-3">
+                  <div className="w-full h-2 bg-muted rounded-full overflow-hidden mt-3">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${file.progress}%` }}

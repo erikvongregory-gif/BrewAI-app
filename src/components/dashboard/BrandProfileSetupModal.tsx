@@ -718,7 +718,7 @@ export function BrandProfileSetupModal({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          "evg-studio studio-brand-modal fixed left-1/2 top-1/2 z-[130] flex max-h-[min(92vh,820px)] w-[min(100%,36rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-0 overflow-hidden rounded-3xl border border-neutral-200 bg-white p-0 text-neutral-900 shadow-2xl sm:max-w-xl dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-100",
+          "evg-studio studio-brand-modal fixed left-1/2 top-1/2 z-[130] flex max-h-[min(92vh,820px)] w-[min(100%,36rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-0 overflow-hidden rounded-3xl border border-border bg-card p-0 text-foreground shadow-2xl sm:max-w-xl",
           step === "review" && "max-w-2xl sm:max-w-2xl",
         )}
         onPointerDownOutside={(e) => {
@@ -744,7 +744,7 @@ export function BrandProfileSetupModal({
             type="button"
             variant="ghost"
             size="icon"
-            className="absolute right-3 top-3 z-20 size-9 shrink-0 text-neutral-400 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-200"
+            className="absolute right-3 top-3 z-20 size-9 shrink-0 text-muted-foreground hover:text-foreground"
             aria-label="Schließen"
             disabled={busy}
             onClick={(event) => {
@@ -779,17 +779,17 @@ export function BrandProfileSetupModal({
         ) : (
           <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4 sm:p-6 lg:p-8">
             <div className="mb-6 flex items-start gap-3 pr-10 sm:gap-4">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-neutral-800 text-white dark:bg-neutral-700 sm:size-12">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground sm:size-12">
                 <StudioIcon name="brand" size={22} />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.08em] text-neutral-500">
+                <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
                   Markenprofil
                 </p>
-                <h2 className="mb-2 text-base font-semibold text-neutral-900 dark:text-neutral-100 sm:text-lg">
+                <h2 className="mb-2 text-base font-semibold text-foreground sm:text-lg">
                   {modalTitle}
                 </h2>
-                <p className="text-sm font-normal leading-relaxed text-neutral-600 dark:text-neutral-400">
+                <p className="text-sm font-normal leading-relaxed text-muted-foreground">
                   Ein Link genügt — BrewAI liest deine Website samt Unterseiten und erkennt Tonalität, Farben und
                   Bildsprache.
                 </p>
@@ -803,10 +803,10 @@ export function BrandProfileSetupModal({
                   onValueChange={(v) => setInputTab(v as InputTab)}
                   className="mb-6 gap-0 sm:mb-8"
                 >
-                  <TabsList className="grid h-auto w-full grid-cols-2 rounded-xl bg-neutral-100 p-1 dark:bg-neutral-800">
+                  <TabsList className="grid h-auto w-full grid-cols-2 rounded-xl bg-muted p-1">
                     <TabsTrigger
                       value="url"
-                      className="gap-1.5 rounded-lg px-2 py-2.5 text-xs font-medium data-active:bg-white data-active:text-neutral-900 data-active:shadow-sm sm:text-sm dark:data-active:bg-neutral-700 dark:data-active:text-neutral-100"
+                      className="gap-1.5 rounded-lg px-2 py-2.5 text-xs font-medium data-active:bg-card data-active:text-foreground data-active:shadow-sm sm:text-sm"
                     >
                       <StudioIcon name="globe" size={15} />
                       <span className="hidden sm:inline">Website</span>
@@ -814,7 +814,7 @@ export function BrandProfileSetupModal({
                     </TabsTrigger>
                     <TabsTrigger
                       value="manual"
-                      className="gap-1.5 rounded-lg px-2 py-2.5 text-xs font-medium data-active:bg-white data-active:text-neutral-900 data-active:shadow-sm sm:text-sm dark:data-active:bg-neutral-700 dark:data-active:text-neutral-100"
+                      className="gap-1.5 rounded-lg px-2 py-2.5 text-xs font-medium data-active:bg-card data-active:text-foreground data-active:shadow-sm sm:text-sm"
                     >
                       <StudioIcon name="image" size={15} />
                       <span className="hidden sm:inline">Screenshots</span>
@@ -824,11 +824,11 @@ export function BrandProfileSetupModal({
 
                   <TabsContent value="url" className="mt-6 space-y-4">
                     <div>
-                      <Label htmlFor="brand-website-url" className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      <Label htmlFor="brand-website-url" className="text-sm font-medium text-foreground">
                         Website deiner Marke
                       </Label>
                       <div className="relative mt-2">
-                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
+                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                           <StudioIcon name="globe" size={16} />
                         </span>
                         <Input
@@ -843,7 +843,7 @@ export function BrandProfileSetupModal({
                           }}
                           disabled={busy}
                           placeholder="www.deine-brauerei.de"
-                          className="h-12 rounded-xl border-neutral-300 bg-white pl-10 dark:border-neutral-700 dark:bg-neutral-900"
+                          className="h-12 rounded-xl border-border bg-card pl-10"
                         />
                       </div>
                     </div>
@@ -855,44 +855,44 @@ export function BrandProfileSetupModal({
                       ].map((chip) => (
                         <div
                           key={chip.label}
-                          className="flex items-center gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-900/50"
+                          className="flex items-center gap-2 rounded-lg border border-border bg-muted p-3"
                         >
-                          <span className="text-neutral-500">
+                          <span className="text-muted-foreground">
                             <StudioIcon name={chip.icon} size={14} />
                           </span>
-                          <span className="text-xs text-neutral-600 dark:text-neutral-400">{chip.label}</span>
+                          <span className="text-xs text-muted-foreground">{chip.label}</span>
                         </div>
                       ))}
                     </div>
                     {websiteUrl.trim() ? (
-                      <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-900/50">
+                      <div className="rounded-xl border border-border bg-muted p-4">
                         <div className="flex items-center gap-3">
-                          <div className="flex size-8 items-center justify-center rounded-lg bg-neutral-200 dark:bg-neutral-800">
+                          <div className="flex size-8 items-center justify-center rounded-lg bg-muted">
                             <StudioIcon name="link" size={14} />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                            <p className="truncate text-sm font-medium text-foreground">
                               Bereit zur Analyse
                             </p>
-                            <p className="truncate text-xs text-neutral-600 dark:text-neutral-400">{websiteUrl}</p>
+                            <p className="truncate text-xs text-muted-foreground">{websiteUrl}</p>
                           </div>
                         </div>
                       </div>
                     ) : null}
-                    <p className="text-xs leading-relaxed text-neutral-500">
+                    <p className="text-xs leading-relaxed text-muted-foreground">
                       Analysiert öffentliche Texte und Bilder — inklusive relevanter Unterseiten.
                     </p>
                   </TabsContent>
 
                   <TabsContent value="manual" className="mt-6 space-y-4">
-                    <div className="rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-50 p-6 text-center dark:border-neutral-700 dark:bg-neutral-900/50">
-                      <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-neutral-200 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
+                    <div className="rounded-xl border-2 border-dashed border-border bg-muted p-6 text-center">
+                      <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
                         <StudioIcon name="image" size={22} />
                       </div>
-                      <h3 className="mb-2 text-base font-medium text-neutral-900 dark:text-neutral-100">
+                      <h3 className="mb-2 text-base font-medium text-foreground">
                         Screenshots ablegen
                       </h3>
-                      <p className="mb-4 text-sm text-neutral-600 dark:text-neutral-400">
+                      <p className="mb-4 text-sm text-muted-foreground">
                         1–5 Screenshots als JPEG, PNG oder WebP
                       </p>
                       <div className="mx-auto grid max-w-sm grid-cols-5 gap-2">
@@ -900,10 +900,10 @@ export function BrandProfileSetupModal({
                           <label
                             key={i}
                             className={cn(
-                              "relative grid aspect-square cursor-pointer place-items-center overflow-hidden rounded-lg border bg-white dark:bg-neutral-900",
+                              "relative grid aspect-square cursor-pointer place-items-center overflow-hidden rounded-lg border bg-card",
                               slot.file
-                                ? "border-solid border-neutral-300 dark:border-neutral-600"
-                                : "border-dashed border-neutral-300 dark:border-neutral-700",
+                                ? "border-solid border-border"
+                                : "border-dashed border-border",
                             )}
                           >
                             <input
@@ -921,12 +921,12 @@ export function BrandProfileSetupModal({
                               // eslint-disable-next-line @next/next/no-img-element
                               <img src={slot.preview} alt="" className="size-full object-cover" />
                             ) : (
-                              <span className="text-[10px] text-neutral-400">{i + 1}</span>
+                              <span className="text-[10px] text-muted-foreground">{i + 1}</span>
                             )}
                           </label>
                         ))}
                       </div>
-                      <p className="mt-3 text-xs text-neutral-500">
+                      <p className="mt-3 text-xs text-muted-foreground">
                         {filledCount} / 5 Bilder
                         {filledCount > 0 && filledCount < 3 ? " — mehr Bilder = präziseres Profil" : ""}
                       </p>
@@ -937,7 +937,7 @@ export function BrandProfileSetupModal({
                 <div className="mb-2 text-center">
                   <button
                     type="button"
-                    className="text-xs text-neutral-500 underline underline-offset-3 hover:text-neutral-700 disabled:opacity-50 dark:hover:text-neutral-300"
+                    className="text-xs text-muted-foreground underline underline-offset-3 hover:text-foreground disabled:opacity-50"
                     disabled={busy}
                     onClick={startManualTemplate}
                   >
@@ -949,17 +949,17 @@ export function BrandProfileSetupModal({
 
             {step === "analyzing" ? (
               <div className="py-4">
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1.5 text-xs text-muted-foreground">
                   <StudioIcon name={inputTab === "url" ? "globe" : "media"} size={13} />
                   <span>{analysisTargetLabel}</span>
                 </div>
                 <TaskSteps steps={taskSteps} current={analysisStepIndex} label="Analyse-Fortschritt" />
                 {analysisDetail ? (
-                  <p className="mt-4 text-sm text-neutral-700 dark:text-neutral-300" aria-live="polite">
+                  <p className="mt-4 text-sm text-muted-foreground" aria-live="polite">
                     {analysisDetail}
                   </p>
                 ) : null}
-                <p className="mt-6 text-sm text-neutral-500">
+                <p className="mt-6 text-sm text-muted-foreground">
                   Dauert meist ein bis zwei Minuten — bitte Fenster offen lassen.
                 </p>
               </div>
@@ -968,13 +968,13 @@ export function BrandProfileSetupModal({
             {error ? <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p> : null}
 
             {step !== "analyzing" ? (
-              <div className="mt-8 flex flex-col-reverse gap-3 border-t border-neutral-200 pt-6 sm:flex-row sm:justify-end sm:gap-4 dark:border-neutral-800">
+              <div className="mt-8 flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:justify-end sm:gap-4">
                 <Button
                   type="button"
                   variant="outline"
                   disabled={busy}
                   onClick={() => handleOpenChange(false)}
-                  className="h-12 rounded-xl border-neutral-300 bg-transparent px-6 text-sm dark:border-neutral-700"
+                  className="h-12 rounded-xl border-border bg-transparent px-6 text-sm"
                 >
                   Abbrechen
                 </Button>
@@ -989,7 +989,7 @@ export function BrandProfileSetupModal({
                     if (inputTab === "url") void runUrlAnalysis(websiteUrl);
                     else void runManualScan();
                   }}
-                  className="h-12 rounded-xl bg-neutral-900 px-8 font-medium text-white hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
+                  className="h-12 rounded-xl bg-primary px-8 font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   {busy ? (
                     "KI analysiert…"
