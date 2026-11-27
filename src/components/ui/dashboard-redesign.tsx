@@ -1,6 +1,5 @@
 ﻿"use client";
 
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, {
   Suspense,
@@ -14,7 +13,6 @@ import React, {
 } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StudioViewTransition } from "@/components/studio/studio-view-transition";
-import { MARKETING_SITE_URL } from "@/lib/siteConfig";
 import { useStudioShell } from "@/components/studio/studio-workspace-shell";
 import { AdminHomeView } from "@/components/dashboard/admin-home-view";
 import type { BrandScanSuggestion } from "@/components/dashboard/BrandProfileSetupModal";
@@ -45,7 +43,6 @@ import { buildGenericBrandProfilePatch, isBrandProfileCompleteFromSettings } fro
 import { mergeDashboardSettings, sanitizeDashboardSettings } from "@/lib/dashboard/settingsPayload";
 import { canWriteWithRole } from "@/lib/dashboard/teamRoles";
 import { fetchWithRetry, parseRetryAfterMs } from "@/lib/http/fetchWithRetry";
-import { signOutAndRedirect } from "@/lib/auth/signOutClient";
 
 type DashboardTab =
   | "dashboard"
@@ -144,102 +141,6 @@ function normalizeSettings(raw: Partial<SettingsPayload> | SettingsPayload): Set
   return sanitizeDashboardSettings(raw);
 }
 
-function Placeholder({
-  label,
-  w = "100%",
-  h = 64,
-}: {
-  label: string;
-  w?: number | string;
-  h?: number;
-}) {
-  return (
-    <div
-      className="relative shrink-0 overflow-hidden rounded-lg border border-dashed bg-muted"
-      style={{ width: w, height: h }}
-    >
-      <span className="absolute bottom-1.5 left-1.5 rounded-sm bg-background/80 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide text-muted-foreground">
-        {label}
-      </span>
-    </div>
-  );
-}
-
-function Sparkline({ data, color, width = 64, height = 22 }: { data: number[]; color: string; width?: number; height?: number }) {
-  if (!data.length) return null;
-  const max = Math.max(...data, 1);
-  const min = Math.min(...data, 0);
-  const range = max - min || 1;
-  const pts = data
-    .map((v, i) => {
-      const x = (i / (data.length - 1)) * width;
-      const y = height - ((v - min) / range) * height;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(" ");
-  const lastY = height - ((data[data.length - 1] - min) / range) * height;
-  return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} fill="none" aria-hidden="true">
-      <polyline points={pts} stroke={color} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={width} cy={lastY} r="2" fill={color} />
-    </svg>
-  );
-}
-
-function SidebarIcon({ name, color = "currentColor" }: { name: string; color?: string }) {
-  const s = 18;
-  const sw = 1.6;
-  const map: Record<string, React.ReactNode> = {
-    home: (
-      <>
-        <path d="M3 9 L10 3 L17 9 V16 H3 Z" />
-        <path d="M8 16 V12 H12 V16" />
-      </>
-    ),
-    dash: (
-      <>
-        <rect x="3" y="3" width="6" height="6" rx="1.2" />
-        <rect x="11" y="3" width="6" height="4" rx="1.2" />
-        <rect x="11" y="9" width="6" height="8" rx="1.2" />
-        <rect x="3" y="11" width="6" height="6" rx="1.2" />
-      </>
-    ),
-    spark: <path d="M10 3 L11.5 8 L16.5 9.5 L11.5 11 L10 16 L8.5 11 L3.5 9.5 L8.5 8 Z" />,
-    media: (
-      <>
-        <rect x="3" y="3" width="14" height="14" rx="2" />
-        <path d="M3 13 L7 9 L11 13 L14 10 L17 13" />
-        <circle cx="13.5" cy="6.5" r="1.3" />
-      </>
-    ),
-    team: (
-      <>
-        <circle cx="7" cy="8" r="2.6" />
-        <circle cx="13" cy="8" r="2.6" />
-        <path d="M3 16 C3 13.5 5 12 7 12 C9 12 11 13.5 11 16 M9 16 C9 13.5 11 12 13 12 C15 12 17 13.5 17 16" />
-      </>
-    ),
-    gear: (
-      <>
-        <circle cx="10" cy="10" r="3" />
-        <path d="M10 2 V4 M10 16 V18 M2 10 H4 M16 10 H18 M4.3 4.3 L5.7 5.7 M14.3 14.3 L15.7 15.7 M4.3 15.7 L5.7 14.3 M14.3 5.7 L15.7 4.3" />
-      </>
-    ),
-    help: (
-      <>
-        <circle cx="10" cy="10" r="7.5" />
-        <path d="M7.8 8 C7.8 6.6 8.8 5.8 10 5.8 C11.2 5.8 12.2 6.6 12.2 7.8 C12.2 9 10 9.5 10 11" />
-        <circle cx="10" cy="13.5" r="0.6" fill={color} stroke="none" />
-      </>
-    ),
-  };
-  return (
-    <svg width={s} height={s} viewBox="0 0 20 20" fill="none" stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }} aria-hidden="true">
-      {map[name]}
-    </svg>
-  );
-}
-
 export function DashboardRedesignShell(props: {
   userEmail?: string;
   initialProfileName?: string;
@@ -247,7 +148,7 @@ export function DashboardRedesignShell(props: {
   isAdmin?: boolean;
   forcedTab?: string;
 }) {
-  const { userEmail, initialProfileName, initialBreweryName, isAdmin, forcedTab } = props;
+  const { initialProfileName, initialBreweryName, forcedTab } = props;
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
