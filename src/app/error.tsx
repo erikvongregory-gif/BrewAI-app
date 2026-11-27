@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { StatusScreen } from "@/components/ui/status-screen";
 import { submitSignOut } from "@/lib/auth/submitSignOut";
 
 /**
@@ -14,7 +15,7 @@ const KNOWN_ERRORS: Array<{ match: RegExp; title: string; text: string }> = [
   {
     match: /Teamabo nicht aktiv/i,
     title: "Teamzugang pausiert",
-    text: "Das Abo deines Teaminhabers ist nicht aktiv. Sobald der Inhaber sein Abo verlängert, kannst du sofort weiterarbeiten.",
+    text: "Das Abo deines Teaminhabers ist nicht aktiv. Sobald das Abo verlängert ist, kannst du sofort weiterarbeiten.",
   },
   {
     match: /Teamplatz/i,
@@ -53,19 +54,23 @@ export default function RouteError({ error, retry }: { error: unknown; retry: ()
   const digest = error instanceof Error && "digest" in error ? String((error as { digest?: unknown }).digest ?? "") : "";
 
   return (
-    <div role="alert" className="mx-auto flex w-full max-w-lg flex-col gap-4 rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm my-10">
-      <h1 className="font-semibold text-xl">{title}</h1>
-      <p className="text-muted-foreground text-sm">{text}</p>
-      <div className="flex flex-wrap gap-2">
-        <Button onClick={() => retry()}>Neu laden</Button>
-        <Button asChild variant="outline">
-          <Link href="/dashboard">Zur Übersicht</Link>
-        </Button>
-        <Button variant="ghost" onClick={() => submitSignOut()}>
-          Abmelden
-        </Button>
-      </div>
-      {digest ? <p className="text-muted-foreground text-xs">Fehlercode: {digest}</p> : null}
-    </div>
+    <StatusScreen
+      role="alert"
+      title={title}
+      actions={
+        <>
+          <Button onClick={() => retry()}>Neu laden</Button>
+          <Button asChild variant="outline">
+            <Link href="/dashboard">Zur Übersicht</Link>
+          </Button>
+          <Button variant="ghost" onClick={() => submitSignOut()}>
+            Abmelden
+          </Button>
+        </>
+      }
+      footer={digest ? <p className="text-muted-foreground text-xs">Fehlercode: {digest}</p> : null}
+    >
+      {text}
+    </StatusScreen>
   );
 }

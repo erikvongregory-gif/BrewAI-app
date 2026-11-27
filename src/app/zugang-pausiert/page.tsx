@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getWorkspaceAccess, type WorkspaceBlockReason } from "@/lib/dashboard/workspace";
 import { createClient } from "@/lib/supabase/server";
+import { Button } from "@/components/ui/button";
+import { StatusScreen } from "@/components/ui/status-screen";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
 const MESSAGES: Record<WorkspaceBlockReason, { title: string; text: string; retry?: boolean }> = {
   team_subscription_inactive: {
     title: "Das Abo deines Teams ist abgelaufen",
-    text: "Solange das Abo des Teaminhabers nicht aktiv ist, ist dein Teamzugang pausiert. Wende dich an den Inhaber deines Teams, damit er das Abo verlängert.",
+    text: "Solange das Abo des Teaminhabers nicht aktiv ist, ist dein Teamzugang pausiert. Wende dich an den Inhaber deines Teams, damit das Abo verlängert wird.",
   },
   team_seat_unavailable: {
     title: "Kein freier Teamplatz",
@@ -50,30 +52,31 @@ export default async function WorkspaceBlockedPage() {
   if (access.ok) redirect("/dashboard");
   const message = MESSAGES[access.reason];
 
+  // Ohne „Erneut versuchen“ ist Abmelden die einzige Aktion und damit primär.
+  const signOut = (
+    <form action="/auth/signout" method="post" className="contents">
+      <Button type="submit" variant={message.retry ? "outline" : "default"} className="w-full sm:flex-1">
+        Abmelden
+      </Button>
+    </form>
+  );
+
   return (
-    <main className="mx-auto my-10 w-full max-w-md px-4">
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <h1 className="text-xl font-semibold text-zinc-900">{message.title}</h1>
-        <p className="mt-2 text-sm text-zinc-600">{message.text}</p>
-        <div className="mt-5 flex flex-col gap-2">
+    <StatusScreen
+      eyebrow="Zugang pausiert"
+      title={message.title}
+      actions={
+        <>
           {message.retry ? (
-            <Link
-              href="/dashboard"
-              className="inline-flex w-full items-center justify-center rounded-lg bg-[#c65a20] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#b14f1c]"
-            >
-              Erneut versuchen
-            </Link>
+            <Button asChild className="w-full sm:flex-1">
+              <Link href="/dashboard">Erneut versuchen</Link>
+            </Button>
           ) : null}
-          <form action="/auth/signout" method="post">
-            <button
-              type="submit"
-              className="inline-flex w-full items-center justify-center rounded-lg border border-zinc-300 px-4 py-2.5 text-sm font-semibold text-zinc-800 hover:bg-zinc-50"
-            >
-              Abmelden
-            </button>
-          </form>
-        </div>
-      </section>
-    </main>
+          {signOut}
+        </>
+      }
+    >
+      {message.text}
+    </StatusScreen>
   );
 }
