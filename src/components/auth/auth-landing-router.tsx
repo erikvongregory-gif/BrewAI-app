@@ -37,6 +37,13 @@ export function AuthLandingRouter({
         }
       }
 
+      // Supabase hängt bei verbrauchten oder abgelaufenen Mail-Links #error=…&error_code=otp_expired an.
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      if (hashParams.has("error") || hashParams.has("error_code")) {
+        window.location.replace("/anmelden?error=link_expired");
+        return;
+      }
+
       const callback = resolveAuthCallbackRedirect(searchParams);
       if (callback) {
         window.location.replace(callback);
