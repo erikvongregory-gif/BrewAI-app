@@ -220,7 +220,7 @@ export function HopBuddyAvatar({
           <linearGradient id={g.shirt} x1="0" y1="0" x2="0.4" y2="1">
             <stop offset="0%" stopColor="#E89259" />
             <stop offset="55%" stopColor="#D87A24" />
-            <stop offset="100%" stopColor="#C7691E" />
+            <stop offset="100%" style={{ stopColor: "var(--color-acc)" }} />
           </linearGradient>
           <linearGradient id={g.skin} x1="0.2" y1="0" x2="0.8" y2="1">
             <stop offset="0%" stopColor="#F6CDA1" />

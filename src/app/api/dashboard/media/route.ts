@@ -1,4 +1,4 @@
-import { workspaceResourceUser } from "@/lib/dashboard/workspace";
+import { workspaceResourceUser, workspaceErrorResponse } from "@/lib/dashboard/workspace";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -58,8 +58,8 @@ async function requireUserId(write = false): Promise<string | NextResponse> {
   if (user) {
     try {
       user = await workspaceResourceUser(user, write, { hydrate: false });
-    } catch {
-      return NextResponse.json({ error: "Teamzugriff nicht erlaubt." }, { status: 403 });
+    } catch (e) {
+      return workspaceErrorResponse(e);
     }
   }
   if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
@@ -103,13 +103,13 @@ export async function POST(req: Request) {
   const originError = enforceSameOrigin(req);
   if (originError) return originError;
 
-  const parsed = mediaSchema.safeParse(await req.json());
+  const userId = await requireUserId(true);
+  if (typeof userId !== "string") return userId;
+
+  const parsed = mediaSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: "Ungültiges Mediathek-Element." }, { status: 400 });
   }
-
-  const userId = await requireUserId(true);
-  if (typeof userId !== "string") return userId;
 
   const payload = parsed.data;
   const item: DashboardMediaItem = {
@@ -137,13 +137,13 @@ export async function PATCH(req: Request) {
   const originError = enforceSameOrigin(req);
   if (originError) return originError;
 
-  const parsed = mediaPatchSchema.safeParse(await req.json());
+  const userId = await requireUserId(true);
+  if (typeof userId !== "string") return userId;
+
+  const parsed = mediaPatchSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: "Ungültiger Motiv-Titel." }, { status: 400 });
   }
-
-  const userId = await requireUserId(true);
-  if (typeof userId !== "string") return userId;
 
   const { id, title } = parsed.data;
   try {
@@ -169,12 +169,11 @@ export async function DELETE(req: Request) {
   const originError = enforceSameOrigin(req);
   if (originError) return originError;
 
-  const url = new URL(req.url);
-  const id = url.searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "id fehlt." }, { status: 400 });
-
   const userId = await requireUserId(true);
   if (typeof userId !== "string") return userId;
+
+  const id = new URL(req.url).searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "Motiv-ID fehlt." }, { status: 400 });
 
   try {
     await deleteDashboardMedia(userId, id);

@@ -53,7 +53,7 @@ export function MoonChatImageGeneration({
   return (
     <div
       className={cn(
-        "flex w-full flex-col overflow-hidden rounded-2xl border shadow-sm",
+        "flex w-full flex-col overflow-hidden rounded-xl border shadow-sm",
         "border-border bg-background/90",
         "dark:border-sidebar-border dark:bg-sidebar",
         className,
@@ -64,7 +64,7 @@ export function MoonChatImageGeneration({
           className="bg-[length:200%_100%] bg-clip-text text-sm font-medium text-transparent"
           style={{
             backgroundImage:
-              "linear-gradient(110deg, #5E574E, 35%, #C7691E, 50%, #18140F, 65%, #5E574E, 85%, #5E574E)",
+              "linear-gradient(110deg, #5E574E, 35%, var(--color-acc), 50%, #18140F, 65%, #5E574E, 85%, #5E574E)",
           }}
           initial={{ backgroundPosition: "200% 0" }}
           animate={{
@@ -117,7 +117,7 @@ export function MoonChatImageGeneration({
             className="absolute inset-0"
             style={{
               background: `
-                radial-gradient(120% 90% at 85% 100%, rgba(199, 105, 30, 0.55) 0%, transparent 55%),
+                radial-gradient(120% 90% at 85% 100%, color-mix(in srgb, var(--color-acc) 55%, transparent) 0%, transparent 55%),
                 radial-gradient(90% 70% at 15% 20%, rgba(180, 175, 210, 0.55) 0%, transparent 50%),
                 radial-gradient(70% 60% at 50% 50%, rgba(230, 228, 235, 0.9) 0%, #d8d6de 100%)
               `,
@@ -125,7 +125,7 @@ export function MoonChatImageGeneration({
           />
           <div
             aria-hidden
-            className="absolute -right-8 -bottom-10 size-48 rounded-full bg-[#C7691E]/35 blur-3xl motion-safe:animate-pulse"
+            className="absolute -right-8 -bottom-10 size-48 rounded-full bg-acc/35 blur-3xl motion-safe:animate-pulse"
           />
           <div
             aria-hidden
@@ -154,7 +154,7 @@ export function MoonChatImageGeneration({
               backdropFilter: "blur(48px)",
               WebkitBackdropFilter: "blur(48px)",
               background:
-                "linear-gradient(105deg, rgba(245,244,248,0.72) 0%, rgba(232,180,130,0.55) 55%, rgba(199,105,30,0.45) 100%)",
+                "linear-gradient(105deg, rgba(245,244,248,0.72) 0%, rgba(232,180,130,0.55) 55%, color-mix(in srgb, var(--color-acc) 45%, transparent) 100%)",
               clipPath: `polygon(0 ${clamped}%, 100% ${clamped}%, 100% 100%, 0 100%)`,
               maskImage:
                 clamped <= 0

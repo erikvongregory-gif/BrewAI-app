@@ -1,4 +1,4 @@
-import { getWorkspace, workspaceResourceUser } from "@/lib/dashboard/workspace";
+import { getWorkspace, workspaceResourceUser, workspaceErrorResponse } from "@/lib/dashboard/workspace";
 import { canWriteWithRole } from "@/lib/dashboard/teamRoles";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { NextResponse } from "next/server";
@@ -26,6 +26,29 @@ const optionalHttpUrl = z
     if (!trimmed) return "";
     return normalizeWebsiteUrl(trimmed) ?? "";
   });
+
+const SETTINGS_FIELD_LABELS: Record<string, string> = {
+  profileName: "Dein Name",
+  breweryName: "Der Brauereiname",
+  profilePhone: "Die Telefonnummer",
+  profileAvatarUrl: "Die Profilbild-Adresse",
+  brandInstagramUrl: "Die Instagram-Adresse",
+  brandWebsiteUrl: "Die Website-Adresse",
+  brandTone: "Die Tonalität",
+  brandColors: "Die Markenfarben",
+  brandDos: "Die Do's",
+  brandDonts: "Die Don'ts",
+  brandReferenceImageUrls: "Die Referenzbilder",
+};
+
+/** Deutsche Du-Meldung für das erste Validierungsproblem; Details gehen nur ins Server-Log. */
+function settingsIssueMessage(issue: z.core.$ZodIssue | undefined): string {
+  const label = SETTINGS_FIELD_LABELS[String(issue?.path[0] ?? "")];
+  if (!issue || !label) return "Deine Einstellungen konnten nicht gespeichert werden. Bitte prüf deine Eingaben.";
+  if (issue.code === "too_big" && issue.origin === "string") return `${label} ist zu lang (höchstens ${issue.maximum} Zeichen).`;
+  if (issue.code === "too_big" && issue.origin === "array") return `${label} sind zu viele (höchstens ${issue.maximum}).`;
+  return `${label} ist ungültig. Bitte prüf deine Eingabe.`;
+}
 
 const settingsSchema = z.object({
   profileName: z.string().max(120),
@@ -198,8 +221,8 @@ export async function GET(req: Request) {
   let workspace: User;
   try {
     workspace = await workspaceResourceUser(actor, false);
-  } catch {
-    return NextResponse.json({ error: "Teamzugriff nicht erlaubt." }, { status: 403 });
+  } catch (e) {
+    return workspaceErrorResponse(e);
   }
 
   // Frische Actor-Metadata (JWT kann stale sein).
@@ -260,8 +283,8 @@ export async function PUT(req: Request) {
     canWriteBrand = canWriteWithRole(membership.role);
     // Marke lesen immer erlaubt; Schreiben nur für Owner/Admin/Editor.
     workspace = await workspaceResourceUser(actor, false);
-  } catch {
-    return NextResponse.json({ error: "Teamzugriff nicht erlaubt." }, { status: 403 });
+  } catch (e) {
+    return workspaceErrorResponse(e);
   }
 
   let body: unknown;
@@ -301,9 +324,8 @@ export async function PUT(req: Request) {
 
   const parsed = settingsSchema.safeParse(mergedInput);
   if (!parsed.success) {
-    const firstIssue = parsed.error.issues[0];
-    const detail = firstIssue ? `${firstIssue.path.join(".")}: ${firstIssue.message}` : "Validierung fehlgeschlagen";
-    return NextResponse.json({ error: `Ungültige Einstellungen (${detail}).` }, { status: 400 });
+    console.warn("[dashboard/settings] Validierung fehlgeschlagen", parsed.error.issues);
+    return NextResponse.json({ error: settingsIssueMessage(parsed.error.issues[0]) }, { status: 400 });
   }
 
   const payload = parsed.data;

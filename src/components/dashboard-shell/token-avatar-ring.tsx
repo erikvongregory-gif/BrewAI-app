@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useBillingCredits } from "@/components/dashboard-shell/billing-credits-provider";
-import Link from "next/link";
+import { DashboardTabLink } from "@/components/dashboard-shell/dashboard-tab-nav";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
@@ -97,7 +97,7 @@ export function TokenAvatarRing({ children, className, size = 36 }: TokenAvatarR
           cy={vb / 2}
           r={radius}
           fill="none"
-          stroke="var(--color-acc, #C7691E)"
+          stroke="var(--color-acc)"
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -139,9 +139,9 @@ export function TokenBalanceMenuBlock() {
     <div className="px-2 py-2">
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-xs text-muted-foreground">Tokens</span>
-        <Link href="/dashboard/pricing" className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
+        <DashboardTabLink href="/dashboard/pricing" className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
           Aufladen
-        </Link>
+        </DashboardTabLink>
       </div>
       <p className="mt-0.5 text-sm font-medium tabular-nums">
         {snapshot == null
@@ -153,7 +153,7 @@ export function TokenBalanceMenuBlock() {
       {snapshot && !snapshot.unlimited ? (
         <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden>
           <div
-            className={cn("h-full rounded-full", progress < 0.15 ? "bg-destructive" : "bg-[var(--color-acc,#C7691E)]")}
+            className={cn("h-full rounded-full", progress < 0.15 ? "bg-destructive" : "bg-acc")}
             style={{ width: `${Math.round(progress * 100)}%` }}
           />
         </div>

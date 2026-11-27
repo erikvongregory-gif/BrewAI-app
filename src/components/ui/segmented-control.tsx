@@ -115,7 +115,7 @@ export function SegmentedControl({
       role="radiogroup"
       aria-label={label}
       className={cn(
-        "relative inline-block w-full select-none rounded-[9px] border border-[var(--line)] bg-[var(--s3)] p-[3px] shadow-[inset_0_1px_2px_rgba(28,25,23,0.07)]",
+        "relative inline-block w-full select-none rounded-lg border border-[var(--line)] bg-[var(--s3)] p-[3px] shadow-[inset_0_1px_2px_rgba(28,25,23,0.07)]",
         className,
       )}
     >
@@ -138,7 +138,7 @@ export function SegmentedControl({
 
         <motion.div
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 left-0 overflow-hidden rounded-[6px] bg-[var(--t1)] shadow-[0_1px_2px_rgba(28,25,23,0.28)]"
+          className="pointer-events-none absolute inset-y-0 left-0 overflow-hidden rounded-sm bg-[var(--t1)] shadow-[0_1px_2px_rgba(28,25,23,0.28)]"
           style={{ width: `${100 / count}%`, x: thumbX }}
           initial={false}
         >
@@ -175,7 +175,7 @@ export function SegmentedControl({
               onClick={() => !option.disabled && select(option.value)}
               onKeyDown={(e) => onKeyDown(e, i)}
               onPointerEnter={() => !option.disabled && setHovered(i)}
-              className="cursor-pointer rounded-[6px] outline-none focus-visible:shadow-[inset_0_0_0_1px_var(--ac)]"
+              className="cursor-pointer rounded-sm outline-none focus-visible:shadow-[inset_0_0_0_1px_var(--ac)]"
             >
               <span className="sr-only">{option.label}</span>
             </button>

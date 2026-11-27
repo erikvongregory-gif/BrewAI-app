@@ -60,7 +60,7 @@ import {
   type DashboardHomeSummary,
   type TokenRangeKey,
 } from "@/components/studio/dashboard/dashboard-home-utils";
-import { hasActiveSubscriptionFromState } from "@/lib/billing/access";
+import { hasActiveSubscriptionFromState } from "@/lib/billing/subscriptionState";
 
 type DashboardTab = "dashboard" | "media" | "team" | "brand" | "settings" | "pricing";
 
@@ -69,6 +69,7 @@ export type AdminHomeViewProps = {
   summaryLoaded: boolean;
   summaryError?: string | null;
   media: DashboardHomeMediaItem[];
+  mediaTotal?: number;
   mediaLoaded: boolean;
   mediaError?: string | null;
   settings: DashboardHomeSettings | null;
@@ -225,7 +226,7 @@ function BrewAiNextSteps({
                     </Button>
                   ) : (
                     <Button asChild variant={variant}>
-                      <Link href="/inhalte-erstellen" prefetch={false}>
+                      <Link href="/inhalte-erstellen">
                         Bild erstellen
                       </Link>
                     </Button>
@@ -282,7 +283,7 @@ function BrewAiMetricCards({
 }) {
   if (!summaryLoaded) {
     return (
-      <div className="grid grid-cols-1 gap-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs xl:grid-cols-4 dark:*:data-[slot=card]:bg-card">
+      <div className="grid grid-cols-1 gap-4 @md/main:grid-cols-2 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs xl:grid-cols-4 dark:*:data-[slot=card]:bg-card">
         <MetricCardSkeleton />
         <MetricCardSkeleton />
         <MetricCardSkeleton />
@@ -322,7 +323,7 @@ function BrewAiMetricCards({
     : "—";
 
   return (
-    <div className="dash-rise-group grid grid-cols-1 gap-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs *:data-[slot=card]:transition-[translate,box-shadow,ring-color] *:data-[slot=card]:duration-200 *:data-[slot=card]:ease-[cubic-bezier(0.22,1,0.36,1)] *:data-[slot=card]:hover:-translate-y-0.5 *:data-[slot=card]:hover:shadow-[0_1px_2px_rgb(0_0_0/0.04),0_12px_28px_-14px_rgb(0_0_0/0.25)] *:data-[slot=card]:hover:ring-foreground/15 motion-reduce:*:data-[slot=card]:transition-none motion-reduce:*:data-[slot=card]:hover:translate-y-0 xl:grid-cols-4 dark:*:data-[slot=card]:bg-card">
+    <div className="dash-rise-group grid grid-cols-1 gap-4 @md/main:grid-cols-2 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs *:data-[slot=card]:transition-[translate,box-shadow,ring-color] *:data-[slot=card]:duration-200 *:data-[slot=card]:ease-[cubic-bezier(0.22,1,0.36,1)] *:data-[slot=card]:hover:-translate-y-0.5 *:data-[slot=card]:hover:shadow-[0_1px_2px_rgb(0_0_0/0.04),0_12px_28px_-14px_rgb(0_0_0/0.25)] *:data-[slot=card]:hover:ring-foreground/15 motion-reduce:*:data-[slot=card]:transition-none motion-reduce:*:data-[slot=card]:hover:translate-y-0 xl:grid-cols-4 dark:*:data-[slot=card]:bg-card">
       <Card>
         <CardHeader>
           <CardTitle>
@@ -470,7 +471,8 @@ function BrewAiActivityOverview({
             </SelectContent>
           </Select>
 
-          <Button variant="outline" size="sm" onClick={onOpenMedia}>
+          {/* Schmale Karte: nur der Zeitraum bleibt; „Zur Mediathek“ steht direkt darunter in „Motive“. */}
+          <Button variant="outline" size="sm" className="hidden @md/card:inline-flex" onClick={onOpenMedia}>
             Zur Mediathek
           </Button>
         </CardAction>
@@ -496,6 +498,7 @@ function BrewAiActivityOverview({
 
 function BrewAiAssetsOverview({
   media,
+  mediaTotal,
   mediaLoaded,
   mediaError,
   onRetryMedia,
@@ -505,6 +508,7 @@ function BrewAiAssetsOverview({
   mediaLoaded: boolean;
   mediaError?: string | null;
   onRetryMedia?: () => void;
+  mediaTotal?: number;
   onOpenMedia: () => void;
 }) {
   const [query, setQuery] = useState("");
@@ -524,7 +528,7 @@ function BrewAiAssetsOverview({
       <CardHeader>
         <CardTitle className="leading-none">
           {mediaLoaded
-            ? `${formatDeNumber(media.length)} ${media.length === 1 ? "Motiv" : "Motive"}`
+            ? `${formatDeNumber(Math.max(mediaTotal ?? 0, media.length))} ${Math.max(mediaTotal ?? 0, media.length) === 1 ? "Motiv" : "Motive"}`
             : "Motive"}
         </CardTitle>
         <CardDescription>Zuletzt erstellte Motive mit Format, Auflösung und Erstellungszeit.</CardDescription>
@@ -589,7 +593,7 @@ function BrewAiAssetsOverview({
             </div>
             {/* Outline: Die primäre Aktion steht oben in „Nächste Schritte“. */}
             <Button asChild size="sm" variant="outline">
-              <Link href="/inhalte-erstellen" prefetch={false}>
+              <Link href="/inhalte-erstellen">
                 Bild erstellen
               </Link>
             </Button>
@@ -661,6 +665,7 @@ export function AdminHomeView({
   summaryLoaded,
   summaryError,
   media,
+  mediaTotal,
   mediaLoaded,
   mediaError,
   settings,
@@ -709,6 +714,7 @@ export function AdminHomeView({
       />
       <BrewAiAssetsOverview
         media={media}
+        mediaTotal={mediaTotal}
         mediaLoaded={mediaLoaded}
         mediaError={mediaError}
         onRetryMedia={onRetryMedia}

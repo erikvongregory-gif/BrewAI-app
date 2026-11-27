@@ -193,7 +193,7 @@ export const ImageGeneration = ({
           className="studio-image-gen__status bg-[length:200%_100%] bg-clip-text text-transparent text-base font-medium"
           style={{
             backgroundImage:
-              "linear-gradient(110deg, var(--t3, #5E574E), 35%, var(--ac, #C7691E), 50%, var(--t1, #18140F), 65%, var(--t3, #5E574E), 85%, var(--t3, #5E574E))",
+              "linear-gradient(110deg, var(--t3, #5E574E), 35%, var(--color-acc), 50%, var(--t1, #18140F), 65%, var(--t3, #5E574E), 85%, var(--t3, #5E574E))",
           }}
           initial={{ backgroundPosition: "200% 0" }}
           animate={{

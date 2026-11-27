@@ -117,7 +117,7 @@ export function TaskSteps({
                   {row.status === "done" ? (
                     <motion.span
                       key="done"
-                      className="col-start-1 row-start-1 grid size-4 place-items-center rounded-[5px] bg-[var(--ok-dim)] text-[var(--ok)]"
+                      className="col-start-1 row-start-1 grid size-4 place-items-center rounded-sm bg-[var(--ok-dim)] text-[var(--ok)]"
                       initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.4 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, transition: STILL }}
@@ -128,7 +128,7 @@ export function TaskSteps({
                   ) : row.status === "error" ? (
                     <motion.span
                       key="error"
-                      className="col-start-1 row-start-1 grid size-4 place-items-center rounded-[5px] bg-[var(--err-dim)] text-[var(--err)]"
+                      className="col-start-1 row-start-1 grid size-4 place-items-center rounded-sm bg-[var(--err-dim)] text-[var(--err)]"
                       initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.4 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, transition: STILL }}
@@ -150,7 +150,7 @@ export function TaskSteps({
                   ) : (
                     <motion.span
                       key="pending"
-                      className="col-start-1 row-start-1 size-[5px] rounded-[2px] bg-[var(--line2)]"
+                      className="col-start-1 row-start-1 size-[5px] rounded-xs bg-[var(--line2)]"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0, transition: STILL }}

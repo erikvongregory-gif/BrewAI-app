@@ -61,3 +61,12 @@ video-brief-assets/
 video-brief-assets.zip
 supabase/.temp/
 .agents/
+
+# Playwright E2E (Zugangsdaten, Sessions, Traces, Screenshots)
+tests/e2e/.state/
+tests/e2e/.artifacts/
+/test-results/
+/playwright-report/
+
+# UI-Screenshots fuer Motion-Video (lokal)
+ui-screenshots/

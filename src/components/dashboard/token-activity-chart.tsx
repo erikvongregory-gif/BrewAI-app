@@ -57,7 +57,7 @@ export default function TokenActivityChart({ data }: { data: { date: string; tok
         <ChartLegend verticalAlign="top" content={<ChartLegendContent className="mb-5 justify-end" />} />
         <Area
           dataKey="tokens"
-          type="natural"
+          type="monotone"
           fill="url(#fillTokens)"
           stroke="var(--color-tokens)"
           strokeWidth={1.25}

@@ -1,4 +1,4 @@
-import { getWorkspace } from "@/lib/dashboard/workspace";
+import { billingOwnerDenied } from "@/lib/dashboard/workspace";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
@@ -13,6 +13,10 @@ import {
 import { getStripeClient, mapPriceIdToPlan, syncBillingFromStripe } from "@/lib/billing/stripeSync";
 import { enforceRateLimit, enforceSameOrigin } from "@/lib/security/requestGuards";
 import { type SubscriptionPlanKey } from "@/lib/billing/tokenState";
+
+// Stripe-/DB-Details nur ins Server-Log. Die Gutschrift ist idempotent, Neuladen bucht nichts doppelt.
+const CONFIRM_FAILED_MESSAGE =
+  "Deine Zahlung konnte gerade nicht bestätigt werden. Lade die Seite bitte in einem Moment neu, dabei geht nichts verloren.";
 
 export async function POST(req: Request) {
   try {
@@ -34,7 +38,7 @@ export async function POST(req: Request) {
     } = await supabase.auth.getUser();
 
     if (user && !(await hasPassedTwoFactor(user))) return NextResponse.json({ error: "Zwei-Faktor-Prüfung erforderlich.", code: "two_factor_required" }, { status: 403 });
-  if (user && (await getWorkspace(user.id)).role !== "owner") return NextResponse.json({error:"Abrechnung kann nur der Teaminhaber verwalten."},{status:403});
+  if (user) { const denied = await billingOwnerDenied(user.id); if (denied) return denied; }
     if (!user) {
       return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
     }
@@ -98,8 +102,8 @@ export async function POST(req: Request) {
             : null,
         });
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Token-Session-Bestätigung fehlgeschlagen.";
-        return NextResponse.json({ error: message }, { status: 500 });
+        console.error("[billing/confirm-session] Token-Gutschrift fehlgeschlagen", error);
+        return NextResponse.json({ error: CONFIRM_FAILED_MESSAGE }, { status: 500 });
       }
     }
 
@@ -162,8 +166,8 @@ export async function POST(req: Request) {
         : null,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Session-Bestätigung fehlgeschlagen.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[billing/confirm-session] Bestätigung fehlgeschlagen", error);
+    return NextResponse.json({ error: CONFIRM_FAILED_MESSAGE }, { status: 500 });
   }
 }
 

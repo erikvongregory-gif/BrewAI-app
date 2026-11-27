@@ -1,29 +1,7 @@
 /* BrewAI Studio — Hopfen Hugo (Design Comp, dark studio tokens) */
-
-@keyframes evg-hopfenhugo-glow {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.9; }
-}
 @keyframes evg-hopfenhugo-bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-3px); }
-}
-
-.evg-hopfenhugo-root {
-  position: fixed;
-  z-index: 115;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 12px;
-  font-family: var(--f-sans);
-  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-  right: 24px;
-  pointer-events: none;
-}
-
-.evg-hopfenhugo-root > * {
-  pointer-events: auto;
 }
 
 /* Panel hugt Content — kein leerer Scrollraum (nur Floating-Widget) */
@@ -35,7 +13,7 @@
   max-height: min(560px, calc(100dvh - 96px));
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: var(--r-lg, 10px);
+  border-radius: var(--r-lg);
   background: var(--s1);
   color: var(--t1);
   box-shadow: var(--sh-card, 0 1px 2px rgba(24, 20, 15, 0.04));
@@ -45,24 +23,6 @@
 .evg-hopfenhugo-panel--column {
   width: 100%;
   max-width: none;
-}
-
-.evg-hopfenhugo-panel-shine {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--ac) 25%,
-    var(--ac-2) 50%,
-    var(--ac) 75%,
-    transparent
-  );
-  z-index: 1;
-  pointer-events: none;
 }
 
 .evg-hopfenhugo-head {
@@ -85,16 +45,6 @@
   flex: none;
 }
 
-.evg-hopfenhugo-avatar-glow {
-  position: absolute;
-  inset: -2px;
-  border-radius: 50%;
-  background: conic-gradient(from 0deg, var(--ac), transparent 35%, transparent 65%, var(--ac));
-  opacity: 0.4;
-  filter: blur(3px);
-  animation: evg-hopfenhugo-glow 2.6s ease-in-out infinite;
-}
-
 .evg-hopfenhugo-avatar-bob {
   position: relative;
   width: 38px;
@@ -102,7 +52,7 @@
   border-radius: 50%;
   background: linear-gradient(
     to top,
-    color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 5%, transparent),
+    color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 5%, transparent),
     var(--card, #fff)
   );
   display: grid;
@@ -141,7 +91,7 @@
 }
 
 .evg-hopfenhugo-status.is-busy {
-  background: var(--ac, #c7691e);
+  background: var(--ac, var(--color-acc));
   animation: hbDotPulse 1.2s ease-in-out infinite;
 }
 
@@ -193,7 +143,7 @@
   flex: none;
   padding: 6px 10px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   background: var(--s2);
   color: var(--t2);
   font-size: 12px;
@@ -219,31 +169,6 @@
   outline-offset: 2px;
 }
 
-.evg-hopfenhugo-close {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: 1px solid var(--line2);
-  border-radius: 8px;
-  background: var(--s2);
-  color: var(--t2);
-  cursor: pointer;
-  transition: border-color 0.16s, color 0.16s, background 0.16s;
-}
-
-.evg-hopfenhugo-close:hover {
-  background: var(--s3);
-  color: var(--t1);
-}
-
-.evg-hopfenhugo-close:focus-visible {
-  outline: 2px solid var(--ac);
-  outline-offset: 2px;
-}
-
 .evg-hopfenhugo-messages {
   flex: none;
   display: flex;
@@ -265,111 +190,13 @@
 
 .evg-hopfenhugo-messages::-webkit-scrollbar-thumb {
   background: var(--line2);
-  border-radius: 999px;
-}
-
-.evg-hopfenhugo-row {
-  display: flex;
-  gap: 9px;
-  align-items: flex-start;
-  width: 100%;
-}
-
-.evg-hopfenhugo-row + .evg-hopfenhugo-row,
-.evg-hopfenhugo-row + .evg-hopfenhugo-suggestions,
-.evg-hopfenhugo-suggestions + .evg-hopfenhugo-row {
-  margin-top: 14px;
-}
-
-.evg-hopfenhugo-row--user {
-  flex-direction: row-reverse;
-}
-
-.evg-hopfenhugo-row-body {
-  flex: 1;
-  min-width: 0;
-}
-
-.evg-hopfenhugo-msg-avatar {
-  flex: none;
-  width: 22px;
-  height: 22px;
-  margin-top: 2px;
-  border-radius: 50%;
-  background: linear-gradient(155deg, var(--ac-2), var(--ac-3));
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  line-height: 0;
-}
-
-.evg-hopfenhugo-bubble {
-  width: 100%;
-  padding: 13px 15px;
-  border: 1px solid var(--line2);
-  border-radius: 14px;
-  background: var(--s2);
-  font-size: 13px;
-  line-height: 1.65;
-  color: var(--t1);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
-}
-
-.evg-hopfenhugo-bubble p {
-  margin: 0;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  text-wrap: pretty;
-}
-
-.evg-hopfenhugo-bubble-label {
-  display: block;
-  margin-bottom: 6px;
-  font-family: var(--f-mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ac);
-}
-
-.evg-hopfenhugo-bubble--assistant {
-  border-color: transparent;
-  background: linear-gradient(
-    to top,
-    color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 5%, transparent),
-    var(--card, var(--s1, #fff))
-  );
-  box-shadow: 0 1px 2px rgba(24, 20, 15, 0.05);
-}
-
-:is(.dark, .dark *) .evg-hopfenhugo-bubble--assistant {
-  border-color: transparent;
-  background: var(--card, var(--s2, var(--background)));
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-  color: var(--t1, var(--foreground));
-}
-
-.evg-hopfenhugo-bubble--user {
-  background: linear-gradient(155deg, var(--ac-2), var(--ac));
-  color: var(--ac-ink);
-  border-color: transparent;
-  box-shadow: 0 8px 20px rgba(201, 162, 77, 0.2);
-}
-
-.evg-hopfenhugo-bubble--typing {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 14px 16px;
-  width: auto;
+  border-radius: var(--r-pill);
 }
 
 .evg-hopfenhugo-dot {
   width: 5px;
   height: 5px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: var(--t3);
   animation: evg-hopfenhugo-bounce 1.2s ease-in-out infinite;
 }
@@ -380,12 +207,6 @@
 @keyframes evg-hopfenhugo-bounce {
   0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
   40% { transform: translateY(-3px); opacity: 1; }
-}
-
-.evg-hopfenhugo-time {
-  margin-top: 6px;
-  font-size: 11px;
-  color: var(--t3);
 }
 
 .evg-hopfenhugo-suggestions {
@@ -399,7 +220,7 @@
 .evg-hopfenhugo-chip {
   height: 30px;
   padding: 0 12px;
-  border-radius: 20px;
+  border-radius: var(--r-xl);
   border: 1px solid var(--line2);
   background: var(--s2);
   color: var(--t2);
@@ -424,72 +245,6 @@
   background: var(--s1);
 }
 
-.evg-hopfenhugo-form {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-radius: 13px;
-  border: 1px solid var(--line2);
-  background: var(--s2);
-  padding: 5px 5px 5px 15px;
-  transition: border-color 0.16s, box-shadow 0.16s;
-}
-
-.evg-hopfenhugo-form:focus-within {
-  border-color: var(--ac);
-  box-shadow: 0 0 0 3px var(--ac-tint);
-}
-
-.evg-hopfenhugo-input {
-  flex: 1;
-  min-width: 0;
-  height: 36px;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  color: var(--t1);
-  font-family: var(--f-sans);
-  font-size: 13px;
-  line-height: 1.4;
-  outline: none;
-  box-shadow: none;
-}
-
-.evg-hopfenhugo-input::placeholder {
-  color: var(--t3);
-}
-
-.evg-hopfenhugo-send {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  border: 0;
-  border-radius: 10px;
-  background: linear-gradient(155deg, var(--ac-2), var(--ac));
-  color: #fff;
-  cursor: pointer;
-  box-shadow: 0 6px 16px rgba(201, 162, 77, 0.28);
-  transition: transform 0.16s, box-shadow 0.16s, opacity 0.16s;
-}
-
-.evg-hopfenhugo-send:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-
-.evg-hopfenhugo-send:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.evg-hopfenhugo-send:focus-visible {
-  outline: 2px solid var(--ac-2);
-  outline-offset: 2px;
-}
-
 .evg-hopfenhugo-policy {
   margin: 10px 0 0;
   font-size: 11px;
@@ -507,42 +262,7 @@
   color: var(--ac-2);
 }
 
-.evg-hopfenhugo-fab {
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  padding: 0;
-  border: 1px solid var(--line2);
-  border-radius: 999px;
-  background: var(--s2);
-  color: var(--t1);
-  cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  transition: border-color 0.16s, background 0.2s, box-shadow 0.2s;
-}
-
-.evg-hopfenhugo-fab:hover {
-  border-color: var(--ac-line);
-  background: var(--s3);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
-}
-
-.evg-hopfenhugo-fab:focus-visible {
-  outline: 2px solid var(--ac);
-  outline-offset: 3px;
-}
-
-.evg-hopfenhugo-fab-icon {
-  width: 34px;
-  height: 34px;
-}
-
 @media (max-width: 768px) {
-  .evg-hopfenhugo-root {
-    bottom: calc(var(--bottom-nav-h, 62px) + env(safe-area-inset-bottom, 0px) + 12px);
-    right: 12px;
-  }
 
   .evg-hopfenhugo-panel:not(.evg-hopfenhugo-panel--page):not(.evg-hopfenhugo-panel--column) {
     width: min(352px, calc(100vw - 24px));
@@ -559,14 +279,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .evg-hopfenhugo-dot,
-  .evg-hopfenhugo-avatar-glow,
   .evg-hopfenhugo-avatar-bob {
     animation: none;
   }
 
-  .evg-hopfenhugo-close,
-  .evg-hopfenhugo-fab,
-  .evg-hopfenhugo-send,
   .evg-hopfenhugo-chip {
     transition: none;
   }
@@ -602,7 +318,7 @@
   flex-direction: column;
   min-height: 0;
   border: none;
-  border-radius: var(--r-lg, 12px);
+  border-radius: var(--r-lg);
   background: var(--background, var(--s2, #f6f6f4));
   overflow: hidden;
 }
@@ -657,11 +373,11 @@
   width: 100%;
   padding: 12px 28px 12px 12px;
   border: none;
-  border-radius: 0.75rem;
+  border-radius: var(--r-xl);
   /* Wie Dashboard-KPI-Cards: primary/5 → card, soft shadow */
   background: linear-gradient(
     to top,
-    color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 5%, transparent),
+    color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 5%, transparent),
     var(--card, var(--s1, #fff))
   );
   box-shadow: 0 1px 2px rgba(24, 20, 15, 0.05);
@@ -685,12 +401,12 @@
 .evg-brewai-history-item.is-active {
   background: linear-gradient(
     to top,
-    color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 10%, transparent),
+    color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 10%, transparent),
     var(--card, var(--s1, #fff))
   );
   box-shadow: 0 1px 2px rgba(24, 20, 15, 0.06);
   color: var(--foreground, var(--t1));
-  outline: 1px solid color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 18%, transparent);
+  outline: 1px solid color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 18%, transparent);
 }
 
 :is(.dark, .dark *) .evg-brewai-history {
@@ -704,13 +420,13 @@
 }
 
 :is(.dark, .dark *) .evg-brewai-history-item:hover:not(:disabled) {
-  background: color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 8%, var(--card));
+  background: color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 8%, var(--card));
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
 }
 
 :is(.dark, .dark *) .evg-brewai-history-item.is-active {
-  background: color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 12%, var(--card));
-  outline-color: color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 28%, transparent);
+  background: color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 12%, var(--card));
+  outline-color: color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 28%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -772,7 +488,7 @@
   height: 22px;
   padding: 0;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   background: transparent;
   color: var(--t3);
   font-size: 16px;
@@ -814,7 +530,7 @@
   max-height: none;
   display: flex;
   flex-direction: column;
-  border-radius: var(--r-lg, 10px);
+  border-radius: var(--r-lg);
   border: 1px solid var(--line);
   background: var(--s1);
   box-shadow: var(--sh-card, none);
@@ -846,11 +562,6 @@
   margin-inline: auto;
   padding-inline: 16px;
   box-sizing: border-box;
-}
-
-.evg-hopfenhugo-panel--page .evg-hopfenhugo-panel-shine,
-.evg-hopfenhugo-panel--page .evg-hopfenhugo-avatar-glow {
-  display: none;
 }
 
 .evg-hopfenhugo-panel--page .evg-hopfenhugo-avatar-bob {
@@ -900,7 +611,7 @@
     min-height: 0;
     width: 100%;
     border: none;
-    border-radius: 16px;
+    border-radius: var(--r-xl);
     background: var(--background, var(--s2, #f6f6f4));
     box-shadow: none;
     overflow: hidden;
@@ -938,7 +649,7 @@
     width: 100%;
     max-width: none;
     border: none;
-    border-radius: var(--r-md, 8px);
+    border-radius: var(--r-md);
   }
 
   .evg-hopfenhugo-head-actions {
@@ -968,16 +679,11 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  border-radius: var(--r-lg, 10px);
+  border-radius: var(--r-lg);
   border: 1px solid var(--line);
   background: var(--s1);
   box-shadow: var(--sh-card, none);
   overflow: hidden;
-}
-
-.evg-hopfenhugo-panel--column .evg-hopfenhugo-panel-shine,
-.evg-hopfenhugo-panel--column .evg-hopfenhugo-avatar-glow {
-  display: none;
 }
 
 .evg-hopfenhugo-panel--column .evg-hopfenhugo-messages {
@@ -1036,7 +742,7 @@
   overflow: hidden;
   background: linear-gradient(
     to top,
-    color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 5%, transparent),
+    color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 5%, transparent),
     var(--card, #fff)
   );
   box-shadow: 0 1px 2px rgba(24, 20, 15, 0.05);
@@ -1072,7 +778,7 @@
   overflow: hidden;
   background: linear-gradient(
     to top,
-    color-mix(in oklab, var(--primary, var(--ac, #c7691e)) 5%, transparent),
+    color-mix(in oklab, var(--primary, var(--ac, var(--color-acc))) 5%, transparent),
     var(--card, #fff)
   );
   box-shadow: 0 1px 2px rgba(24, 20, 15, 0.05);

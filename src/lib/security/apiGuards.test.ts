@@ -22,7 +22,10 @@ vi.mock("@/lib/supabase/server", () => ({
 }));
 vi.mock("@/lib/supabase/env", () => ({ isSupabaseConfigured: () => true, getSupabaseUrl: () => "https://auth.brewai.de" }));
 vi.mock("@/lib/auth/twoFactorSession", () => ({ hasPassedTwoFactor: mocks.twoFactor }));
-vi.mock("@/lib/dashboard/workspace", () => ({ workspaceResourceUser: mocks.workspace }));
+vi.mock("@/lib/dashboard/workspace", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/dashboard/workspace")>()),
+  workspaceResourceUser: mocks.workspace,
+}));
 vi.mock("@/lib/billing/access", () => ({ requireActiveSubscription: mocks.subscription }));
 vi.mock("@/lib/security/requestGuards", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/security/requestGuards")>();
@@ -63,6 +66,8 @@ import {
 } from "@/app/(dashboard)/inhalte-erstellen/lib/api-guards";
 import { POST as generationStatus } from "@/app/api/generation/status/route";
 import { POST as mediaPost } from "@/app/api/dashboard/media/route";
+import { writeDashboardMedia } from "@/lib/dashboard/media-store";
+import { WorkspaceAccessError } from "@/lib/dashboard/workspace";
 
 const APP = "https://app.brewai.de";
 const actor = { id: "member-1", app_metadata: {}, user_metadata: {} };
@@ -123,10 +128,17 @@ describe("requireImageGenerationUser", () => {
   });
 
   it("verweigert einem Team-Viewer Schreibzugriffe (POST → write=true)", async () => {
-    mocks.workspace.mockRejectedValueOnce(new Error("Deine Teamrolle erlaubt nur Lesezugriff."));
+    mocks.workspace.mockRejectedValueOnce(new WorkspaceAccessError("read_only", "Deine Teamrolle erlaubt nur Lesezugriff."));
     const result = await requireImageGenerationUser(post("/api/x", { origin: APP }), "t");
     expect(!result.ok && result.response.status).toBe(403);
     expect(mocks.workspace).toHaveBeenCalledWith(actor, true);
+  });
+
+  it("meldet eine DB-Störung bei der Teamprüfung als 503 statt als Sperre", async () => {
+    mocks.workspace.mockRejectedValueOnce(new Error("connection reset"));
+    const result = await requireImageGenerationUser(post("/api/x", { origin: APP }), "t");
+    expect(!result.ok && result.response.status).toBe(503);
+    if (!result.ok) expect((await result.response.json()).code).toBe("lookup_failed");
   });
 
   it("liefert die Workspace-ID des Inhabers als Ressourcen-ID", async () => {
@@ -187,7 +199,13 @@ describe("POST /api/dashboard/media", () => {
       const response = await mediaPost(post("/api/dashboard/media", { origin: APP, body: { ...item, imageUrl } }));
       expect(response.status, imageUrl).toBe(400);
     }
-    expect(mocks.getUser).not.toHaveBeenCalled();
+    expect(writeDashboardMedia).not.toHaveBeenCalled();
+  });
+
+  it("prüft die Anmeldung vor dem Body: ohne Session 401 statt 400", async () => {
+    mocks.getUser.mockResolvedValueOnce({ data: { user: null } });
+    const response = await mediaPost(post("/api/dashboard/media", { origin: APP, body: { kaputt: true } }));
+    expect(response.status).toBe(401);
   });
 
   it("akzeptiert weiterhin https-URLs", async () => {

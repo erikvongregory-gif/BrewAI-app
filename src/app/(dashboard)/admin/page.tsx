@@ -22,11 +22,7 @@ export default async function AdminDashboardPage() {
     <>
       <StudioPageHeader
         eyebrow="Administration"
-        title={
-          <>
-            Admin-<em>Bereich</em>
-          </>
-        }
+        title="Admin-Bereich"
         subtitle={`Angemeldet als ${admin.email ?? "Admin"} · Nutzer, Billing, Team und Inhalte verwalten`}
       />
       <AdminDashboard />

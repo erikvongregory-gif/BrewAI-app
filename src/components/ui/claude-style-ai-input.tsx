@@ -200,7 +200,7 @@ const ModelSelectorDropdown: React.FC<{ models: ModelOption[]; selectedModel: st
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-zinc-100">{model.name}</span>
-                  {model.badge ? <span className="px-1.5 py-0.5 text-xs bg-blue-500/20 text-blue-300 rounded">{model.badge}</span> : null}
+                  {model.badge ? <span className="px-1.5 py-0.5 text-xs bg-blue-500/20 text-blue-300 rounded-sm">{model.badge}</span> : null}
                 </div>
                 <p className="text-xs text-zinc-400 mt-0.5">{model.description}</p>
               </div>

@@ -8,40 +8,7 @@
 
 /* ── Page header (StudioPageHeader) ──────────────────────── */
 
-.evg-studio .studio-brand-page > .evg-pagehead {
-  margin-bottom: var(--sp-8);
-}
-
 /* Legacy header hooks (mobile.css) */
-.evg-studio .studio-brand-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--sp-8);
-  flex-wrap: wrap;
-  margin-bottom: var(--sp-7);
-}
-
-.evg-studio .studio-brand-title {
-  margin: 0;
-  font-size: var(--t-page);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--t1);
-  line-height: 1.2;
-}
-
-.evg-studio .studio-brand-sub {
-  margin: 5px 0 0;
-  font-size: var(--t-13);
-  color: var(--t3);
-  max-width: 52ch;
-  line-height: 1.45;
-}
-
-.evg-studio .studio-muted {
-  color: var(--t2);
-}
 
 .evg-studio .studio-faint {
   color: var(--t3);
@@ -55,17 +22,6 @@
 }
 
 /* ── Shared form (brand scope) ─────────────────────────────── */
-
-.evg-studio .studio-brand-page .studio-field-label,
-.evg-studio .studio-brand-modal .studio-field-label {
-  display: block;
-  font-family: var(--f-mono);
-  font-size: var(--t-9);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--t3);
-}
 
 .evg-studio .studio-brand-page .studio-field,
 .evg-studio .studio-brand-modal .studio-field,
@@ -107,43 +63,6 @@
   resize: vertical;
 }
 
-.evg-studio .studio-brand-page .studio-field-with-icon,
-.evg-studio .studio-brand-modal .studio-field-with-icon {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  height: 36px;
-  padding: 0 11px;
-  border-radius: var(--r-md);
-  border: 1px solid var(--line2);
-  background: var(--s1);
-  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
-}
-
-.evg-studio .studio-brand-page .studio-field-with-icon:focus-within,
-.evg-studio .studio-brand-modal .studio-field-with-icon:focus-within {
-  border-color: var(--ac);
-  box-shadow: 0 0 0 3px var(--ac-tint);
-}
-
-.evg-studio .studio-brand-page .studio-field-with-icon .studio-field,
-.evg-studio .studio-brand-modal .studio-field-with-icon .studio-field {
-  flex: 1;
-  min-width: 0;
-  height: auto;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
-.evg-studio .studio-brand-page .studio-field-icon,
-.evg-studio .studio-brand-modal .studio-field-icon {
-  flex: none;
-  display: flex;
-  color: var(--t3);
-}
-
 /* ── Quick start ───────────────────────────────────────────── */
 
 .evg-studio .studio-brand-quick {
@@ -163,268 +82,13 @@
   color: var(--fg);
 }
 
-.evg-studio .studio-brand-quick__s {
-  margin: 3px 0 0;
-  font-size: var(--t-13);
-  color: var(--fg-4);
-  line-height: 1.45;
-}
-
-.evg-studio .studio-brand-quick__form {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--sp-4);
-  align-items: center;
-}
-
-.evg-studio .studio-brand-quick__alt {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-5);
-}
-
-.evg-studio .studio-brand-quick__alt button {
-  background: none;
-  border: 0;
-  padding: 0;
-  font: inherit;
-  font-size: var(--t-12);
-  color: var(--fg-5);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
-}
-
-.evg-studio .studio-brand-quick__alt button:hover {
-  color: var(--acc);
-}
-
 /* Legacy empty/quickstart hooks */
-.evg-studio .studio-brand-quickstart {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-5);
-  max-width: 420px;
-  margin: var(--sp-7) auto 0;
-}
-
-.evg-studio .studio-brand-empty-card {
-  border: 1px solid var(--line-strong);
-  border-left: 2px solid var(--acc);
-  background: var(--field);
-  padding: var(--sp-8);
-}
 
 /* ── 21st.dev components layout ────────────────────────────── */
 
-.studio-brand-21st,
-.evg-studio .studio-brand-21st {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  column-gap: 1.5rem;
-  row-gap: 1.5rem;
-  align-items: stretch;
-}
-
-.studio-brand-21st > *,
-.evg-studio .studio-brand-21st > * {
-  min-width: 0;
-}
-
-@media (max-width: 720px) {
-  .studio-brand-21st,
-  .evg-studio .studio-brand-21st {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
 /* ── Identity board (legacy / fallback) ────────────────────── */
 
-.evg-studio .studio-brand-id {
-  border: 1px solid var(--line-strong);
-  background: var(--s1);
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-  margin-bottom: var(--sp-10);
-}
-
-.evg-studio .studio-brand-id__type {
-  position: relative;
-  padding: var(--sp-8) var(--sp-8) var(--sp-9);
-  border-right: 1px solid var(--line);
-  min-height: 168px;
-  overflow: hidden;
-}
-
-.evg-studio .studio-brand-id__meta {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
-  flex-wrap: wrap;
-}
-
-.evg-studio .studio-brand-id__eyebrow {
-  font-family: var(--f-mono);
-  font-size: var(--t-9);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--fg-5);
-}
-
-.evg-studio .studio-brand-id__font {
-  margin: var(--sp-5) 0 0;
-  font-size: clamp(22px, 2.4vw, 30px);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-  color: var(--fg);
-}
-
-.evg-studio .studio-brand-id__source {
-  margin: var(--sp-3) 0 0;
-  font-family: var(--f-mono);
-  font-size: var(--t-11);
-  color: var(--fg-5);
-  letter-spacing: 0.02em;
-}
-
-.evg-studio .studio-brand-id__specimen {
-  position: absolute;
-  right: var(--sp-7);
-  bottom: var(--sp-5);
-  display: flex;
-  gap: 2px;
-  font-size: clamp(48px, 7vw, 72px);
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  pointer-events: none;
-  user-select: none;
-}
-
-.evg-studio .studio-brand-id__specimen span:first-child {
-  color: var(--fg);
-}
-
-.evg-studio .studio-brand-id__specimen span:last-child {
-  color: var(--fg-6);
-  opacity: 0.55;
-}
-
-.evg-studio .studio-brand-id__palette {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.evg-studio .studio-brand-id__swatches {
-  flex: 1;
-  min-height: 120px;
-  border: 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.evg-studio .studio-brand-id__swatches .evg-swatch {
-  height: auto;
-  min-height: 120px;
-  border-right-color: rgba(24, 20, 15, 0.08);
-}
-
-.evg-studio .studio-brand-id__hexes {
-  display: flex;
-  padding: var(--sp-4) 0;
-  background: var(--field);
-}
-
-.evg-studio .studio-brand-id__hexes span {
-  flex: 1;
-  text-align: center;
-  font-family: var(--f-mono);
-  font-size: var(--t-9);
-  letter-spacing: 0.04em;
-  color: var(--fg-5);
-}
-
-.evg-studio .studio-brand-id__strength {
-  grid-column: 1 / -1;
-  padding: var(--sp-5) var(--sp-8);
-  border-top: 1px solid var(--line);
-  background: var(--s2);
-}
-
-.evg-studio .studio-brand-id__strength-top {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--sp-5);
-  font-family: var(--f-mono);
-  font-size: var(--t-10);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--fg-5);
-}
-
-.evg-studio .studio-brand-id__strength-bar {
-  height: 3px;
-  background: var(--line-strong);
-  margin-top: var(--sp-4);
-}
-
-.evg-studio .studio-brand-id__strength-bar i {
-  display: block;
-  height: 3px;
-  background: var(--acc-quiet);
-}
-
 /* ── Layout: main + lock ───────────────────────────────────── */
-
-.evg-studio .studio-brand-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
-  gap: var(--sp-10);
-  align-items: start;
-}
-
-.evg-studio .studio-brand-main {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-10);
-}
-
-.evg-studio .studio-brand-aside {
-  border: 1px solid var(--line-strong);
-  background: var(--field);
-  padding: var(--sp-6) var(--sp-7);
-}
-
-.evg-studio .studio-brand-aside__desc {
-  margin: 0 0 var(--sp-4);
-  font-size: var(--t-12);
-  line-height: 1.5;
-  color: var(--fg-4);
-}
-
-.evg-studio .studio-brand-aside .evg-choice {
-  width: 100%;
-  background: none;
-  border-left: 0;
-  border-right: 0;
-  border-top: 0;
-  text-align: left;
-  font: inherit;
-  color: inherit;
-}
-
-.evg-studio .studio-brand-aside .evg-choice:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.evg-studio .studio-brand-aside .evg-choice:focus-visible {
-  outline: 2px solid var(--ac);
-  outline-offset: 2px;
-}
 
 .evg-studio .studio-brand-sec__head {
   display: flex;
@@ -452,238 +116,13 @@
 }
 
 /* Aliases for BrandCharactersSection */
-.evg-studio .studio-brand-section-label {
-  font-size: var(--t-15);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--fg);
-  margin: 0;
-  padding-bottom: var(--sp-3);
-  border-bottom: 1px solid var(--line-strong);
-}
-
-.evg-studio .studio-brand-rules-sub {
-  font-size: var(--t-12);
-  line-height: 1.45;
-  color: var(--fg-5);
-}
-
-.evg-studio .studio-brand-page .evg-field {
-  padding-left: 0;
-  padding-right: 0;
-}
-
-.evg-studio .studio-brand-font-ctrl {
-  display: grid;
-  gap: var(--sp-3);
-  min-width: 0;
-}
-
-.evg-studio .studio-brand-font-ctrl__row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--sp-4);
-}
-
-.evg-studio .studio-brand-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.evg-studio .studio-brand-rule-row {
-  display: grid;
-  grid-template-columns: 100px minmax(0, 1fr);
-  gap: var(--sp-5);
-  padding: var(--sp-5) 0;
-  border-bottom: 1px solid var(--line-faint);
-}
-
-.evg-studio .studio-brand-rule-row:last-child {
-  border-bottom: 0;
-}
-
-.evg-studio .studio-brand-rule-key {
-  font-family: var(--f-mono);
-  font-size: var(--t-11);
-  letter-spacing: 0.04em;
-  color: var(--fg-5);
-  padding-top: 2px;
-}
-
-.evg-studio .studio-brand-rule-val {
-  font-size: var(--t-14);
-  line-height: 1.5;
-  color: var(--fg-2);
-}
-
-.evg-studio .studio-brand-danger {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-8);
-  padding: var(--sp-6) 0;
-  border-top: 1px solid var(--line-strong);
-}
-
-.evg-studio .studio-brand-danger__t {
-  font-size: var(--t-14);
-  font-weight: 500;
-  color: var(--fg);
-}
-
-.evg-studio .studio-brand-danger__s {
-  margin: 3px 0 0;
-  font-size: var(--t-12);
-  color: var(--fg-5);
-  line-height: 1.45;
-  max-width: 48ch;
-}
-
-.evg-studio .studio-brand-danger .evg-btn {
-  margin-left: auto;
-  flex: none;
-}
 
 /* Referenzen */
-.evg-studio .studio-brand-refs-section {
-  margin-top: var(--sp-8);
-}
-
-.evg-studio .studio-brand-chars-section {
-  margin-top: var(--sp-2);
-}
-
-.evg-studio .studio-brand-chars-list {
-  display: grid;
-  gap: var(--sp-3);
-}
-
-.evg-studio .studio-brand-char-card {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: var(--sp-3);
-  align-items: center;
-  border: 1px solid var(--line);
-  background: var(--s1);
-  border-radius: 0;
-}
-
-.evg-studio .studio-brand-char-card__thumbs {
-  display: flex;
-  gap: 4px;
-}
-
-.evg-studio .studio-brand-char-card__thumbs img {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--line);
-}
-
-.evg-studio .studio-brand-char-card__meta {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.evg-studio .studio-brand-char-card__meta strong {
-  font-size: 0.95rem;
-  color: var(--t1);
-}
-
-.evg-studio .studio-brand-char-card__meta small {
-  color: var(--t2);
-  font-size: 0.8rem;
-}
-
-.evg-studio .studio-brand-char-create {
-  display: grid;
-  gap: var(--sp-3);
-}
-
-.evg-studio .studio-brand-char-field {
-  display: grid;
-  gap: 6px;
-}
-
-.evg-studio .studio-brand-char-field > span {
-  font-size: 0.78rem;
-  color: var(--t2);
-  letter-spacing: 0.02em;
-}
-
-.evg-studio .studio-brand-char-field input {
-  width: 100%;
-  border: 1px solid var(--line);
-  background: var(--s1);
-  color: var(--t1);
-  border-radius: var(--r-sm);
-  padding: 10px 12px;
-  font: inherit;
-}
-
-.evg-studio .studio-brand-char-draft-thumbs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.evg-studio .studio-brand-char-draft-thumb,
-.evg-studio .studio-brand-char-add-photo {
-  width: 64px;
-  height: 64px;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--line);
-  padding: 0;
-  overflow: hidden;
-  background: var(--s2);
-  cursor: pointer;
-  color: var(--t2);
-  font-size: 0.75rem;
-}
-
-.evg-studio .studio-brand-char-draft-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.evg-studio .studio-brand-char-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
 
 .evg-studio .studio-brand-inline-error {
   color: var(--warn);
   font-size: 0.85rem;
   margin: 8px 0 0;
-}
-
-.evg-studio .studio-brand-refs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: var(--sp-4);
-  margin-top: var(--sp-4);
-}
-
-.evg-studio .studio-brand-ref-tile {
-  aspect-ratio: 1;
-  overflow: hidden;
-  padding: 0;
-  border: 1px solid var(--line);
-  background: var(--s2);
-}
-
-.evg-studio .studio-brand-ref-tile img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 /* ── Loading skeleton ──────────────────────────────────────── */
@@ -707,10 +146,6 @@
 .evg-studio .studio-brand-skeleton__line {
   height: 12px;
   background: var(--s3);
-}
-
-.evg-studio .studio-brand-skeleton__line--short {
-  width: 45%;
 }
 
 .evg-studio .studio-brand-skeleton__shimmer {
@@ -739,7 +174,7 @@
   box-shadow:
     0 24px 64px rgba(15, 15, 15, 0.14),
     0 2px 8px rgba(15, 15, 15, 0.06) !important;
-  border-radius: 16px !important;
+  border-radius: var(--r-xl) !important;
 }
 
 /* Dark Mode: Studio-Tokens sind nur hell definiert — im Modal (Eingabe, Analyse, „Profil prüfen“)
@@ -761,7 +196,7 @@
   --fg-2: var(--foreground);
   --fg-4: var(--muted-foreground);
   --fg-6: var(--muted-foreground);
-  --ac-tint: rgba(199, 105, 30, 0.18);
+  --ac-tint: color-mix(in srgb, var(--color-acc) 18%, transparent);
   --sh-card: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
@@ -770,124 +205,11 @@
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5) !important;
 }
 
-.evg-studio .studio-brand-modal .studio-modal-body {
-  position: relative;
-  max-height: min(92vh, 720px);
-  overflow-y: auto;
-  padding: 28px 28px 20px;
-}
-
-.evg-studio .studio-brand-modal .studio-modal-source {
-  margin-top: 22px;
-}
-
-.evg-studio .studio-brand-modal .studio-modal-panel {
-  margin-top: 20px;
-}
-
-.evg-studio .studio-brand-modal .studio-modal-hint {
-  margin-top: 10px;
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--t3);
-}
-
-.evg-studio .studio-brand-modal .studio-modal-skip {
-  margin-top: 22px;
-  text-align: center;
-}
-
-.evg-studio .studio-brand-modal .studio-modal-skip-btn {
-  font-size: 12.5px;
-  line-height: 1.4;
-  color: var(--t3);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  background: none;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-}
-
-.evg-studio .studio-brand-modal .studio-modal-skip-btn:hover:not(:disabled) {
-  color: var(--t2);
-}
-
-.evg-studio .studio-brand-modal .studio-modal-skip-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.evg-studio .studio-brand-modal .studio-field-label {
-  font-family: var(--f-sans);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  text-transform: none;
-  color: var(--t2);
-}
-
-.evg-studio .studio-brand-modal .studio-field-with-icon {
-  height: 44px;
-  margin-top: 8px;
-  padding: 0 14px;
-  border-radius: 10px;
-}
-
 .evg-studio .studio-brand-modal .studio-field {
   height: 44px;
-  border-radius: 10px;
+  border-radius: var(--r-lg);
   padding: 0 14px;
   font-size: 14px;
-}
-
-.evg-studio .studio-modal-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: transparent;
-  color: var(--t3);
-  cursor: pointer;
-  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease);
-}
-
-.evg-studio .studio-modal-close:hover:not(:disabled) {
-  background: var(--s3);
-  border-color: var(--line2);
-  color: var(--t1);
-}
-
-.evg-studio .studio-modal-close:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.evg-studio .studio-modal-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--f-sans);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--t3);
-}
-
-.evg-studio .studio-modal-eyebrow .dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--ac);
 }
 
 .evg-studio .studio-modal-title {
@@ -907,144 +229,7 @@
   color: var(--t3);
 }
 
-.evg-studio .studio-modal-tabs {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: var(--sp-7);
-  padding: 3px;
-  border-radius: var(--r-md);
-  border: 1px solid var(--line);
-  background: var(--s1);
-}
-
-.evg-studio .studio-modal-tab {
-  flex: 1;
-  min-width: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 10px;
-  border: 0;
-  border-radius: calc(var(--r-md) - 2px);
-  background: transparent;
-  font-family: var(--f-sans);
-  font-size: var(--t-12);
-  font-weight: 500;
-  color: var(--t3);
-  cursor: pointer;
-  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
-}
-
-.evg-studio .studio-modal-tab.on {
-  background: var(--s3);
-  color: var(--t1);
-  box-shadow: inset 0 0 0 1px var(--line2);
-}
-
-.evg-studio .studio-modal-tab:focus-visible {
-  outline: 2px solid var(--ac);
-  outline-offset: 1px;
-}
-
-.evg-studio .studio-modal-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-4);
-  padding: 16px 28px 20px;
-  border-top: 1px solid var(--line);
-  background: var(--s2);
-}
-
-.evg-studio .studio-brand-modal .studio-modal-foot .evg-btn {
-  min-height: 40px;
-}
-
-.evg-studio .studio-modal-ref-grid label.studio-card {
-  border: 1px dashed var(--line2);
-  border-radius: var(--r-md);
-  background: var(--s1);
-  transition: border-color var(--dur) var(--ease);
-}
-
-.evg-studio .studio-modal-ref-grid label.studio-card:hover {
-  border-color: var(--line2);
-}
-
 /* Scan / Analyzing */
-.evg-studio .studio-brand-analyzing {
-  padding: var(--sp-6) 0 var(--sp-4);
-}
-
-.evg-studio .studio-brand-analyzing-domain {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 11px;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--line2);
-  background: var(--s3);
-  font-family: var(--f-mono);
-  font-size: var(--t-11);
-  color: var(--t2);
-}
-
-.evg-studio .studio-brand-analyzing-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: var(--sp-7);
-}
-
-.evg-studio .studio-brand-analyzing-step {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: var(--t-13);
-  color: var(--t3);
-}
-
-.evg-studio .studio-brand-analyzing-step.done {
-  color: var(--t2);
-}
-
-.evg-studio .studio-brand-analyzing-step.active {
-  color: var(--t1);
-  font-weight: 500;
-}
-
-.evg-studio .studio-brand-analyzing-step-icon {
-  flex: none;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: 1px solid var(--line2);
-  color: var(--t3);
-}
-
-.evg-studio .studio-brand-analyzing-step.done .studio-brand-analyzing-step-icon {
-  border-color: var(--ok-dim);
-  background: var(--ok-dim);
-  color: var(--ok);
-}
-
-.evg-studio .studio-brand-analyzing-step.active .studio-brand-analyzing-step-icon {
-  border-color: var(--ac-line);
-  background: var(--ac-tint);
-  color: var(--ac);
-}
-
-.evg-studio .studio-brand-analyzing-hint {
-  margin-top: var(--sp-7);
-  font-size: var(--t-11);
-  text-align: center;
-}
 
 /* ── Review panel ──────────────────────────────────────────── */
 
@@ -1094,32 +279,6 @@
   color: var(--t3);
 }
 
-.evg-studio .studio-brand-review-strength {
-  margin-top: var(--sp-5);
-}
-
-.evg-studio .studio-brand-review-strength-bar {
-  height: 4px;
-  border-radius: var(--r-pill);
-  background: var(--s4);
-  overflow: hidden;
-}
-
-.evg-studio .studio-brand-review-strength-fill {
-  height: 100%;
-  border-radius: inherit;
-  background: var(--ac);
-  transition: width var(--dur-page) var(--ease);
-}
-
-.evg-studio .studio-brand-review-strength-label {
-  display: block;
-  margin-top: 6px;
-  font-family: var(--f-mono);
-  font-size: var(--t-10);
-  color: var(--t3);
-}
-
 .evg-studio .studio-brand-review-body {
   flex: 1;
   min-height: 0;
@@ -1132,13 +291,6 @@
 
 .evg-studio .studio-brand-review-label {
   margin-bottom: 8px;
-}
-
-.evg-studio .studio-brand-review-refs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
 }
 
 .evg-studio .studio-brand-review-ref {
@@ -1195,39 +347,6 @@
   cursor: default;
 }
 
-.evg-studio .studio-brand-review-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.evg-studio .studio-brand-review-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 28px;
-  padding: 0 8px 0 10px;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--line2);
-  background: var(--s3);
-  font-size: var(--t-12);
-  color: var(--t1);
-}
-
-.evg-studio .studio-brand-review-chip button {
-  display: flex;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--t3);
-  cursor: pointer;
-}
-
-.evg-studio .studio-brand-review-chip button:hover:not(:disabled) {
-  color: var(--t1);
-}
-
 .evg-studio .studio-brand-review-tone-input {
   height: 28px;
   min-width: 120px;
@@ -1238,6 +357,12 @@
   font-size: var(--t-12);
   color: var(--t1);
   outline: none;
+}
+
+/* Sichtbarer Fokus (outline ist oben entfernt) */
+.evg-studio .studio-brand-review-tone-input:focus-visible {
+  border-color: var(--ac);
+  box-shadow: 0 0 0 3px var(--ac-tint);
 }
 
 .evg-studio .studio-brand-review-add-chip {
@@ -1417,22 +542,6 @@
 /* ── Responsive ────────────────────────────────────────────── */
 
 @media (max-width: 900px) {
-  .evg-studio .studio-brand-id {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .evg-studio .studio-brand-id__type {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .evg-studio .studio-brand-layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .evg-studio .studio-brand-aside {
-    order: -1;
-  }
 
   .evg-studio .studio-brand-review-rules {
     grid-template-columns: minmax(0, 1fr);
@@ -1440,30 +549,12 @@
 }
 
 @media (max-width: 768px) {
-  .evg-studio .studio-brand-quick__form {
-    grid-template-columns: minmax(0, 1fr);
-  }
 
-  .evg-studio .studio-brand-danger {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .evg-studio .studio-brand-danger .evg-btn {
-    margin-left: 0;
-  }
-
-  .evg-studio .studio-brand-id__specimen {
-    font-size: 52px;
-  }
-
-  .evg-studio .studio-modal-foot,
   .evg-studio .studio-brand-review-foot-actions {
     flex-direction: column-reverse;
     align-items: stretch;
   }
 
-  .evg-studio .studio-modal-foot .evg-btn,
   .evg-studio .studio-brand-review-foot-actions .evg-btn {
     width: 100%;
     justify-content: center;
@@ -1503,9 +594,9 @@
   --t1: var(--foreground, #18140f);
   --t2: color-mix(in oklab, var(--foreground, #18140f) 78%, var(--muted-foreground, #5e574e));
   --t3: var(--muted-foreground, #5e574e);
-  --ac: var(--primary, #c7691e);
-  --ac-tint: color-mix(in oklab, var(--primary, #c7691e) 12%, transparent);
-  --ac-line: color-mix(in oklab, var(--primary, #c7691e) 34%, transparent);
+  --ac: var(--primary, var(--color-acc));
+  --ac-tint: color-mix(in oklab, var(--primary, var(--color-acc)) 12%, transparent);
+  --ac-line: color-mix(in oklab, var(--primary, var(--color-acc)) 34%, transparent);
   --err: var(--destructive, #c0392b);
   --err-dim: color-mix(in oklab, var(--destructive, #c0392b) 10%, transparent);
   --ok: #2f7a4a;
@@ -1564,7 +655,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  border-radius: 14px;
+  border-radius: var(--r-xl);
   border: 1px solid var(--line);
   background: var(--s1);
   box-shadow: var(--sh-card);
@@ -1614,7 +705,7 @@
   width: 32px;
   height: 32px;
   flex: none;
-  border-radius: 9px;
+  border-radius: var(--r-md);
   transition: transform 420ms cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
@@ -1782,7 +873,7 @@
   color: var(--t1);
   text-align: left;
   cursor: text;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
 }
 
 .studio-rules-text:focus-visible {
@@ -1971,7 +1062,7 @@
   min-width: 18px;
   height: 18px;
   padding: 0 4px;
-  border-radius: 9px;
+  border-radius: var(--r-md);
   background: var(--t1);
   color: var(--s1);
   font-size: 10px;

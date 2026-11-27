@@ -341,7 +341,7 @@ export function Tour({
 
             <motion.div
               ref={cardRef}
-              className="pointer-events-auto absolute w-[340px] max-w-[calc(100vw-24px)] overflow-hidden rounded-2xl border border-zinc-200/80 bg-white/95 shadow-[0_24px_70px_-20px_rgba(0,0,0,0.45)] backdrop-blur-xl dark:border-zinc-800 dark:bg-zinc-900/95"
+              className="pointer-events-auto absolute w-[340px] max-w-[calc(100vw-24px)] overflow-hidden rounded-xl border border-border/80 bg-card/95 shadow-[0_24px_70px_-20px_rgba(0,0,0,0.45)] backdrop-blur-xl"
               initial={reduce ? false : { opacity: 0, scale: 0.94, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0, left, top }}
               exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: 4, transition: { duration: 0.18 } }}
@@ -349,9 +349,9 @@ export function Tour({
               style={{ left, top }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative h-1 w-full bg-zinc-100 dark:bg-zinc-800" aria-hidden>
+              <div className="relative h-1 w-full bg-muted" aria-hidden>
                 <motion.div
-                  className="absolute inset-y-0 left-0 origin-left bg-gradient-to-r from-[#E9A25F] to-[#C7691E]"
+                  className="absolute inset-y-0 left-0 origin-left bg-gradient-to-r from-acc-light to-acc"
                   style={{ width: "100%" }}
                   initial={false}
                   animate={{ scaleX: (index + 1) / count }}
@@ -368,7 +368,7 @@ export function Tour({
                   <div className="flex items-start gap-3">
                     {step.icon ? (
                       <motion.span
-                        className="relative mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#F6D2AE] to-[#E9A25F] text-[#5A2D08] shadow-[0_6px_16px_-6px_rgba(199,105,30,0.7)] [&_svg]:size-[18px]"
+                        className="relative mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#F6D2AE] to-acc-light text-[#5A2D08] shadow-[0_6px_16px_-6px_color-mix(in_srgb,var(--color-acc)_70%,transparent)] [&_svg]:size-[18px]"
                         initial={reduce ? false : { scale: 0.5, rotate: -12, opacity: 0 }}
                         animate={{ scale: 1, rotate: 0, opacity: 1 }}
                         transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 18, delay: 0.1 }}
@@ -378,9 +378,9 @@ export function Tour({
                     ) : null}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#C7691E]">
+                        <p className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-acc">
                           {step.eyebrow ?? "Rundgang"}
-                          <span className="ml-1.5 font-medium tabular-nums text-zinc-400">
+                          <span className="ml-1.5 font-medium tabular-nums text-muted-foreground">
                             {index + 1}/{count}
                           </span>
                         </p>
@@ -388,27 +388,27 @@ export function Tour({
                           type="button"
                           onClick={skip}
                           aria-label="Tour schließen"
-                          className="-mr-1.5 -mt-1 rounded-md p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                          className="-mr-1.5 -mt-1 rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                         >
                           <IconX />
                         </button>
                       </div>
-                      <h3 className="mt-0.5 text-[15px] font-semibold leading-snug tracking-tight text-zinc-900 dark:text-zinc-50">
+                      <h3 className="mt-0.5 text-[15px] font-semibold leading-snug tracking-tight text-foreground">
                         {step.title}
                       </h3>
-                      <div className="mt-1 text-[13px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+                      <div className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
                         {step.content}
                       </div>
                     </div>
                   </div>
                   {step.tip ? (
                     <motion.div
-                      className="mt-3 flex items-start gap-2 rounded-lg bg-[#C7691E]/[0.07] px-3 py-2 text-[12px] leading-snug text-zinc-600 ring-1 ring-inset ring-[#C7691E]/15 dark:text-zinc-300"
+                      className="mt-3 flex items-start gap-2 rounded-lg bg-acc/[0.07] px-3 py-2 text-[12px] leading-snug text-muted-foreground ring-1 ring-inset ring-acc/15"
                       initial={reduce ? false : { opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.35, ease: EASE_OUT, delay: reduce ? 0 : 0.2 }}
                     >
-                      <span aria-hidden className="mt-px text-[#C7691E]">✦</span>
+                      <span aria-hidden className="mt-px text-acc">✦</span>
                       <span>{step.tip}</span>
                     </motion.div>
                   ) : null}
@@ -421,7 +421,7 @@ export function Tour({
                         <motion.span
                           key={i}
                           className={`h-1.5 rounded-full ${
-                            i <= index ? "bg-[#C7691E]" : "bg-zinc-200 dark:bg-zinc-700"
+                            i <= index ? "bg-acc" : "bg-muted"
                           }`}
                           initial={false}
                           animate={{ width: i === index ? 16 : 6, opacity: i < index ? 0.4 : 1 }}
@@ -430,9 +430,9 @@ export function Tour({
                       ))}
                     </div>
                   ) : (
-                    <span className="hidden text-[11px] text-zinc-400 sm:inline">
-                      <kbd className="rounded border border-zinc-200 px-1 font-sans dark:border-zinc-700">←</kbd>{" "}
-                      <kbd className="rounded border border-zinc-200 px-1 font-sans dark:border-zinc-700">→</kbd> navigieren
+                    <span className="hidden text-[11px] text-muted-foreground sm:inline">
+                      <kbd className="rounded-sm border border-border px-1 font-sans">←</kbd>{" "}
+                      <kbd className="rounded-sm border border-border px-1 font-sans">→</kbd> navigieren
                     </span>
                   )}
 
@@ -441,7 +441,7 @@ export function Tour({
                       <button
                         type="button"
                         onClick={back}
-                        className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[12.5px] font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                        className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[12.5px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                       >
                         <IconArrow className="rotate-180" />
                         Zurück
@@ -452,7 +452,7 @@ export function Tour({
                       data-tour-primary
                       onClick={next}
                       disabled={primaryDisabled}
-                      className="group inline-flex items-center gap-1 rounded-lg bg-zinc-900 px-3.5 py-1.5 text-[12.5px] font-medium text-white shadow-sm transition-[background-color,transform] duration-150 hover:bg-zinc-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C7691E] focus-visible:ring-offset-2 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white dark:focus-visible:ring-offset-zinc-900"
+                      className="group inline-flex items-center gap-1 rounded-lg bg-primary px-3.5 py-1.5 text-[12.5px] font-medium text-primary-foreground shadow-sm transition-[background-color,transform] duration-150 hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-acc focus-visible:ring-offset-2 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:ring-offset-zinc-900"
                     >
                       {nextLabel}
                       {!isLast && <IconArrow className="transition-transform duration-200 group-hover:translate-x-0.5" />}

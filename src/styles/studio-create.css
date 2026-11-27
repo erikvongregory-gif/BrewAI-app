@@ -66,7 +66,7 @@
   height: 16px;
   display: grid;
   place-items: center;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   border: 1px solid var(--line2);
   background: var(--s1);
   color: var(--t3);
@@ -95,17 +95,6 @@
   color: var(--t1);
 }
 
-.evg-studio .studio-eyebrow {
-  display: block;
-  font-family: var(--f-mono);
-  font-size: var(--t-10);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--t3);
-  margin-bottom: var(--sp-3);
-}
-
 .evg-studio .studio-create-banner {
   margin-bottom: var(--sp-7);
   padding: var(--sp-5) var(--sp-7);
@@ -117,11 +106,6 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-5);
-}
-
-.evg-studio .studio-create-banner--warn {
-  border-color: rgba(222, 143, 60, 0.35);
-  background: var(--warn-dim);
 }
 
 .evg-studio .studio-create-banner--brand {
@@ -176,1084 +160,6 @@
   color: var(--err);
 }
 
-.evg-studio .studio-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-3);
-  height: 34px;
-  padding: 0 var(--sp-6);
-  border-radius: var(--r-md);
-  border: 1px solid var(--line2);
-  background: var(--s3);
-  color: var(--t1);
-  font-family: var(--f-sans);
-  font-size: var(--t-13);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background var(--dur-mid) var(--ease), border-color var(--dur-mid) var(--ease), transform 80ms ease;
-}
-
-.evg-studio .studio-btn:hover:not(:disabled) {
-  background: var(--s4);
-  border-color: var(--t3);
-}
-
-.evg-studio .studio-btn:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.evg-studio .studio-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.evg-studio .studio-btn-primary {
-  border: none;
-  background: var(--ac);
-  color: var(--ac-ink);
-  font-weight: 600;
-}
-
-.evg-studio .studio-btn-primary:hover:not(:disabled) {
-  background: var(--ac-2);
-}
-
-.evg-studio .studio-btn-ghost {
-  background: transparent;
-}
-
-.evg-studio .studio-btn-sm {
-  height: 30px;
-  padding: 0 var(--sp-5);
-  font-size: var(--t-12);
-}
-
-.evg-studio .studio-chip {
-  height: 30px;
-  padding: 0 var(--sp-5);
-  border-radius: var(--r-pill);
-  border: 1px solid var(--line2);
-  background: transparent;
-  color: var(--t2);
-  font-size: var(--t-12);
-  font-weight: 500;
-  cursor: pointer;
-  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
-}
-
-.evg-studio .studio-chip:hover {
-  border-color: var(--t3);
-  color: var(--t1);
-}
-
-.evg-studio .studio-chip.on {
-  background: var(--ac-tint);
-  border-color: var(--ac-line);
-  color: var(--ac);
-}
-
-.evg-studio .evg-pill {
-  height: 30px;
-  padding: 0 var(--sp-5);
-  border-radius: var(--r-pill);
-  border: 1px solid var(--line2);
-  background: transparent;
-  color: var(--t2);
-  font-size: var(--t-12);
-  font-weight: 500;
-  cursor: pointer;
-  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
-}
-
-.evg-studio .evg-pill:hover:not(:disabled) {
-  border-color: var(--t3);
-  color: var(--t1);
-}
-
-.evg-studio .evg-pill-active,
-.evg-studio .evg-pill.evg-pill-active {
-  background: var(--ac-tint);
-  border-color: var(--ac-line);
-  color: var(--ac);
-}
-
-.evg-studio .evg-pill:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.evg-studio .studio-create-start {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-10);
-}
-
-.evg-studio .studio-create-start-head h1 {
-  margin: var(--sp-3) 0 0;
-  font-size: var(--t-greet);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--t1);
-  line-height: 1.2;
-}
-
-.evg-studio .studio-create-start-head p {
-  margin: var(--sp-4) 0 0;
-  font-size: var(--t-14);
-  color: var(--t2);
-  max-width: 58ch;
-  line-height: 1.45;
-}
-
-.evg-studio .studio-create-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-6);
-}
-
-.evg-studio .studio-create-section-head h2 {
-  margin: 0;
-  font-size: var(--t-15);
-  font-weight: 600;
-  color: var(--t1);
-}
-
-.evg-studio .studio-create-section-head span {
-  display: block;
-  margin-top: var(--sp-2);
-  font-size: var(--t-13);
-  color: var(--t3);
-  max-width: 52ch;
-  line-height: 1.5;
-}
-
-.evg-studio .studio-beer-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
-  gap: var(--sp-4);
-}
-
-.evg-studio .studio-beer-card {
-  position: relative;
-  border-radius: var(--r-lg);
-  border: 1px solid var(--line);
-  background: var(--s2);
-  min-width: 0;
-  transition: border-color var(--dur-mid) var(--ease), box-shadow var(--dur-mid) var(--ease);
-}
-
-.evg-studio .studio-beer-card:hover {
-  border-color: var(--line2);
-}
-
-.evg-studio .studio-beer-card.on {
-  border-color: var(--ac-line);
-  box-shadow: inset 0 0 0 1px var(--ac-line);
-}
-
-.evg-studio .studio-beer-card--ghost {
-  min-height: 112px;
-  animation: studio-create-shimmer 1.4s ease-in-out infinite;
-  background: linear-gradient(90deg, var(--s2) 0%, var(--s3) 50%, var(--s2) 100%);
-  background-size: 200% 100%;
-}
-
-.evg-studio .studio-beer-card--add {
-  border-style: dashed;
-  border-color: var(--line2);
-  background: transparent;
-  cursor: pointer;
-}
-
-.evg-studio .studio-beer-card--add:hover {
-  border-color: var(--ac-line);
-  background: var(--ac-tint);
-}
-
-.evg-studio .studio-beer-card-main {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--sp-4);
-  width: 100%;
-  padding: var(--sp-5);
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.evg-studio .studio-beer-thumb {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--r-md);
-  background: var(--s3);
-  border: 1px solid var(--line);
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  flex: none;
-}
-
-.evg-studio .studio-beer-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.evg-studio .studio-beer-thumb--initials {
-  font-family: var(--f-mono);
-  font-size: var(--t-12);
-  font-weight: 600;
-  color: var(--ac);
-}
-
-.evg-studio .studio-beer-thumb--add {
-  color: var(--t3);
-}
-
-.evg-studio .studio-beer-card-text strong {
-  display: block;
-  font-size: var(--t-13);
-  font-weight: 600;
-  color: var(--t1);
-}
-
-.evg-studio .studio-beer-card-text small {
-  display: block;
-  margin-top: 2px;
-  font-size: var(--t-11);
-  color: var(--t3);
-}
-
-.evg-studio .studio-beer-card-check {
-  position: absolute;
-  top: var(--sp-3);
-  right: var(--sp-3);
-  width: 22px;
-  height: 22px;
-  border-radius: var(--r-pill);
-  background: var(--ac);
-  color: var(--ac-ink);
-  display: grid;
-  place-items: center;
-}
-
-.evg-studio .studio-beer-card-remove {
-  position: absolute;
-  top: var(--sp-3);
-  right: var(--sp-3);
-  width: 22px;
-  height: 22px;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--line2);
-  background: var(--s3);
-  color: var(--t3);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity var(--dur) var(--ease), color var(--dur) var(--ease);
-}
-
-.evg-studio .studio-beer-card:hover .studio-beer-card-remove,
-.evg-studio .studio-beer-card-remove:focus-visible {
-  opacity: 1;
-}
-
-.evg-studio .studio-beer-card.on .studio-beer-card-remove {
-  right: calc(var(--sp-3) + 26px);
-}
-
-.evg-studio .studio-beer-card-etikett {
-  display: block;
-  padding: var(--sp-3) var(--sp-5) var(--sp-5);
-  font-size: var(--t-11);
-  color: var(--ac);
-  cursor: pointer;
-  border-top: 1px solid var(--line);
-}
-
-.evg-studio .studio-beer-form {
-  margin-top: var(--sp-4);
-  padding: var(--sp-7);
-  border-radius: var(--r-lg);
-  border: 1px solid var(--line);
-  background: var(--s2);
-}
-
-.evg-studio .studio-beer-form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-5);
-}
-
-.evg-studio .studio-beer-form-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-  min-width: 0;
-}
-
-.evg-studio .studio-beer-form-field--wide {
-  grid-column: 1 / -1;
-}
-
-.evg-studio .studio-beer-form-field input,
-.evg-studio .studio-beer-form-field select,
-.evg-studio .studio-create-wish {
-  width: 100%;
-  min-height: 36px;
-  padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--r-md);
-  border: 1px solid var(--line2);
-  background: var(--s1);
-  color: var(--t1);
-  font-family: var(--f-sans);
-  font-size: var(--t-13);
-  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
-}
-
-.evg-studio .studio-beer-form-field input:focus,
-.evg-studio .studio-beer-form-field select:focus,
-.evg-studio .studio-create-wish:focus {
-  outline: none;
-  border-color: var(--ac);
-  box-shadow: 0 0 0 3px var(--ac-tint);
-}
-
-.evg-studio .studio-beer-form-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-}
-
-.evg-studio .studio-beer-form-etikett-preview {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--r-md);
-  overflow: hidden;
-  border: 1px solid var(--line2);
-}
-
-.evg-studio .studio-beer-form-etikett-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.evg-studio .studio-beer-form-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-3);
-  margin-top: var(--sp-6);
-}
-
-.evg-studio .studio-occasion-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--sp-4);
-}
-
-.evg-studio .studio-occasion-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
-  min-height: 168px;
-  padding: var(--sp-5);
-  border-radius: var(--r-lg);
-  border: 1px solid var(--line);
-  background: var(--s2);
-  text-align: left;
-  cursor: pointer;
-  color: inherit;
-  font: inherit;
-  transition: border-color var(--dur-mid) var(--ease), background var(--dur-mid) var(--ease), transform 80ms ease;
-}
-
-.evg-studio .studio-occasion-card:hover:not(.is-off) {
-  border-color: var(--ac-line);
-  background: var(--s3);
-}
-
-.evg-studio .studio-occasion-card:active:not(.is-off) {
-  transform: scale(0.99);
-}
-
-.evg-studio .studio-occasion-card.is-off {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.evg-studio .studio-occasion-card--custom {
-  border-style: dashed;
-  border-color: var(--line2);
-  background: transparent;
-}
-
-.evg-studio .studio-occasion-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-3);
-}
-
-.evg-studio .studio-occasion-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--r-md);
-  background: color-mix(in srgb, var(--occasion-accent, var(--ac)) 18%, transparent);
-  border: 1px solid color-mix(in srgb, var(--occasion-accent, var(--ac)) 35%, transparent);
-  color: var(--occasion-accent, var(--ac));
-  display: grid;
-  place-items: center;
-}
-
-.evg-studio .studio-occasion-badge {
-  font-family: var(--f-mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 2px 6px;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--line2);
-  color: var(--t3);
-}
-
-.evg-studio .studio-occasion-card-body strong {
-  display: block;
-  font-size: var(--t-14);
-  font-weight: 600;
-  color: var(--t1);
-}
-
-.evg-studio .studio-occasion-card-body em {
-  display: block;
-  margin-top: 2px;
-  font-style: normal;
-  font-size: var(--t-12);
-  color: var(--t2);
-}
-
-.evg-studio .studio-occasion-card-body small {
-  display: block;
-  margin-top: var(--sp-2);
-  font-size: var(--t-11);
-  color: var(--t3);
-  line-height: 1.45;
-}
-
-.evg-studio .studio-occasion-card-cta {
-  margin-top: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  font-size: var(--t-12);
-  font-weight: 600;
-  color: var(--ac);
-}
-
-.evg-studio .evg-marketing-create {
-  min-width: 0;
-}
-
-.evg-studio .studio-create-workspace {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
-  gap: var(--sp-5);
-  align-items: start;
-}
-
-.evg-studio .studio-create-composer {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
-  min-width: 0;
-}
-
-.evg-studio .studio-create-composer-surface {
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--s2);
-  overflow: hidden;
-  min-width: 0;
-}
-
-.evg-studio .studio-create-composer-meta {
-  margin: var(--sp-2) 0 0;
-  font-size: var(--t-12);
-  color: var(--t3);
-}
-
-.evg-studio .evg-marketing-create__prompt-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-5);
-  padding: var(--sp-5) var(--sp-7);
-  border-bottom: 1px solid var(--line);
-}
-
-.evg-studio .evg-marketing-create__prompt-label {
-  font-family: var(--f-mono);
-  font-size: var(--t-11);
-  color: var(--t3);
-  letter-spacing: 0.06em;
-}
-
-.evg-studio .evg-marketing-create__prompt-accent {
-  color: var(--ac);
-  font-weight: 600;
-}
-
-.evg-studio .evg-marketing-create__prompt-text {
-  padding: var(--sp-6) var(--sp-7) var(--sp-5);
-  font-size: var(--t-14);
-  line-height: 1.65;
-  color: var(--t2);
-  min-height: 56px;
-}
-
-.evg-studio .evg-marketing-create__prompt-text button {
-  text-underline-offset: 3px;
-}
-
-.evg-studio .evg-marketing-create__cursor {
-  color: var(--ac);
-  animation: studio-create-blink 1s step-end infinite;
-}
-
-.evg-studio .evg-marketing-create__question {
-  padding: 0 var(--sp-7) var(--sp-5);
-}
-
-.evg-studio .evg-marketing-create__question-title {
-  margin: 0;
-  font-size: var(--t-15);
-  font-weight: 600;
-  color: var(--t1);
-}
-
-.evg-studio .evg-marketing-create__question-sub {
-  margin: var(--sp-2) 0 0;
-  font-size: var(--t-13);
-  color: var(--t3);
-  line-height: 1.5;
-}
-
-.evg-studio .evg-marketing-create__choices {
-  margin-top: var(--sp-6);
-}
-
-.evg-studio .studio-create-form-row {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-3);
-}
-
-.evg-studio .evg-marketing-create__pill-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-}
-
-.evg-studio .evg-marketing-create__pill {
-  height: 30px;
-  padding: 0 var(--sp-5);
-  border-radius: var(--r-pill);
-  border: 1px solid var(--line2);
-  background: transparent;
-  color: var(--t2);
-  font-size: var(--t-12);
-  font-weight: 500;
-  cursor: pointer;
-  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
-}
-
-.evg-studio .evg-marketing-create__pill:hover:not(:disabled) {
-  border-color: var(--t3);
-  color: var(--t1);
-}
-
-.evg-studio .evg-marketing-create__pill--active {
-  background: var(--ac-tint);
-  border-color: var(--ac-line);
-  color: var(--ac);
-}
-
-.evg-studio .evg-marketing-create__referenz {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
-}
-
-.evg-studio .evg-marketing-create__review {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-5);
-}
-
-.evg-studio .studio-create-label-lock {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-5);
-  padding: var(--sp-4);
-  border-radius: var(--r-md);
-  border: 1px solid var(--ac-line);
-  background: var(--ac-tint);
-}
-
-.evg-studio .studio-create-label-lock img {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--r-sm);
-  object-fit: cover;
-  flex: none;
-}
-
-.evg-studio .studio-create-label-lock strong {
-  display: block;
-  font-size: var(--t-12);
-  color: var(--t1);
-}
-
-.evg-studio .studio-create-label-lock span {
-  display: block;
-  margin-top: 2px;
-  font-size: var(--t-11);
-  color: var(--t3);
-  line-height: 1.45;
-}
-
-.evg-studio .studio-create-wish {
-  min-height: 72px;
-  resize: vertical;
-  line-height: 1.45;
-}
-
-.evg-studio .evg-marketing-create__prompt-foot {
-  padding: var(--sp-5) var(--sp-7);
-  border-top: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-5);
-}
-
-.evg-studio .evg-marketing-create__ratios {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-}
-
-.evg-studio .evg-marketing-create__ratio {
-  height: 34px;
-  padding: 0 var(--sp-5);
-  border-radius: var(--r-md);
-  border: 1px solid var(--line2);
-  background: transparent;
-  color: var(--t2);
-  font-size: var(--t-12);
-  font-weight: 500;
-  cursor: pointer;
-  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), color var(--dur) var(--ease);
-}
-
-.evg-studio .evg-marketing-create__ratio:hover {
-  border-color: var(--t3);
-  color: var(--t1);
-}
-
-.evg-studio .evg-marketing-create__ratio--active {
-  border-color: var(--ac-line);
-  background: var(--ac-tint);
-  color: var(--t1);
-}
-
-.evg-studio .evg-marketing-create__foot-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
-  flex-wrap: wrap;
-}
-
-.evg-studio .evg-marketing-create__back {
-  height: 34px;
-  padding: 0 var(--sp-5);
-  border-radius: var(--r-md);
-  border: 1px solid var(--line2);
-  background: transparent;
-  color: var(--t2);
-  font-size: var(--t-13);
-  cursor: pointer;
-  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
-}
-
-.evg-studio .evg-marketing-create__back:hover:not(:disabled) {
-  background: var(--s3);
-  color: var(--t1);
-}
-
-.evg-studio .evg-marketing-create__back:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.evg-studio .evg-marketing-create__eta {
-  margin-left: auto;
-  font-family: var(--f-mono);
-  font-size: var(--t-11);
-  color: var(--t3);
-}
-
-.evg-studio .evg-marketing-create__primary {
-  height: 34px;
-  padding: 0 var(--sp-6);
-  border-radius: var(--r-md);
-  border: none;
-  background: var(--ac);
-  color: var(--ac-ink);
-  font-family: var(--f-sans);
-  font-size: var(--t-13);
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  transition: background var(--dur-mid) var(--ease), transform 80ms ease;
-}
-
-.evg-studio .evg-marketing-create__primary:hover:not(:disabled) {
-  background: var(--ac-2);
-}
-
-.evg-studio .evg-marketing-create__primary:active:not(:disabled) {
-  transform: scale(0.97);
-}
-
-.evg-studio .evg-marketing-create__primary:disabled {
-  background: var(--line-strong);
-  color: var(--t3);
-  cursor: not-allowed;
-}
-
-.evg-studio .evg-marketing-create__primary-arrow {
-  opacity: 0.85;
-}
-
-.evg-studio .evg-marketing-create__statusbar {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-5);
-  flex-wrap: wrap;
-  padding: var(--sp-5) var(--sp-6);
-  border-radius: var(--r-lg);
-  border: 1px solid var(--line);
-  background: var(--s2);
-}
-
-.evg-studio .evg-marketing-create__brand-chip {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
-  min-width: 0;
-}
-
-.evg-studio .evg-marketing-create__brand-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--r-md);
-  background: var(--s3);
-  border: 1px solid var(--line2);
-  flex: none;
-}
-
-.evg-studio .evg-marketing-create__brand-icon--active {
-  background: var(--ac-tint);
-  border-color: var(--ac-line);
-  box-shadow: inset 0 0 0 2px var(--ac);
-}
-
-.evg-studio .evg-marketing-create__brand-kicker {
-  font-family: var(--f-mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--t3);
-}
-
-.evg-studio .evg-marketing-create__brand-name {
-  font-size: var(--t-12);
-  font-weight: 600;
-  color: var(--t1);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.evg-studio .evg-marketing-create__status-tags {
-  margin-left: auto;
-  font-family: var(--f-mono);
-  font-size: var(--t-11);
-  color: var(--t3);
-}
-
-.evg-studio .evg-marketing-create__tokens {
-  font-family: var(--f-mono);
-  font-size: var(--t-11);
-  color: var(--t2);
-}
-
-.evg-studio .studio-create-feed {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
-}
-
-.evg-studio .studio-create-feed-empty {
-  padding: 18px 16px;
-  border-radius: var(--r-md);
-  border: 0;
-  background: var(--s2);
-  text-align: center;
-}
-
-.evg-studio .studio-create-feed-empty__title {
-  font-family: var(--f-sans);
-  font-size: var(--t-14);
-  font-weight: 600;
-  color: var(--t1);
-}
-
-.evg-studio .studio-create-feed-empty__text {
-  margin-top: var(--sp-2);
-  font-size: var(--t-12);
-  color: var(--t2);
-  line-height: 1.45;
-  max-width: 28ch;
-  margin-inline: auto;
-}
-
-.evg-studio .studio-create-feed-panel {
-  padding: var(--sp-7);
-  border-radius: var(--r-lg);
-  border: 1px solid var(--line);
-  background: var(--s2);
-}
-
-.evg-studio .evg-marketing-create__results {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-4);
-}
-
-.evg-studio .evg-marketing-create__result {
-  position: relative;
-  border-radius: var(--r-md);
-  border: 1px solid var(--line);
-  background: var(--s3);
-  overflow: hidden;
-  min-width: 0;
-}
-
-.evg-studio .evg-marketing-create__result--done {
-  border-color: var(--ac-line);
-  cursor: pointer;
-}
-
-.evg-studio .evg-marketing-create__result-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.evg-studio .evg-marketing-create__result-badge {
-  position: absolute;
-  left: var(--sp-3);
-  top: var(--sp-3);
-  padding: 2px 7px;
-  border-radius: var(--r-pill);
-  background: var(--ac);
-  color: var(--ac-ink);
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.evg-studio .evg-marketing-create__result-bar {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-4);
-  background: linear-gradient(transparent, rgba(15, 9, 6, 0.88));
-  font-size: var(--t-11);
-  color: var(--t1);
-}
-
-.evg-studio .evg-marketing-create__select {
-  border: 1px solid var(--line2);
-  background: var(--s3);
-  color: var(--t1);
-  font-size: var(--t-11);
-  padding: 2px 8px;
-  border-radius: var(--r-sm);
-  cursor: pointer;
-}
-
-.evg-studio .evg-marketing-create__rendering {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-2);
-  background: var(--s3);
-}
-
-.evg-studio .evg-marketing-create__render-ring svg {
-  width: 56px;
-  height: 56px;
-  display: block;
-}
-
-.evg-studio .evg-marketing-create__render-label {
-  font-size: var(--t-11);
-  color: var(--t3);
-}
-
-.evg-studio .evg-marketing-create__render-pct {
-  font-family: var(--f-mono);
-  font-size: var(--t-12);
-  color: var(--t2);
-}
-
-.evg-studio .evg-marketing-create__results-nav {
-  grid-column: 1 / -1;
-}
-
-.evg-studio .studio-create-feed-loading {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
-}
-
-.evg-studio .studio-create-feed-loading__head {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
-  font-size: var(--t-14);
-  font-weight: 600;
-  color: var(--t1);
-}
-
-.evg-studio .studio-create-feed-loading__spinner {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid var(--s4);
-  border-top-color: var(--ac);
-  animation: studio-create-spin 0.8s linear infinite;
-  flex: none;
-}
-
-.evg-studio .studio-create-feed-loading__bar {
-  height: 4px;
-  border-radius: 2px;
-  background: var(--s3);
-  overflow: hidden;
-}
-
-.evg-studio .studio-create-feed-loading__bar > span {
-  display: block;
-  width: 42%;
-  height: 100%;
-  background: var(--ac);
-  animation: studio-create-bar-pulse 1.6s ease-in-out infinite;
-}
-
-.evg-studio .studio-create-feed-loading__hint {
-  font-size: var(--t-11);
-  color: var(--t3);
-}
-
-.evg-studio .studio-create-feed-error {
-  padding: var(--sp-7);
-  border-radius: var(--r-lg);
-  border: 1px solid var(--err-dim);
-  background: var(--s2);
-}
-
-.evg-studio .studio-create-feed-error__title {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  font-size: var(--t-14);
-  font-weight: 600;
-  color: var(--t1);
-}
-
-.evg-studio .studio-create-feed-error__title::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--err);
-  flex: none;
-}
-
-.evg-studio .studio-create-feed-error__text {
-  margin-top: var(--sp-3);
-  font-size: var(--t-12);
-  color: var(--t2);
-  line-height: 1.6;
-}
-
-@keyframes studio-create-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-@keyframes studio-create-blink {
-  50% { opacity: 0; }
-}
-
-@keyframes studio-create-spin {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes studio-create-bar-pulse {
-  0%, 100% { opacity: 0.55; transform: scaleX(0.92); transform-origin: left; }
-  50% { opacity: 1; transform: scaleX(1); transform-origin: left; }
-}
-
-@media (max-width: 1024px) {
-  .evg-studio .studio-create-workspace {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .evg-studio .studio-beer-form-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .evg-studio .evg-marketing-create__eta {
-    margin-left: 0;
-  }
-
-  .evg-studio .evg-marketing-create__foot-actions {
-    justify-content: space-between;
-  }
-}
-
 @media (max-width: 639px) {
   .evg-studio .studio-create-page-head {
     margin-bottom: var(--sp-6);
@@ -1262,30 +168,6 @@
   .evg-studio .studio-create-page-head__actions {
     width: 100%;
     justify-content: space-between;
-  }
-
-  .evg-studio .studio-occasion-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .evg-studio .studio-beer-row {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .evg-studio .evg-marketing-create__results {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .evg-studio .evg-marketing-create__prompt-head,
-  .evg-studio .evg-marketing-create__prompt-text,
-  .evg-studio .evg-marketing-create__question,
-  .evg-studio .evg-marketing-create__prompt-foot {
-    padding-inline: var(--sp-5);
-  }
-
-  .evg-studio .evg-marketing-create__primary {
-    flex: 1;
-    justify-content: center;
   }
 }
 
@@ -1353,34 +235,9 @@
   color: var(--t3);
 }
 
-.evg-studio .studio-create-field__optional {
-  margin-left: 6px;
-  font-style: normal;
-  font-size: var(--t-10);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--t3);
-}
-
 .evg-studio .studio-create-field__hint {
   font-size: var(--t-12);
   color: var(--t3);
-}
-
-.evg-studio .studio-create-field--switch {
-  gap: 8px;
-}
-
-.evg-studio .studio-create-field--switch .stu-switch-row {
-  justify-content: space-between;
-  width: 100%;
-}
-
-.evg-studio .studio-create-field--switch .stu-switch__label {
-  font-size: var(--t-13);
-  font-weight: 600;
-  color: var(--t1);
 }
 
 .evg-studio .studio-create-upload {
@@ -1407,24 +264,6 @@
 .evg-studio .studio-create-upload__placeholder strong {
   color: var(--t1);
   font-size: var(--t-13);
-}
-
-.evg-studio .studio-create-upload__thumb {
-  max-height: 140px;
-  max-width: 100%;
-  object-fit: contain;
-  border-radius: var(--r-md);
-}
-
-.evg-studio .studio-create-beer-preview {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 120px;
-  padding: 12px;
-  border: 1px solid var(--line2);
-  border-radius: var(--r-lg);
-  background: var(--s2);
 }
 
 .evg-studio .studio-create-beer-picker {
@@ -1623,10 +462,6 @@
   color: var(--t3);
 }
 
-.evg-studio .studio-create-beer-create-host {
-  width: 100%;
-}
-
 .evg-studio .studio-create-extra-refs {
   list-style: none;
   margin: 0;
@@ -1701,7 +536,7 @@
 }
 
 .evg-studio .studio-create-link--accent {
-  color: #c7691e;
+  color: var(--color-acc);
   font-weight: 600;
   text-decoration: none;
 }
@@ -1720,7 +555,7 @@
   border: 1px solid var(--line2);
   background: var(--s2);
   color: var(--t1);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   padding: 6px 12px;
   font-size: var(--t-12);
   font-weight: 600;
@@ -1730,19 +565,6 @@
 .evg-studio .studio-create-chip--ghost {
   font-weight: 500;
   color: var(--t2);
-}
-
-.evg-studio .studio-create-chip--hyperreal {
-  min-height: 36px;
-  border-color: color-mix(in srgb, var(--m-hyperreal, var(--ac)) 35%, var(--line2));
-  color: var(--t1);
-}
-
-.evg-studio .studio-create-chip--hyperreal.is-active {
-  border-color: var(--m-hyperreal, var(--ac));
-  background: color-mix(in srgb, var(--m-hyperreal, var(--ac)) 16%, var(--s1));
-  color: var(--t1);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-hyperreal, var(--ac)) 30%, transparent);
 }
 
 .evg-studio .studio-create-chip--photo-style {
@@ -1791,7 +613,7 @@
 
 .evg-studio .studio-create-status.is-busy::before {
   background: var(--ac);
-  box-shadow: 0 0 0 0 rgba(199, 105, 30, 0.45);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-acc) 45%, transparent);
   animation: studio-create-status-pulse 1.4s ease-out infinite;
 }
 
@@ -1964,9 +786,9 @@
   background: linear-gradient(
     105deg,
     transparent 40%,
-    color-mix(in srgb, var(--ac-tint, #FBEFE0) 55%, transparent) 48%,
+    color-mix(in srgb, var(--ac-tint, var(--color-acc-dim)) 55%, transparent) 48%,
     rgba(255, 255, 255, 0.35) 50%,
-    color-mix(in srgb, var(--ac-tint, #FBEFE0) 55%, transparent) 52%,
+    color-mix(in srgb, var(--ac-tint, var(--color-acc-dim)) 55%, transparent) 52%,
     transparent 60%
   );
   mix-blend-mode: soft-light;
@@ -1981,11 +803,11 @@
 .studio-image-gen__bubble {
   position: absolute;
   bottom: -16px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.95), color-mix(in srgb, var(--ac, #C7691E) 38%, transparent) 60%, color-mix(in srgb, var(--ac, #C7691E) 18%, transparent) 100%);
+  border-radius: var(--r-pill);
+  background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.95), color-mix(in srgb, var(--ac, var(--color-acc)) 38%, transparent) 60%, color-mix(in srgb, var(--ac, var(--color-acc)) 18%, transparent) 100%);
   box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--ac, #C7691E) 45%, rgba(255, 255, 255, 0.5)),
-    0 0 8px color-mix(in srgb, var(--ac, #C7691E) 30%, transparent);
+    inset 0 0 0 1px color-mix(in srgb, var(--ac, var(--color-acc)) 45%, rgba(255, 255, 255, 0.5)),
+    0 0 8px color-mix(in srgb, var(--ac, var(--color-acc)) 30%, transparent);
   opacity: 0;
   animation-name: studio-image-gen-bubble;
   animation-timing-function: cubic-bezier(0.35, 0, 0.65, 1);
@@ -2016,19 +838,19 @@
 .studio-image-gen__orb-core {
   width: 22px;
   height: 22px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 35% 30%, #fff, var(--ac, #C7691E) 70%);
+  border-radius: var(--r-pill);
+  background: radial-gradient(circle at 35% 30%, #fff, var(--ac, var(--color-acc)) 70%);
   box-shadow:
-    0 0 24px color-mix(in srgb, var(--ac, #C7691E) 70%, transparent),
-    0 0 60px color-mix(in srgb, var(--ac, #C7691E) 40%, transparent);
+    0 0 24px color-mix(in srgb, var(--ac, var(--color-acc)) 70%, transparent),
+    0 0 60px color-mix(in srgb, var(--ac, var(--color-acc)) 40%, transparent);
   animation: studio-image-gen-breathe 2.4s ease-in-out infinite;
 }
 
 .studio-image-gen__orb-ring {
   position: absolute;
   inset: 0;
-  border-radius: 999px;
-  border: 1.5px solid color-mix(in srgb, var(--ac, #C7691E) 55%, transparent);
+  border-radius: var(--r-pill);
+  border: 1.5px solid color-mix(in srgb, var(--ac, var(--color-acc)) 55%, transparent);
   animation: studio-image-gen-ripple 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
 }
 
@@ -2039,7 +861,7 @@
 .studio-image-gen__phase {
   min-height: 1.5em;
   padding: 6px 14px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: color-mix(in srgb, var(--s1, #FFFFFF) 62%, transparent);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -2061,7 +883,7 @@
   bottom: 16px;
   z-index: 3;
   height: 3px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: color-mix(in srgb, var(--s1, #FFFFFF) 55%, transparent);
   overflow: hidden;
 }
@@ -2071,8 +893,8 @@
   inset: 0;
   transform-origin: left center;
   border-radius: inherit;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--ac, #C7691E) 60%, transparent), var(--ac, #C7691E));
-  box-shadow: 0 0 12px var(--ac, #C7691E);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ac, var(--color-acc)) 60%, transparent), var(--ac, var(--color-acc)));
+  box-shadow: 0 0 12px var(--ac, var(--color-acc));
 }
 
 .studio-image-gen__bar-fill::after {
@@ -2220,7 +1042,7 @@
   height: 70px;
   margin-bottom: 6px;
   border: 1.5px dashed var(--line2);
-  border-radius: 8px;
+  border-radius: var(--r-md);
   background:
     linear-gradient(180deg, var(--ac-tint), transparent 70%),
     var(--s1);
@@ -2242,165 +1064,23 @@
   line-height: 1.45;
 }
 
-.evg-studio .studio-create-generating {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  padding: 28px 20px 24px;
-  text-align: center;
-  background: var(--s1);
-  overflow: hidden;
-}
-
-.evg-studio .studio-create-generating__glow {
-  position: absolute;
-  width: 160%;
-  height: 70%;
-  left: -30%;
-  top: 10%;
-  background: radial-gradient(
-    ellipse at center,
-    color-mix(in srgb, var(--ac) 18%, transparent) 0%,
-    transparent 68%
-  );
-  animation: studio-create-gen-glow 2.8s ease-in-out infinite;
-  pointer-events: none;
-}
-
-.evg-studio .studio-create-generating__scan {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 28%;
-  top: -30%;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    color-mix(in srgb, var(--ac) 14%, transparent) 45%,
-    transparent 100%
-  );
-  animation: studio-create-gen-scan 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  pointer-events: none;
-}
-
-.evg-studio .studio-create-generating__ring {
-  position: relative;
-  z-index: 1;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: 2px solid var(--line2);
-  border-top-color: var(--ac);
-  border-right-color: color-mix(in srgb, var(--ac) 45%, var(--line2));
-  animation: studio-create-gen-spin 0.9s linear infinite;
-}
-
-.evg-studio .studio-create-generating__copy {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-width: 32ch;
-}
-
-.evg-studio .studio-create-generating__copy strong {
-  font-size: var(--t-14);
-  font-weight: 600;
-  color: var(--t1);
-  letter-spacing: -0.01em;
-}
-
-.evg-studio .studio-create-generating__copy span {
-  font-size: var(--t-12);
-  color: var(--t3);
-  line-height: 1.45;
-}
-
-.evg-studio .studio-create-generating__bar {
-  position: relative;
-  z-index: 1;
-  width: min(220px, 70%);
-  height: 3px;
-  margin-top: 4px;
-  border-radius: 999px;
-  background: var(--s3);
-  overflow: hidden;
-}
-
-.evg-studio .studio-create-generating__bar::after {
-  content: "";
-  display: block;
-  height: 100%;
-  width: var(--p, 10%);
-  border-radius: inherit;
-  background: linear-gradient(90deg, var(--ac-3), var(--ac), var(--ac-2));
-  transition: width 0.45s var(--ease, ease);
-}
-
 @keyframes studio-create-status-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(199, 105, 30, 0.4);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-acc) 40%, transparent);
   }
   70% {
-    box-shadow: 0 0 0 8px rgba(199, 105, 30, 0);
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-acc) 0%, transparent);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(199, 105, 30, 0);
-  }
-}
-
-@keyframes studio-create-gen-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes studio-create-gen-scan {
-  0% {
-    top: -30%;
-    opacity: 0;
-  }
-  12% {
-    opacity: 1;
-  }
-  88% {
-    opacity: 1;
-  }
-  100% {
-    top: 100%;
-    opacity: 0;
-  }
-}
-
-@keyframes studio-create-gen-glow {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: 0.7;
-  }
-  50% {
-    transform: translateY(8%) scale(1.06);
-    opacity: 1;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-acc) 0%, transparent);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .evg-studio .studio-create-status.is-busy::before,
-  .evg-studio .studio-create-generating__glow,
-  .evg-studio .studio-create-generating__scan,
-  .evg-studio .studio-create-generating__ring,
   .evg-studio .studio-image-gen__aurora-spin,
   .evg-studio .studio-image-gen__aurora-spin::after {
     animation: none !important;
-  }
-
-  .evg-studio .studio-create-generating__ring {
-    border-color: var(--ac);
   }
 
   .evg-studio .studio-image-gen__img.is-blurred,
@@ -2425,7 +1105,7 @@
 .evg-studio .studio-create-variant-dots__btn {
   width: 44px;
   height: 44px;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   border: 1px solid var(--line2);
   background: var(--s2);
   cursor: pointer;
@@ -2434,8 +1114,8 @@
 }
 
 .evg-studio .studio-create-variant-dots__btn.is-active {
-  border-color: #c7691e;
-  box-shadow: 0 0 0 1px #c7691e;
+  border-color: var(--color-acc);
+  box-shadow: 0 0 0 1px var(--color-acc);
 }
 
 .evg-studio .studio-create-variant-dots__btn img {
@@ -2447,33 +1127,6 @@
 
 .evg-studio .studio-create-variant-dots__btn:disabled {
   opacity: 0.4;
-}
-
-.evg-studio .studio-create-preview-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.evg-studio .studio-create-dock {
-  display: none;
-}
-
-.evg-studio .studio-image-gen__error {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 16px;
-  text-align: center;
-  background: var(--s1);
-  color: var(--t1);
-  font-size: var(--t-13, 13px);
 }
 
 .evg-studio .studio-create-segment {
@@ -2683,7 +1336,7 @@
   top: 10px;
   bottom: 10px;
   width: 3px;
-  border-radius: 2px;
+  border-radius: var(--r-xs);
 }
 
 .evg-studio .studio-create-preset-card strong {
@@ -2709,7 +1362,7 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #c7691e;
+  color: var(--color-acc);
 }
 
 @media (max-width: 1100px) {
@@ -2739,298 +1392,13 @@
 .evg-studio .studio-create-studio-col--right,
 .evg-studio .studio-create-mobile-nav,
 .evg-studio .studio-create-mobile-next,
-.evg-studio .studio-create-mobile-panel-actions,
-.evg-studio .studio-create-col-generate,
-.evg-studio .studio-create-mobile-switch {
+.evg-studio .studio-create-mobile-panel-actions {
   display: none;
 }
 
-.evg-studio .studio-create-editor {
-  position: sticky;
-  top: 8px;
-  max-height: calc(100dvh - 72px);
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding-right: 4px;
-}
-
-.evg-studio .studio-create-stage {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.evg-studio .studio-create-stage .studio-create-image-gen {
-  margin: 0;
-}
-
-.evg-studio .studio-create-dock {
-  display: none;
-}
-
-.evg-studio .studio-create-product {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.evg-studio .studio-create-product__photo,
-.evg-studio .studio-create-product__empty {
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  max-height: 220px;
-  border: 0;
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  background: var(--s3);
-  padding: 0;
-  cursor: pointer;
-  color: inherit;
-  font: inherit;
-}
-
-.evg-studio .studio-create-product__photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.evg-studio .studio-create-product__empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: var(--s3);
-  color: var(--t2);
-  text-align: center;
-  padding: 16px;
-}
-
-.evg-studio .studio-create-product__empty strong {
-  font-size: var(--t-14);
-  color: var(--t1);
-}
-
-.evg-studio .studio-create-product__empty span {
-  font-size: var(--t-12);
-  color: var(--t3);
-  max-width: 28ch;
-}
-
-.evg-studio .studio-create-product__photo:focus-visible,
-.evg-studio .studio-create-product__empty:focus-visible,
-.evg-studio .studio-create-character-add:focus-visible,
-.evg-studio .studio-create-ref-add:focus-visible,
-.evg-studio .studio-create-template:focus-visible,
 .evg-studio .studio-create-generate:focus-visible {
   outline: 2px solid var(--ac);
   outline-offset: 2px;
-}
-
-.evg-studio .studio-create-product__meta {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.evg-studio .studio-create-product__name {
-  border: 0;
-  background: none;
-  padding: 0;
-  text-align: left;
-  cursor: pointer;
-  color: inherit;
-  font: inherit;
-  min-width: 0;
-}
-
-.evg-studio .studio-create-product__name strong,
-.evg-studio .studio-create-character strong {
-  display: block;
-  font-size: var(--t-14);
-  font-weight: 600;
-  color: var(--t1);
-}
-
-.evg-studio .studio-create-product__name span,
-.evg-studio .studio-create-character small {
-  display: block;
-  margin-top: 2px;
-  font-size: var(--t-12);
-  color: var(--t3);
-}
-
-.evg-studio .studio-create-text-btn,
-.evg-studio .studio-create-settings-link {
-  border: 0;
-  background: none;
-  padding: 0;
-  color: var(--t2);
-  font: inherit;
-  font-size: var(--t-12);
-  font-weight: 600;
-  cursor: pointer;
-  text-align: left;
-}
-
-.evg-studio .studio-create-text-btn:hover,
-.evg-studio .studio-create-settings-link:hover {
-  color: var(--ac);
-}
-
-.evg-studio .studio-create-inline-warn {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 12px;
-  align-items: center;
-  padding: 10px 12px;
-  border-radius: var(--r-md);
-  background: var(--warn-dim);
-  color: var(--t1);
-  font-size: var(--t-12);
-}
-
-.evg-studio .studio-create-inline-warn p {
-  margin: 0;
-  flex: 1 1 100%;
-}
-
-.evg-studio .studio-create-character-block {
-  position: relative;
-}
-
-.evg-studio .studio-create-character {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.evg-studio .studio-create-character__main {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  flex: 1;
-  border: 0;
-  background: none;
-  padding: 0;
-  text-align: left;
-  cursor: pointer;
-  color: inherit;
-  font: inherit;
-}
-
-.evg-studio .studio-create-character__thumb {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--r-sm);
-  overflow: hidden;
-  background: var(--s3);
-  flex: none;
-  display: grid;
-  place-items: center;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.evg-studio .studio-create-character__thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.evg-studio .studio-create-character-add {
-  width: 100%;
-  min-height: 40px;
-  border: 0;
-  background: none;
-  padding: 0;
-  text-align: left;
-  color: var(--t3);
-  font: inherit;
-  font-size: var(--t-13);
-  cursor: pointer;
-}
-
-.evg-studio .studio-create-character-add:hover {
-  color: var(--t1);
-}
-
-.evg-studio .studio-create-ref-row {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 2px;
-}
-
-.evg-studio .studio-create-ref-card {
-  position: relative;
-  flex: 0 0 72px;
-  border: 0;
-  background: none;
-  padding: 0;
-  text-align: left;
-}
-
-.evg-studio .studio-create-ref-card img {
-  width: 72px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: var(--r-md);
-  background: var(--s3);
-  display: block;
-}
-
-.evg-studio .studio-create-ref-card b,
-.evg-studio .studio-create-ref-card__role {
-  display: block;
-  margin-top: 4px;
-  border: 0;
-  background: none;
-  padding: 0;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--t2);
-  cursor: pointer;
-}
-
-.evg-studio .studio-create-ref-card__remove {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 20px;
-  height: 20px;
-  border: 0;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--s1) 88%, transparent);
-  color: var(--t1);
-  cursor: pointer;
-  line-height: 1;
-}
-
-.evg-studio .studio-create-ref-add {
-  flex: 0 0 72px;
-  width: 72px;
-  height: 90px;
-  border: 1px dashed var(--line2);
-  border-radius: var(--r-md);
-  background: var(--s2);
-  color: var(--t2);
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-}
-
-.evg-studio .studio-create-ref-add:hover {
-  border-color: var(--ac-line);
-  color: var(--ac);
 }
 
 .evg-studio .studio-create-textarea {
@@ -3040,13 +1408,6 @@
 .evg-studio .studio-create-social-copy {
   display: grid;
   gap: 10px;
-}
-
-.evg-studio .studio-create-editor-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding-top: 4px;
 }
 
 .evg-studio .studio-create-generate {
@@ -3072,207 +1433,6 @@
   cursor: not-allowed;
 }
 
-.evg-studio .studio-create-stage__bar,
-.evg-studio .studio-create-stage__meta,
-.evg-studio .studio-create-preview-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
-}
-
-.evg-studio .studio-create-stage__meta {
-  font-size: var(--t-12);
-  color: var(--t3);
-  font-variant-numeric: tabular-nums;
-}
-
-.evg-studio .studio-create-action {
-  min-height: 36px;
-  padding: 0 12px;
-  border: 1px solid var(--line2);
-  border-radius: var(--r-md);
-  background: var(--s1);
-  color: var(--t1);
-  font: inherit;
-  font-size: var(--t-13);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.evg-studio .studio-create-action:hover:not(:disabled) {
-  border-color: var(--ac-line);
-  color: var(--ac);
-}
-
-.evg-studio .studio-create-action:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.evg-studio .studio-create-templates {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.evg-studio .studio-create-template {
-  position: relative;
-  display: block;
-  padding: 0;
-  border: 0;
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  background: var(--s3);
-  cursor: pointer;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  aspect-ratio: 4 / 5;
-}
-
-.evg-studio .studio-create-template img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.evg-studio .studio-create-template__copy {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 28px 12px 12px;
-  background: linear-gradient(180deg, transparent, rgba(24, 20, 15, 0.72));
-  color: #fff;
-}
-
-.evg-studio .studio-create-template__copy strong {
-  display: block;
-  font-size: var(--t-15);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-.evg-studio .studio-create-template__copy span {
-  display: block;
-  margin-top: 2px;
-  font-size: var(--t-12);
-  color: rgba(255, 255, 255, 0.86);
-}
-
-.evg-studio .studio-create-template__badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 1;
-  padding: 3px 7px;
-  border-radius: var(--r-sm);
-  background: color-mix(in srgb, var(--s1) 86%, transparent);
-  color: var(--t2);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.evg-studio .studio-create-template.is-selected {
-  box-shadow: 0 0 0 2px var(--ac);
-}
-
-.evg-studio .studio-create-template:hover img {
-  transform: scale(1.02);
-  transition: transform var(--dur-page) var(--ease);
-}
-
-.evg-studio .studio-create-slots,
-.evg-studio .studio-create-compare {
-  display: grid;
-  gap: 10px;
-}
-
-.evg-studio .studio-create-slot,
-.evg-studio .studio-create-compare button {
-  position: relative;
-  min-height: 180px;
-  border: 0;
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  background: var(--s3);
-  padding: 0;
-  color: var(--t3);
-  font: inherit;
-  font-size: var(--t-13);
-}
-
-.evg-studio .studio-create-slot {
-  display: grid;
-  place-items: center;
-  aspect-ratio: 4 / 5;
-}
-
-.evg-studio .studio-create-slot img,
-.evg-studio .studio-create-compare img,
-.evg-studio .studio-create-gallery img,
-.evg-studio .studio-create-history img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.evg-studio .studio-create-compare {
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-}
-
-.evg-studio .studio-create-compare button {
-  aspect-ratio: 4 / 5;
-  cursor: pointer;
-}
-
-.evg-studio .studio-create-compare button.is-active,
-.evg-studio .studio-create-gallery button.is-active,
-.evg-studio .studio-create-history button.is-active {
-  box-shadow: 0 0 0 2px var(--ac);
-}
-
-.evg-studio .studio-create-gallery,
-.evg-studio .studio-create-history {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-}
-
-.evg-studio .studio-create-gallery button,
-.evg-studio .studio-create-history button {
-  flex: 0 0 64px;
-  height: 80px;
-  padding: 0;
-  border: 0;
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--s3);
-  cursor: pointer;
-}
-
-.evg-studio .studio-create-history button {
-  flex-basis: 56px;
-  height: 70px;
-  opacity: 0.78;
-}
-
-.evg-studio .studio-create-suggestion {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  padding: 10px 12px;
-  border-radius: var(--r-md);
-  background: var(--ac-tint);
-  font-size: var(--t-13);
-}
-
 .evg-studio .studio-create-preset-row {
   display: flex;
   flex-wrap: wrap;
@@ -3290,22 +1450,10 @@
   .evg-studio .studio-create-studio-grid {
     grid-template-columns: minmax(0, 1fr);
   }
-
-  .evg-studio .studio-create-editor {
-    position: static;
-    max-height: none;
-    overflow: visible;
-    order: 2;
-  }
-
-  .evg-studio .studio-create-stage {
-    order: 1;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .evg-studio .studio-create-studio,
-  .evg-studio .studio-create-template img,
   .evg-studio .studio-image-gen__img {
     transition: none !important;
     animation: none !important;

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { DashboardTabLink } from "@/components/dashboard-shell/dashboard-tab-nav";
 import { useEffect, useState } from "react";
 
 import { BadgeCheck, Compass, CreditCard, LogOut, Settings2 } from "lucide-react";
@@ -84,22 +84,22 @@ export function AccountSwitcher({
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href="/dashboard/settings">
+            <DashboardTabLink href="/dashboard/settings">
               <BadgeCheck className="group-hover/dropdown-menu-item:-rotate-6 group-focus/dropdown-menu-item:-rotate-6" />
               Profil
-            </Link>
+            </DashboardTabLink>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/dashboard/pricing">
+            <DashboardTabLink href="/dashboard/pricing">
               <CreditCard className="group-hover/dropdown-menu-item:-rotate-3 group-focus/dropdown-menu-item:-rotate-3" />
               Abonnement
-            </Link>
+            </DashboardTabLink>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/dashboard/settings">
+            <DashboardTabLink href="/dashboard/settings">
               <Settings2 className="group-hover/dropdown-menu-item:rotate-45 group-focus/dropdown-menu-item:rotate-45" />
               Einstellungen
-            </Link>
+            </DashboardTabLink>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => startDashboardTour()}>
             <Compass className="group-hover/dropdown-menu-item:rotate-45 group-focus/dropdown-menu-item:rotate-45" />

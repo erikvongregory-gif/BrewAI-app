@@ -892,7 +892,7 @@ export function OnboardingTourFlow({ bootstrap }: { bootstrap: OnboardingBootstr
                               aria-expanded={editOpen}
                               aria-controls="onboarding-brand-edit"
                               onClick={() => setEditOpen((open) => !open)}
-                              className="flex items-center gap-1.5 rounded text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                              className="flex items-center gap-1.5 rounded-sm text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring"
                             >
                               Texte anpassen
                               <ChevronDown className={cn("size-4 text-muted-foreground transition-transform duration-300", editOpen && "rotate-180")} aria-hidden="true" />

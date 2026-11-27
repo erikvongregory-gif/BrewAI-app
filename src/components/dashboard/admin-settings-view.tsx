@@ -326,6 +326,8 @@ export function AdminSettingsView({
                       ref={fileInputRef}
                       type="file"
                       accept="image/jpeg,image/png,image/webp"
+                      aria-label="Profilbild hochladen"
+                      tabIndex={-1}
                       className="sr-only"
                       onChange={(e) => {
                         const file = e.target.files?.[0];

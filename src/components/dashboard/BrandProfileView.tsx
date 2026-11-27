@@ -277,7 +277,7 @@ export function BrandProfileView({
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:grid-rows-[auto_auto]">
           <BrandingCard
             category="Branding"
-            title="Typography"
+            title="Typografie"
             subtitle={fontName}
             displayElement={
               <span
@@ -366,7 +366,7 @@ export function BrandProfileView({
               <h2>Vorgaben</h2>
             </div>
 
-            <div className="rounded-2xl bg-[var(--s1)] p-5 shadow-sm sm:p-6">
+            <div className="rounded-xl bg-[var(--s1)] p-5 shadow-sm sm:p-6">
               <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--t3)]">Tonalität</p>
               <div className="mt-4">
                 <ToneFilterChips
@@ -404,7 +404,7 @@ export function BrandProfileView({
 
           <BrandCharactersSection />
 
-          <div className="flex flex-col gap-4 rounded-2xl bg-[var(--s1)] p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="flex flex-col gap-4 rounded-xl bg-[var(--s1)] p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6">
             <div className="min-w-0">
               <div className="text-sm font-medium text-[var(--t1)]">Generisch weitermachen</div>
               <p className="mt-1 text-xs leading-relaxed text-[var(--t3)]">
@@ -454,7 +454,7 @@ export function BrandProfileView({
           </AlertDialog>
         </div>
 
-        <aside className="rounded-2xl bg-[var(--s1)] p-5 shadow-sm lg:sticky lg:top-6">
+        <aside className="rounded-xl bg-[var(--s1)] p-5 shadow-sm lg:sticky lg:top-6">
           <fieldset className="flex flex-col gap-4">
             <legend className="text-sm font-medium leading-none text-[var(--t1)]">Markentreue</legend>
             <p className="text-xs leading-relaxed text-[var(--t3)]">

@@ -13,9 +13,12 @@ import { z } from "zod";
  * es gibt bewusst keine Prozentwerte.
  */
 
-export const EVIDENCE_STATUS = ["belegt", "geschaetzt", "fehlt", "bestaetigt"] as const;
+import { BRAND_EVIDENCE_FIELDS, EVIDENCE_STATUS } from "./brand-evidence-status";
+
+export { BRAND_EVIDENCE_FIELDS, EVIDENCE_STATUS, isHardEvidence } from "./brand-evidence-status";
+export type { BrandEvidenceField, EvidenceStatus } from "./brand-evidence-status";
+
 export const evidenceStatusSchema = z.enum(EVIDENCE_STATUS);
-export type EvidenceStatus = z.infer<typeof evidenceStatusSchema>;
 
 export const EVIDENCE_SOURCE_KINDS = [
   "website_text",
@@ -34,9 +37,6 @@ export const evidenceSourceSchema = z.object({
   auszug: z.string().max(200).optional(),
 });
 export type EvidenceSource = z.infer<typeof evidenceSourceSchema>;
-
-export const BRAND_EVIDENCE_FIELDS = ["breweryName", "brandTone", "brandColors", "brandDos", "brandDonts", "label"] as const;
-export type BrandEvidenceField = (typeof BRAND_EVIDENCE_FIELDS)[number];
 
 export const fieldEvidenceSchema = z.object({
   feld: z.enum(BRAND_EVIDENCE_FIELDS),
@@ -89,11 +89,6 @@ export function evidenceStrength(evidence: Pick<FieldEvidence, "status" | "quell
   if (evidence.status === "geschaetzt") return "schwach";
   const kinds = new Set(evidence.quellen.filter((source) => source.art !== "ki_schaetzung").map((source) => source.art));
   return kinds.size >= 2 ? "stark" : kinds.size === 1 ? "einfach" : "schwach";
-}
-
-/** Darf das Merkmal als harte Vorgabe in die Bildgenerierung? Nur belegt oder vom Nutzer bestätigt. */
-export function isHardEvidence(status: EvidenceStatus | undefined): boolean {
-  return status === "belegt" || status === "bestaetigt";
 }
 
 /** Nur fürs Frontend: Produktbeleg tolerant lesen (Altbestand ohne Feld → undefined). */

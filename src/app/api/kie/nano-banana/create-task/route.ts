@@ -1,5 +1,5 @@
 import { buildFreeformImagePromptV3 } from "@/lib/inhalte-erstellen/image-prompt-v3";
-import { workspaceResourceUser } from "@/lib/dashboard/workspace";
+import { workspaceResourceUser, workspaceErrorResponse } from "@/lib/dashboard/workspace";
 import { reserveGeneration, finishGeneration, linkProviderTask } from "@/lib/billing/generationJobs";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { NextResponse } from "next/server";
@@ -158,7 +158,7 @@ export async function POST(req: Request) {
       } = await supabase.auth.getUser();
 
       if (user && !(await hasPassedTwoFactor(user))) return NextResponse.json({ error: "Zwei-Faktor-Prüfung erforderlich.", code: "two_factor_required" }, { status: 403 });
-  if (user) { try { user = await workspaceResourceUser(user, true); } catch { return NextResponse.json({error:"Teamzugriff nicht erlaubt."},{status:403}); } }
+  if (user) { try { user = await workspaceResourceUser(user, true); } catch (e) { return workspaceErrorResponse(e); } }
       if (!user) {
         return NextResponse.json({ error: "Nicht angemeldet.", code: "auth_required" }, { status: 401 });
       }

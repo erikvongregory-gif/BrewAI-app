@@ -357,7 +357,7 @@ export function VideoGenerationStudio({ breweryName }: Props) {
                 hoverText="BrewAI"
                 textClassName="text-4xl font-semibold tracking-normal drop-shadow-sm 2xl:text-5xl"
               />
-              <p className="mt-2 text-neutral-600 dark:text-neutral-200">
+              <p className="mt-2 text-muted-foreground">
                 {breweryName ? `Videos für ${breweryName}` : "Ideen brauen. Videos zapfen."}
               </p>
             </div>
@@ -366,7 +366,7 @@ export function VideoGenerationStudio({ breweryName }: Props) {
               {tiles.map((tile) => (
                 <article
                   key={tile.id}
-                  className="overflow-hidden rounded-2xl border border-border bg-background shadow-sm dark:border-sidebar-border dark:bg-sidebar"
+                  className="overflow-hidden rounded-xl border border-border bg-background shadow-sm dark:border-sidebar-border dark:bg-sidebar"
                 >
                   <div className="aspect-video bg-muted">
                     {tile.status === "completed" && tile.videoUrl ? (
@@ -381,7 +381,7 @@ export function VideoGenerationStudio({ breweryName }: Props) {
                       </div>
                     ) : (
                       <div className="flex h-full animate-pulse flex-col items-center justify-center gap-2 text-sm text-muted-foreground">
-                        <span className="size-5 animate-spin rounded-full border-2 border-[#C7691E] border-t-transparent" />
+                        <span className="size-5 animate-spin rounded-full border-2 border-acc border-t-transparent" />
                         {tile.status === "queued" ? "In Warteschlange …" : "ModelArk arbeitet …"}
                       </div>
                     )}
@@ -391,7 +391,7 @@ export function VideoGenerationStudio({ breweryName }: Props) {
                     {tile.status === "completed" ? (
                       <button
                         type="button"
-                        className="font-medium text-[#C7691E] hover:underline"
+                        className="font-medium text-acc hover:underline"
                         onClick={() => handleReuse(tile)}
                       >
                         Reuse
@@ -417,7 +417,7 @@ export function VideoGenerationStudio({ breweryName }: Props) {
             <div className="brew-composer__ring" aria-hidden />
             <div
               className={cn(
-                "brew-composer__surface rounded-2xl border",
+                "brew-composer__surface rounded-xl border",
                 "border-border bg-background shadow-sm",
                 "dark:border-sidebar-border dark:bg-sidebar",
               )}
@@ -436,7 +436,7 @@ export function VideoGenerationStudio({ breweryName }: Props) {
                         <div
                           className={cn(
                             "relative size-14 overflow-hidden rounded-xl border border-border bg-muted shadow-sm",
-                            "ring-1 ring-[#C7691E]/20",
+                            "ring-1 ring-acc/20",
                           )}
                           title={ROLE_LABELS[item.role]}
                         >
@@ -503,11 +503,11 @@ export function VideoGenerationStudio({ breweryName }: Props) {
                         className={cn(
                           "mt-0.5 size-9 shrink-0 rounded-xl bg-transparent text-foreground hover:bg-muted",
                           "dark:text-white dark:hover:bg-white/10",
-                          (assetsOpen || media.items.length > 0) && "text-[#C7691E]",
+                          (assetsOpen || media.items.length > 0) && "text-acc",
                         )}
                       >
                         {uploading ? (
-                          <span className="size-4 animate-spin rounded-full border-2 border-[#C7691E] border-t-transparent" />
+                          <span className="size-4 animate-spin rounded-full border-2 border-acc border-t-transparent" />
                         ) : (
                           <StudioIcon name="plus" size={18} />
                         )}
@@ -837,7 +837,7 @@ function SettingControl({
                 ) : (
                   <span className="min-w-0 flex-1" />
                 )}
-                {active ? <StudioIcon name="check" size={14} className="shrink-0 text-[#C7691E]" /> : null}
+                {active ? <StudioIcon name="check" size={14} className="shrink-0 text-acc" /> : null}
               </button>
             );
           })}
@@ -863,7 +863,7 @@ function SettingControl({
           step={field.step ?? 1}
           value={n}
           onChange={(e) => onChange(name, Number(e.target.value))}
-          className="w-full accent-[#C7691E]"
+          className="w-full accent-acc"
           aria-label={label}
         />
         <div className="mt-1 flex justify-between text-[10px] tabular-nums text-muted-foreground">
@@ -888,7 +888,7 @@ function SettingControl({
       <span
         className={cn(
           "relative h-5 w-9 shrink-0 rounded-full transition-colors",
-          checked ? "bg-[#C7691E]" : "bg-muted-foreground/30",
+          checked ? "bg-acc" : "bg-muted-foreground/30",
         )}
         aria-hidden
       >

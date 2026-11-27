@@ -197,7 +197,7 @@ export function VideoAssetPicker({
                   className={cn(
                     "min-w-[1.25rem] rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums leading-none",
                     active
-                      ? "bg-[#C7691E]/15 text-[#A85518] dark:text-[#D4782A]"
+                      ? "bg-acc/15 text-acc-deep dark:text-acc-hover"
                       : "bg-background/60 text-muted-foreground dark:bg-neutral-900/40",
                   )}
                 >
@@ -232,7 +232,7 @@ export function VideoAssetPicker({
                 className={cn(
                   "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
                   active
-                    ? "border-[#C7691E] bg-[#C7691E]/10 text-[#A85518] dark:text-[#D4782A]"
+                    ? "border-acc bg-acc/10 text-acc-deep dark:text-acc-hover"
                     : "border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
@@ -249,7 +249,7 @@ export function VideoAssetPicker({
       <div className="min-h-[11rem] max-h-[16rem] overflow-y-auto px-2 py-3">
         {libraryLoading && source === "library" ? (
           <div className="flex flex-col items-center justify-center gap-2 px-4 py-8 text-center text-sm text-muted-foreground">
-            <span className="size-5 animate-spin rounded-full border-2 border-[#C7691E] border-t-transparent" />
+            <span className="size-5 animate-spin rounded-full border-2 border-acc border-t-transparent" />
             Mediathek wird geladen…
           </div>
         ) : assets.length === 0 ? (
@@ -281,7 +281,7 @@ export function VideoAssetPicker({
                 variant="default"
                 size="sm"
                 disabled={!canUpload}
-                className="mt-1 bg-[#C7691E] text-white hover:bg-[#B55D1A]"
+                className="mt-1 bg-acc text-white hover:bg-acc-deep"
                 onClick={() => onUpload(role)}
               >
                 <StudioIcon name="plus" size={14} />
@@ -297,16 +297,16 @@ export function VideoAssetPicker({
                 disabled={!canUpload}
                 onClick={() => onUpload(role)}
                 className={cn(
-                  "flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-border bg-muted/40 text-muted-foreground transition-colors hover:border-[#C7691E]/50 hover:bg-[#C7691E]/5 hover:text-foreground",
+                  "flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-border bg-muted/40 text-muted-foreground transition-colors hover:border-acc/50 hover:bg-acc/5 hover:text-foreground",
                   !canUpload && "opacity-40",
                 )}
               >
                 {uploading ? (
-                  <span className="size-4 animate-spin rounded-full border-2 border-[#C7691E] border-t-transparent" />
+                  <span className="size-4 animate-spin rounded-full border-2 border-acc border-t-transparent" />
                 ) : (
                   <StudioIcon name="plus" size={18} />
                 )}
-                <span className="text-[10px] font-medium">Upload</span>
+                <span className="text-[10px] font-medium">Hochladen</span>
               </button>
             ) : null}
             {assets.map((asset) => {
@@ -324,7 +324,7 @@ export function VideoAssetPicker({
                   onClick={() => toggle(asset.url)}
                   className={cn(
                     "relative aspect-square overflow-hidden rounded-xl border bg-muted transition-colors",
-                    on ? "border-[#C7691E] ring-2 ring-[#C7691E]/30" : "border-border",
+                    on ? "border-acc ring-2 ring-acc/30" : "border-border",
                     blocked && "opacity-40",
                   )}
                 >
@@ -339,7 +339,7 @@ export function VideoAssetPicker({
                     <img src={thumb || asset.url} alt="" className="h-full w-full object-cover" />
                   )}
                   {on ? (
-                    <span className="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-[#C7691E] text-white">
+                    <span className="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-acc text-white">
                       <StudioIcon name="check" size={12} />
                     </span>
                   ) : null}
@@ -361,7 +361,7 @@ export function VideoAssetPicker({
             "min-w-[5.5rem]",
             added + dropped === 0
               ? "bg-muted text-foreground hover:bg-muted"
-              : "bg-[#C7691E] text-white hover:bg-[#B55D1A]",
+              : "bg-acc text-white hover:bg-acc-deep",
           )}
           onClick={() => commit(selected)}
         >

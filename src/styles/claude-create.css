@@ -48,7 +48,7 @@
 
 .brewai-claude-create .cc-scroll::-webkit-scrollbar-thumb {
   background: var(--cc-bg-300);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
 }
 
 @keyframes cc-fade-in {
@@ -120,7 +120,7 @@
   max-height: min(68vh, 560px);
   flex-direction: column;
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: var(--r-xl);
   background: var(--cc-bg-100);
   color: var(--cc-text-100);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18);
@@ -145,7 +145,7 @@
     max-width: none;
     max-height: min(88vh, 720px);
     transform: none;
-    border-radius: 24px 24px 0 0;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
   }
 }
 
@@ -179,7 +179,7 @@
 .brew-composer {
   position: relative;
   isolation: isolate;
-  border-radius: 1rem;
+  border-radius: var(--r-xl);
 }
 
 .brew-composer__glow,
@@ -192,13 +192,13 @@
   opacity: 0;
   background: conic-gradient(
     from var(--brew-glow-angle),
-    #c7691e 0deg,
+    var(--color-acc) 0deg,
     #e8b87a 55deg,
-    #a85518 110deg,
-    #c7691e 170deg,
+    var(--color-acc-deep) 110deg,
+    var(--color-acc) 170deg,
     #7a4a28 230deg,
-    #d4782a 290deg,
-    #c7691e 360deg
+    var(--color-acc-hover) 290deg,
+    var(--color-acc) 360deg
   );
   transition: opacity 0.35s ease;
 }

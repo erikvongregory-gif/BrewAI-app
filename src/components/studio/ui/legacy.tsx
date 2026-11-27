@@ -199,20 +199,18 @@ export function StudioPageHeader({
   action?: React.ReactNode;
   className?: string;
 }) {
-  const metaText = (meta ?? eyebrow).toUpperCase();
+  // Shell-Stil (wie BrandProfileEmptyState): Eyebrow steht im DOM vor dem Titel, damit Titel und
+  // Kennzeichnung nicht zu einem Wort verschmelzen („Lüne BräuMARKENPROFIL“).
+  const metaText = meta ?? eyebrow;
   return (
-    <div className={cn("evg-pagehead", className)} style={{ paddingLeft: 0, paddingRight: 0 }}>
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
-        <div>
-          <div className="evg-pagehead__top">
-            <h1 className="evg-h1">{title}</h1>
-            {metaText ? <span className="evg-pagehead__meta">{metaText}</span> : null}
-          </div>
-          {subtitle ? <p className="evg-pagehead__ctx">{subtitle}</p> : null}
-        </div>
-        {action}
+    <header className={cn("mb-6 flex flex-wrap items-start justify-between gap-3", className)}>
+      <div className="min-w-0">
+        {metaText ? <p className="mb-1 font-medium text-muted-foreground text-xs">{metaText}</p> : null}
+        <h1 className="break-words font-semibold text-2xl tracking-tight">{title}</h1>
+        {subtitle ? <p className="mt-1.5 text-muted-foreground text-sm">{subtitle}</p> : null}
       </div>
-    </div>
+      {action}
+    </header>
   );
 }
 

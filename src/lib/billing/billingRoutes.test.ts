@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/auth/twoFactorSession",()=>({hasPassedTwoFactor:async()=>true}));
-vi.mock("@/lib/dashboard/workspace",()=>({getWorkspace:async()=>({ownerId:"user_one",role:"owner"})}));
+vi.mock("@/lib/dashboard/workspace",()=>({getWorkspace:async()=>({ownerId:"user_one",role:"owner"}),billingOwnerDenied:async()=>null}));
 const mocks = vi.hoisted(() => ({
   grant: vi.fn(), claim: vi.fn(), renew: vi.fn(), activate: vi.fn(),
   release: vi.fn(), processed: vi.fn(), retrieve: vi.fn(), event: vi.fn(),
@@ -65,7 +65,15 @@ describe("token purchase routes", () => {
   });
   it("confirmation surfaces a grant failure instead of reporting success", async () => {
     mocks.grant.mockRejectedValueOnce(new Error("DB unavailable"));
-    expect((await confirm(request())).status).toBe(500);
+    const res = await confirm(request());
+    expect(res.status).toBe(500);
+    expect((await res.json()).error).not.toContain("DB unavailable");
+  });
+  it("confirmation hides raw Stripe errors from the user", async () => {
+    mocks.retrieve.mockRejectedValueOnce(new Error("No such checkout.session: 'cs_one'"));
+    const res = await confirm(request());
+    expect(res.status).toBe(500);
+    expect((await res.json()).error).toMatch(/^Deine Zahlung konnte gerade nicht bestätigt werden/);
   });
   it("a completed but unpaid checkout receives no tokens", async () => {
     const unpaid = { ...session, payment_status: "unpaid" };

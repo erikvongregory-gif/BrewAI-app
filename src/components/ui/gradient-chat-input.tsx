@@ -175,15 +175,15 @@ export default function GradientChatInput({
     <div className={cn("relative w-full", className)}>
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-[2px] rounded-[26px] opacity-70 blur-[10px] transition-opacity"
+        className="pointer-events-none absolute -inset-[2px] rounded-xl opacity-70 blur-[10px] transition-opacity"
         style={{
           background: gradient,
           opacity: hasText || showBubbles ? 0.55 : 0.28,
         }}
       />
 
-      <div className="relative rounded-3xl border border-border bg-background p-1 shadow-[0_10px_20px_-6px_rgba(0,0,0,0.1)]">
-        <div className="relative z-[2] flex items-center justify-between gap-2 rounded-3xl bg-background p-1.5">
+      <div className="relative rounded-xl border border-border bg-background p-1 shadow-[0_10px_20px_-6px_rgba(0,0,0,0.1)]">
+        <div className="relative z-[2] flex items-center justify-between gap-2 rounded-xl bg-background p-1.5">
           <div className="flex flex-1 items-center gap-3 pr-1">
             <Button
               type="button"
@@ -214,7 +214,7 @@ export default function GradientChatInput({
               autoComplete="off"
               className={cn(
                 "h-auto min-w-0 flex-1 border-0 bg-transparent py-0 pl-1 pr-0 text-base shadow-none",
-                "caret-[var(--color-acc,#C7691E)]",
+                "caret-acc",
                 "focus-visible:border-transparent focus-visible:ring-0 dark:bg-transparent md:text-sm",
               )}
             />
@@ -247,8 +247,8 @@ export default function GradientChatInput({
                   className={cn(
                     "max-w-[260px] break-words px-3.5 py-2.5 text-sm shadow-[0_10px_20px_-6px_rgba(0,0,0,0.15)]",
                     m.sender === "user"
-                      ? "self-end rounded-[14px_14px_6px_14px] border border-border bg-background text-foreground"
-                      : "self-start rounded-[14px_14px_14px_6px] bg-primary text-primary-foreground",
+                      ? "self-end rounded-xl rounded-br-sm border border-border bg-background text-foreground"
+                      : "self-start rounded-xl rounded-bl-sm bg-primary text-primary-foreground",
                   )}
                 >
                   {m.text}

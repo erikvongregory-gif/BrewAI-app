@@ -1,7 +1,7 @@
 import { buildFreeformImagePromptV3 } from "@/lib/inhalte-erstellen/image-prompt-v3";
 import { uploadGeneratedImageToStorage } from "@/lib/supabase/storage";
 import { applyAiWatermark } from "@/lib/openai/aiWatermark";
-import { workspaceResourceUser } from "@/lib/dashboard/workspace";
+import { workspaceResourceUser, workspaceErrorResponse } from "@/lib/dashboard/workspace";
 import { reserveGeneration, finishGeneration } from "@/lib/billing/generationJobs";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { randomUUID } from "crypto";
@@ -109,11 +109,25 @@ export async function POST(req: Request) {
     const originError = enforceSameOrigin(req);
     if (originError) return originError;
 
-    const parsed = schema.safeParse(await req.json());
+    // Anmeldung vor der Body-Validierung: ohne Session 401 statt 400.
+    if (!isSupabaseConfigured()) {
+      return NextResponse.json({ error: "Nicht angemeldet.", code: "auth_required" }, { status: 401 });
+    }
+    const supabase = await createClient();
+    let {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Nicht angemeldet.", code: "auth_required" }, { status: 401 });
+    }
+    if (!(await hasPassedTwoFactor(user))) return NextResponse.json({ error: "Zwei-Faktor-Prüfung erforderlich.", code: "two_factor_required" }, { status: 403 });
+    try { user = await workspaceResourceUser(user, true); } catch (e) { return workspaceErrorResponse(e); }
+    const userId = user.id;
+
+    const parsed = schema.safeParse(await req.json().catch(() => null));
     if (!parsed.success) {
-      const firstIssue = parsed.error.issues[0];
-      const detail = firstIssue ? `${firstIssue.path.join(".")}: ${firstIssue.message}` : "Payload validation failed.";
-      return NextResponse.json({ error: `Ungueltige Anfrage. ${detail}` }, { status: 400 });
+      console.warn("[openai/image2/generate] Ungültige Anfrage", parsed.error.issues);
+      return NextResponse.json({ error: "Ungültige Anfrage. Bitte prüf deine Eingaben." }, { status: 400 });
     }
     const body = parsed.data as GenerateImageBody;
 
@@ -135,20 +149,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "OPENAI_IMAGE_API_KEY fehlt." }, { status: 500 });
     }
 
-    let userId: string | null = null;
     let brandContext = "";
-    if (isSupabaseConfigured()) {
-      const supabase = await createClient();
-      let {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (user && !(await hasPassedTwoFactor(user))) return NextResponse.json({ error: "Zwei-Faktor-Prüfung erforderlich.", code: "two_factor_required" }, { status: 403 });
-  if (user) { try { user = await workspaceResourceUser(user, true); } catch { return NextResponse.json({error:"Teamzugriff nicht erlaubt."},{status:403}); } }
-      if (!user) {
-        return NextResponse.json({ error: "Nicht angemeldet.", code: "auth_required" }, { status: 401 });
-      }
-      userId = user.id;
+    {
       const profile = getBrandProfileFromMetadata(user.user_metadata);
       if (!isBrandProfileComplete(profile)) {
         return NextResponse.json(
@@ -171,10 +173,6 @@ export async function POST(req: Request) {
         );
       }
       brandContext = buildBrandProfilePromptContext(profile);
-    }
-
-    if (!userId) {
-      return NextResponse.json({ error: "Nicht angemeldet.", code: "auth_required" }, { status: 401 });
     }
 
     const subscriptionError = await requireActiveSubscription(userId);

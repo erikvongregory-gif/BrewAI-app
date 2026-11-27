@@ -1,9 +1,5 @@
-import {
-  hyperrealisticSchema,
-  socialPostSchema,
-  type HyperrealisticInput,
-  type SocialPostInput,
-} from "@/app/(dashboard)/inhalte-erstellen/lib/schemas";
+// Nur Typen: ein Wert-Import zieht zod (~105 KB) in das Client-Bundle von /inhalte-erstellen.
+import type { HyperrealisticInput, SocialPostInput } from "@/app/(dashboard)/inhalte-erstellen/lib/schemas";
 import { hasUsableBeerEtikett, sanitizeProduktKategorie, type DashboardBeer, type DashboardCharacter, type ProduktKategorie } from "@/lib/dashboard/metadata";
 import { aspectRatioToOutputDimensions } from "@/lib/openai/imageAspectRatio";
 
@@ -297,18 +293,6 @@ export function stiltreueFromDraft(draft: Pick<StudioDraft, "keepLabel" | "label
     etikettModus: draft.keepLabel ? "marke" : "generisch",
     stiltreue: draft.keepLabel ? draft.labelFidelity : "frei",
   };
-}
-
-export function parseStudioPayload(mode: StudioMode, payload: unknown) {
-  const parsed = mode === "social" ? socialPostSchema.safeParse(payload) : hyperrealisticSchema.safeParse(payload);
-  if (!parsed.success) {
-    const issue = parsed.error.issues[0];
-    return {
-      ok: false as const,
-      message: issue ? `Eingabe ungültig (${issue.path.join(".")}: ${issue.message})` : "Eingabe ungültig.",
-    };
-  }
-  return { ok: true as const, data: parsed.data };
 }
 
 export function snapshotFromPayload(input: {

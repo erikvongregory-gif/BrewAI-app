@@ -252,7 +252,7 @@ export function DashboardProductTour({
               {phase === "intro" ? (
                 <motion.div
                   key="intro"
-                  className="relative w-full max-w-[460px] overflow-hidden rounded-3xl border border-white/10 bg-white shadow-[0_40px_120px_-30px_rgba(0,0,0,0.6)] dark:bg-zinc-900"
+                  className="relative w-full max-w-[460px] overflow-hidden rounded-xl border border-white/10 bg-card shadow-[0_40px_120px_-30px_rgba(0,0,0,0.6)]"
                   initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 24 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: -12, transition: { duration: 0.22 } }}
@@ -264,7 +264,7 @@ export function DashboardProductTour({
                       className="absolute -inset-1/2"
                       style={{
                         background:
-                          "conic-gradient(from 0deg, #18140F, #C7691E 70deg, #F6D2AE 120deg, #18140F 190deg, #7A3E10 260deg, #18140F)",
+                          "conic-gradient(from 0deg, #18140F, var(--color-acc) 70deg, #F6D2AE 120deg, #18140F 190deg, #7A3E10 260deg, #18140F)",
                         filter: "blur(40px)",
                       }}
                       animate={reduce ? undefined : { rotate: 360 }}
@@ -284,7 +284,7 @@ export function DashboardProductTour({
                       animate={{ scale: 1, opacity: 1, rotate: 0 }}
                       transition={{ type: "spring", stiffness: 260, damping: 16, delay: 0.15 }}
                     >
-                      <span className="flex size-16 items-center justify-center rounded-2xl bg-white/95 shadow-[0_0_60px_rgba(233,162,95,0.65)]">
+                      <span className="flex size-16 items-center justify-center rounded-xl bg-white/95 shadow-[0_0_60px_rgba(233,162,95,0.65)]">
                         <EvglabMark size={34} />
                       </span>
                     </motion.div>
@@ -292,14 +292,14 @@ export function DashboardProductTour({
 
                   <div className="p-6 pt-5">
                     <motion.p
-                      className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#C7691E]"
+                      className="text-[11px] font-semibold uppercase tracking-[0.1em] text-acc"
                       initial={reduce ? false : { opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, ease: EASE_OUT, delay: 0.25 }}
                     >
                       Einrichtung abgeschlossen
                     </motion.p>
-                    <h2 id="tour-overlay-title" className="mt-1.5 text-2xl font-semibold leading-tight tracking-tight text-zinc-900 dark:text-zinc-50">
+                    <h2 id="tour-overlay-title" className="mt-1.5 text-2xl font-semibold leading-tight tracking-tight text-foreground">
                       {(name ? `Willkommen im Studio, ${name}.` : "Willkommen im Studio.").split(" ").map((word, i) => (
                         <motion.span
                           key={`${word}-${i}`}
@@ -313,7 +313,7 @@ export function DashboardProductTour({
                       ))}
                     </h2>
                     <motion.p
-                      className="mt-2 text-sm leading-6 text-zinc-500 dark:text-zinc-400"
+                      className="mt-2 text-sm leading-6 text-muted-foreground"
                       initial={reduce ? false : { opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.5, delay: 0.6 }}
@@ -327,16 +327,16 @@ export function DashboardProductTour({
                         return (
                           <motion.div
                             key={point.title}
-                            className="rounded-xl border border-zinc-200/80 bg-zinc-50/80 p-3 dark:border-zinc-800 dark:bg-zinc-800/50"
+                            className="rounded-xl border border-border/80 bg-muted/80 p-3"
                             initial={reduce ? false : { opacity: 0, y: 14 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.45, ease: EASE_OUT, delay: 0.7 + i * 0.09 }}
                           >
-                            <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#F6D2AE] to-[#E9A25F] text-[#5A2D08]">
+                            <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#F6D2AE] to-acc-light text-[#5A2D08]">
                               <Icon className="size-4" aria-hidden />
                             </span>
-                            <p className="mt-2 text-[13px] font-semibold text-zinc-900 dark:text-zinc-50">{point.title}</p>
-                            <p className="text-[11.5px] leading-snug text-zinc-500 dark:text-zinc-400">{point.text}</p>
+                            <p className="mt-2 text-[13px] font-semibold text-foreground">{point.title}</p>
+                            <p className="text-[11.5px] leading-snug text-muted-foreground">{point.text}</p>
                           </motion.div>
                         );
                       })}
@@ -351,7 +351,7 @@ export function DashboardProductTour({
                       <button
                         type="button"
                         onClick={skipAll}
-                        className="rounded-lg px-2 py-2 text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-800 dark:hover:text-zinc-200"
+                        className="rounded-lg px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                       >
                         Überspringen
                       </button>
@@ -359,7 +359,7 @@ export function DashboardProductTour({
                         type="button"
                         autoFocus
                         onClick={beginSpotlight}
-                        className="group inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-black/20 transition-[background-color,transform] hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C7691E] focus-visible:ring-offset-2 active:scale-[0.97] dark:bg-white dark:text-zinc-900"
+                        className="group inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-lg shadow-black/20 transition-[background-color,transform] hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-acc focus-visible:ring-offset-2 active:scale-[0.97]"
                       >
                         Rundgang starten
                         <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
@@ -370,7 +370,7 @@ export function DashboardProductTour({
               ) : (
                 <motion.div
                   key="outro"
-                  className="relative w-full max-w-[400px] rounded-3xl border border-white/10 bg-white p-7 text-center shadow-[0_40px_120px_-30px_rgba(0,0,0,0.6)] dark:bg-zinc-900"
+                  className="relative w-full max-w-[400px] rounded-xl border border-white/10 bg-card p-7 text-center shadow-[0_40px_120px_-30px_rgba(0,0,0,0.6)]"
                   initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.9, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, transition: { duration: 0.2 } }}
@@ -382,7 +382,7 @@ export function DashboardProductTour({
                           <motion.span
                             key={i}
                             aria-hidden
-                            className="absolute left-1/2 top-1/2 rounded-[2px]"
+                            className="absolute left-1/2 top-1/2 rounded-xs"
                             style={{ width: c.w, height: c.w * 0.45, background: c.color, marginLeft: -c.w / 2 }}
                             initial={{ x: 0, y: 0, opacity: 0, rotate: 0, scale: 0.4 }}
                             animate={{ x: c.x, y: [0, c.y, c.y + 60], opacity: [0, 1, 0], rotate: c.r * 4, scale: 1 }}
@@ -391,13 +391,13 @@ export function DashboardProductTour({
                         ))
                       : null}
                     <motion.span
-                      className="absolute inset-0 rounded-full bg-[#C7691E]/20"
+                      className="absolute inset-0 rounded-full bg-acc/20"
                       initial={reduce ? false : { scale: 0.6, opacity: 0 }}
                       animate={reduce ? undefined : { scale: [0.6, 1.5], opacity: [0.8, 0] }}
                       transition={{ duration: 1.2, ease: "easeOut", delay: 0.15 }}
                     />
                     <motion.span
-                      className="relative flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#E9A25F] to-[#C7691E] text-white shadow-[0_12px_36px_-8px_rgba(199,105,30,0.8)]"
+                      className="relative flex size-16 items-center justify-center rounded-xl bg-gradient-to-br from-acc-light to-acc text-white shadow-[0_12px_36px_-8px_color-mix(in_srgb,var(--color-acc)_80%,transparent)]"
                       initial={reduce ? false : { scale: 0.3, rotate: -30 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ type: "spring", stiffness: 380, damping: 14, delay: 0.1 }}
@@ -405,10 +405,10 @@ export function DashboardProductTour({
                       <Sparkles className="size-7" aria-hidden />
                     </motion.span>
                   </div>
-                  <h2 id="tour-overlay-title" className="mt-5 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+                  <h2 id="tour-overlay-title" className="mt-5 text-2xl font-semibold tracking-tight text-foreground">
                     Du bist startklar.
                   </h2>
-                  <p className="mx-auto mt-2 max-w-[300px] text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+                  <p className="mx-auto mt-2 max-w-[300px] text-sm leading-6 text-muted-foreground">
                     Dein Markenprofil steht. Zeit für dein erstes Motiv — in unter einer Minute fertig.
                   </p>
                   <div className="mt-6 flex flex-col gap-2">
@@ -416,7 +416,7 @@ export function DashboardProductTour({
                       href="/inhalte-erstellen"
                       autoFocus
                       onClick={() => setPhase("idle")}
-                      className="group inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm font-medium text-white shadow-lg shadow-black/20 transition-[background-color,transform] hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C7691E] focus-visible:ring-offset-2 active:scale-[0.98] dark:bg-white dark:text-zinc-900"
+                      className="group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-black/20 transition-[background-color,transform] hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-acc focus-visible:ring-offset-2 active:scale-[0.98]"
                     >
                       <ImagePlus className="size-4" aria-hidden />
                       Erstes Motiv erstellen
@@ -425,7 +425,7 @@ export function DashboardProductTour({
                     <button
                       type="button"
                       onClick={() => setPhase("idle")}
-                      className="rounded-xl px-4 py-2.5 text-sm font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                      className="rounded-xl px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                     >
                       Erst mal umschauen
                     </button>

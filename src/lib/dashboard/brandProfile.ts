@@ -5,7 +5,7 @@ import {
   isHardEvidence,
   type BrandEvidenceField,
   type EvidenceStatus,
-} from "@/lib/brand/brand-evidence-model";
+} from "@/lib/brand/brand-evidence-status";
 
 export type BrandProfileSource = "url" | "instagram" | "manual" | "skip";
 

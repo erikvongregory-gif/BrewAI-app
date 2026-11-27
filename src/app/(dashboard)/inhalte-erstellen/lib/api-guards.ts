@@ -1,4 +1,4 @@
-import { workspaceResourceUser } from "@/lib/dashboard/workspace";
+import { workspaceResourceUser, workspaceErrorResponse } from "@/lib/dashboard/workspace";
 import { hasPassedTwoFactor } from "@/lib/auth/twoFactorSession";
 import { NextResponse } from "next/server";
 import { requireActiveSubscription } from "@/lib/billing/access";
@@ -61,7 +61,7 @@ export async function requireImageGenerationUser(req: Request, keyPrefix: string
   try {
     const resource = await workspaceResourceUser(user, !["GET", "HEAD"].includes(req.method));
     return { ok: true, userId: resource.id, userMetadata: resource.user_metadata };
-  } catch { return { ok: false, response: NextResponse.json({error:"Teamzugriff nicht erlaubt."},{status:403}) }; }
+  } catch (e) { return { ok: false, response: workspaceErrorResponse(e) }; }
 }
 
 export async function requireAuthenticatedUser(req: Request, keyPrefix: string): Promise<ApiGuardResult> {
@@ -93,7 +93,7 @@ export async function requireAuthenticatedUser(req: Request, keyPrefix: string):
   try {
     const resource = await workspaceResourceUser(user, !["GET", "HEAD"].includes(req.method));
     return { ok: true, userId: resource.id, userMetadata: resource.user_metadata };
-  } catch { return { ok: false, response: NextResponse.json({error:"Teamzugriff nicht erlaubt."},{status:403}) }; }
+  } catch (e) { return { ok: false, response: workspaceErrorResponse(e) }; }
 }
 
 /** Bildgenerierung: Auth + Rate-Limit + aktives Abo. */

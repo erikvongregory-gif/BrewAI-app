@@ -36,9 +36,9 @@ export function Folder({ className, size = "lg", showHint = size === "lg" }: Fol
       >
         <div
           className={cn(
-            "work-5 bg-amber-600 w-full h-full origin-top rounded-2xl rounded-tl-none relative",
+            "work-5 bg-amber-600 w-full h-full origin-top rounded-xl rounded-tl-none relative",
             "group-hover:shadow-[0_20px_40px_rgba(0,0,0,.2)] transition-all ease duration-300",
-            "after:absolute after:content-[''] after:bottom-[99%] after:left-0 after:bg-amber-600 after:rounded-t-2xl",
+            "after:absolute after:content-[''] after:bottom-[99%] after:left-0 after:bg-amber-600 after:rounded-t-xl",
             "before:absolute before:content-[''] before:bg-amber-600 before:[clip-path:polygon(0_35%,0%_100%,50%_100%)]",
             compact
               ? "rounded-md rounded-tl-none after:w-3 after:h-1 before:-top-[3px] before:left-[11px] before:w-1 before:h-1"
@@ -47,29 +47,29 @@ export function Folder({ className, size = "lg", showHint = size === "lg" }: Fol
         />
         <div
           className={cn(
-            "work-4 absolute inset-1 bg-zinc-400 rounded-2xl transition-all ease duration-300 origin-bottom select-none",
+            "work-4 absolute inset-1 bg-zinc-400 rounded-xl transition-all ease duration-300 origin-bottom select-none",
             "group-hover:[transform:rotateX(-20deg)]",
             compact && "inset-px rounded-md",
           )}
         />
         <div
           className={cn(
-            "work-3 absolute inset-1 bg-zinc-300 rounded-2xl transition-all ease duration-300 origin-bottom",
+            "work-3 absolute inset-1 bg-zinc-300 rounded-xl transition-all ease duration-300 origin-bottom",
             "group-hover:[transform:rotateX(-30deg)]",
             compact && "inset-px rounded-md",
           )}
         />
         <div
           className={cn(
-            "work-2 absolute inset-1 bg-zinc-200 rounded-2xl transition-all ease duration-300 origin-bottom",
+            "work-2 absolute inset-1 bg-zinc-200 rounded-xl transition-all ease duration-300 origin-bottom",
             "group-hover:[transform:rotateX(-38deg)]",
             compact && "inset-px rounded-md",
           )}
         />
         <div
           className={cn(
-            "work-1 absolute bottom-0 bg-gradient-to-t from-amber-500 to-amber-400 w-full rounded-2xl rounded-tr-none",
-            "after:absolute after:content-[''] after:bottom-[99%] after:right-0 after:bg-amber-400 after:rounded-t-2xl",
+            "work-1 absolute bottom-0 bg-gradient-to-t from-amber-500 to-amber-400 w-full rounded-xl rounded-tr-none",
+            "after:absolute after:content-[''] after:bottom-[99%] after:right-0 after:bg-amber-400 after:rounded-t-xl",
             "before:absolute before:content-[''] before:bg-amber-400 before:[clip-path:polygon(100%_14%,50%_100%,100%_100%)]",
             "transition-all ease duration-300 origin-bottom flex items-end",
             "group-hover:shadow-[inset_0_20px_40px_#fbbf24,_inset_0_-20px_40px_#d97706]",

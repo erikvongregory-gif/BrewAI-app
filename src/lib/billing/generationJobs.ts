@@ -71,6 +71,44 @@ export async function resumeGenerationIfPresent(
   return null;
 }
 
+/**
+ * Übersetzt Fehler von generation_reserve/billing_debit_lots in Nutzertexte.
+ * „Nicht genug gekaufte Tokens.“ kommt erst mit dem Vorschlag in docs/audit/migrations-proposed.sql
+ * (Abo-Credits bei inaktivem Abo gesperrt, gekaufte nutzbar); heute wirft die DB „Kein aktives Abo.“.
+ */
+export function reservationErrorResponse(rawMessage: string | null | undefined): NextResponse {
+  const message = rawMessage?.toLowerCase() ?? "";
+  if (message.includes("idempotency") || message.includes("mismatch")) {
+    return NextResponse.json(
+      {
+        error: "Auftragsschlüssel wurde mit anderem Inhalt oder einer anderen Route wiederverwendet.",
+        code: "idempotency_key_mismatch",
+      },
+      { status: 409 },
+    );
+  }
+  if (message.includes("nicht genug gekaufte tokens")) {
+    return NextResponse.json(
+      {
+        error:
+          "Dein Abo ist nicht aktiv, deshalb kannst du nur gekaufte Credits nutzen. Die reichen für diesen Auftrag nicht. Verlängere dein Abo oder kauf Credits nach.",
+        code: "subscription_inactive",
+      },
+      { status: 402 },
+    );
+  }
+  if (message.includes("kein aktives abo")) {
+    return NextResponse.json(
+      { error: "Dein Abo ist nicht aktiv. Verlängere dein Abo, um weiter Inhalte zu erstellen.", code: "subscription_inactive" },
+      { status: 402 },
+    );
+  }
+  return NextResponse.json(
+    { error: "Auftrag konnte nicht reserviert werden. Bitte Guthaben prüfen.", code: "reservation_failed" },
+    { status: 409 },
+  );
+}
+
 export async function reserveGeneration(
   req: Request,
   userId: string,
@@ -89,22 +127,7 @@ export async function reserveGeneration(
     p_hash: generationRequestHash(req, payload),
     p_amount: owner ? 0 : amount,
   });
-  if (error) {
-    const message = error.message?.toLowerCase() ?? "";
-    if (message.includes("idempotency") || message.includes("mismatch")) {
-      return NextResponse.json(
-        {
-          error: "Auftragsschlüssel wurde mit anderem Inhalt oder einer anderen Route wiederverwendet.",
-          code: "idempotency_key_mismatch",
-        },
-        { status: 409 },
-      );
-    }
-    return NextResponse.json(
-      { error: "Auftrag konnte nicht reserviert werden. Bitte Guthaben prüfen.", code: "reservation_failed" },
-      { status: 409 },
-    );
-  }
+  if (error) return reservationErrorResponse(error.message);
   if (!data?.fresh) {
     if (["completed", "failed"].includes(data?.job?.status) && data?.job?.result) {
       return NextResponse.json(await hydratePrivateAssets(data.job.result, userId));

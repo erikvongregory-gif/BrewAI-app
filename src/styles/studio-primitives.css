@@ -706,7 +706,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border-radius: 16px;
+  border-radius: var(--r-xl);
 }
 /* Panel füllt den Dialog; nur der Formular-Body scrollt, Kopf + Footer bleiben stehen. */
 .stu-dialog.evg-studio.stu-dialog--beer .studio-beer-create {

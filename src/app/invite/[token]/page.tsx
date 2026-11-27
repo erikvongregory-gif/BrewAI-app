@@ -35,9 +35,9 @@ export default async function InviteTokenPage({ params, searchParams }: InvitePa
 
   return (
     <main className="mx-auto my-10 w-full max-w-md px-4">
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <h1 className="text-xl font-semibold text-zinc-900">Einladung zum Dashboard</h1>
-        <p className="mt-2 text-sm text-zinc-600">
+      <section className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <h1 className="text-xl font-semibold text-foreground">Einladung zum Dashboard</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
           Registriere dich mit deiner eingeladenen E-Mail-Adresse, um Zugang zum Dashboard zu erhalten.
         </p>
 
@@ -52,7 +52,7 @@ export default async function InviteTokenPage({ params, searchParams }: InvitePa
             <input type="hidden" name="inviteToken" value={token} />
             <input type="hidden" name="next" value="/dashboard" />
             <div>
-              <label htmlFor="invite-email" className="text-sm font-medium text-zinc-800">
+              <label htmlFor="invite-email" className="text-sm font-medium text-foreground">
                 E-Mail
               </label>
               <input
@@ -61,34 +61,53 @@ export default async function InviteTokenPage({ params, searchParams }: InvitePa
                 type="email"
                 required
                 defaultValue={invite?.email ?? ""}
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2.5"
+                className="mt-1 w-full rounded-lg border border-border px-3 py-2.5"
               />
             </div>
             <div>
-              <label htmlFor="invite-brewery" className="text-sm font-medium text-zinc-800">
+              <label htmlFor="invite-brewery" className="text-sm font-medium text-foreground">
                 Brauerei / Betriebsname (optional)
               </label>
               <input
                 id="invite-brewery"
                 name="brewery"
                 type="text"
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2.5"
+                className="mt-1 w-full rounded-lg border border-border px-3 py-2.5"
               />
             </div>
             <div>
-              <label htmlFor="invite-password" className="text-sm font-medium text-zinc-800">
+              <label htmlFor="invite-password" className="text-sm font-medium text-foreground">
                 Passwort
               </label>
               <input
                 id="invite-password"
                 name="password"
                 type="password"
-                minLength={6}
+                autoComplete="new-password"
+                minLength={8}
                 required
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2.5"
+                aria-describedby="invite-password-hint"
+                className="mt-1 w-full rounded-lg border border-border px-3 py-2.5"
+              />
+              <p id="invite-password-hint" className="mt-1 text-xs text-muted-foreground">
+                Mindestens 8 Zeichen.
+              </p>
+            </div>
+            <div>
+              <label htmlFor="invite-password-confirm" className="text-sm font-medium text-foreground">
+                Passwort wiederholen
+              </label>
+              <input
+                id="invite-password-confirm"
+                name="passwordConfirm"
+                type="password"
+                autoComplete="new-password"
+                minLength={8}
+                required
+                className="mt-1 w-full rounded-lg border border-border px-3 py-2.5"
               />
             </div>
-            <div className="flex items-start gap-2 text-sm text-zinc-700">
+            <div className="flex items-start gap-2 text-sm text-muted-foreground">
               <input
                 id="invite-terms"
                 name="accepted_terms"
@@ -103,7 +122,7 @@ export default async function InviteTokenPage({ params, searchParams }: InvitePa
                   href="https://brewai.de/agb"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-[#c65a20] hover:underline"
+                  className="font-medium text-acc-deep hover:underline"
                 >
                   AGB
                 </a>{" "}
@@ -112,7 +131,7 @@ export default async function InviteTokenPage({ params, searchParams }: InvitePa
                   href="https://brewai.de/datenschutz"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-[#c65a20] hover:underline"
+                  className="font-medium text-acc-deep hover:underline"
                 >
                   Datenschutzerklärung
                 </a>
@@ -121,7 +140,7 @@ export default async function InviteTokenPage({ params, searchParams }: InvitePa
             </div>
             <button
               type="submit"
-              className="inline-flex w-full items-center justify-center rounded-lg bg-[#c65a20] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#b14f1c]"
+              className="inline-flex w-full items-center justify-center rounded-lg bg-acc px-4 py-2.5 text-sm font-semibold text-white hover:bg-acc-deep"
             >
               Einladung annehmen und Konto erstellen
             </button>
@@ -132,9 +151,9 @@ export default async function InviteTokenPage({ params, searchParams }: InvitePa
           </div>
         )}
 
-        <p className="mt-4 text-sm text-zinc-600">
+        <p className="mt-4 text-sm text-muted-foreground">
           Du hast schon ein Konto?{" "}
-          <Link href="/anmelden" className="font-medium text-[#c65a20] hover:underline">
+          <Link href="/anmelden" className="font-medium text-acc-deep hover:underline">
             Jetzt anmelden
           </Link>
         </p>

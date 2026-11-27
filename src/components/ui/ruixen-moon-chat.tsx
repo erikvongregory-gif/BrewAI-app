@@ -30,14 +30,22 @@ import { estimateStudioImageTokenCost } from "@/lib/billing/generationTokenCost"
 import { startStudioGeneration } from "@/lib/inhalte-erstellen/start-studio-generation";
 import { clearActiveGeneration, readActiveGeneration } from "@/lib/inhalte-erstellen/active-generation";
 import { pollGenerationJob } from "@/lib/inhalte-erstellen/poll-generation-job";
-import { CreateResultStage, type CreateRun } from "@/components/ui/create-result-stage";
+import dynamic from "next/dynamic";
+import type { CreateRun } from "@/components/ui/create-result-stage";
 import {
   CHARACTER_ASPECTS,
   effectiveAspectRatio,
   type Aspect,
 } from "@/lib/inhalte-erstellen/studio-config";
 
+// Ergebnisbühne erscheint erst nach dem ersten Auftrag: nicht im First-Load-Bundle, im Effekt unten vorgeladen.
+const loadCreateResultStage = () => import("@/components/ui/create-result-stage");
+const CreateResultStage = dynamic(() => loadCreateResultStage().then((m) => m.CreateResultStage));
+
 const PLACEHOLDER_ETIKETT = "https://example.com/placeholder.png";
+/** Grenze für zusatzWunsch (siehe Payload unten); der Zähler erscheint ab 80 %. */
+const PROMPT_MAX = 800;
+const PROMPT_HINT_FROM = 640;
 
 const ASPECT_OPTIONS: { value: Aspect; hint: string }[] = [
   { value: "1:1", hint: "Quadrat" },
@@ -149,12 +157,23 @@ function beerMeta(beer: DashboardBeer) {
   return [stil, filtr, glas].filter(Boolean).join(" · ");
 }
 
+// Entwurf übersteht den Wechsel Erstellen → Mediathek → Erstellen (Client-Navigation), nicht einen Reload.
+// Wird nur im Effekt (Client) beschrieben, auf dem Server bleibt er leer: kein Teilen zwischen Requests,
+// keine Hydration-Abweichung beim ersten Laden.
+const draft: {
+  message: string;
+  activePresetId: string | null;
+  aspectRatio: Aspect;
+  requestQuality: RequestQuality;
+  photoStyle: PhotoStyle;
+} = { message: "", activePresetId: null, aspectRatio: "4:5", requestQuality: "medium", photoStyle: "reportage" };
+
 export default function RuixenMoonChat() {
-  const [message, setMessage] = useState("");
-  const [activePresetId, setActivePresetId] = useState<string | null>(null);
-  const [aspectRatio, setAspectRatio] = useState<Aspect>("4:5");
+  const [message, setMessage] = useState(draft.message);
+  const [activePresetId, setActivePresetId] = useState<string | null>(draft.activePresetId);
+  const [aspectRatio, setAspectRatio] = useState<Aspect>(draft.aspectRatio);
   const [formatPickerOpen, setFormatPickerOpen] = useState(false);
-  const [requestQuality, setRequestQuality] = useState<RequestQuality>("medium");
+  const [requestQuality, setRequestQuality] = useState<RequestQuality>(draft.requestQuality);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
   const [presetPickerOpen, setPresetPickerOpen] = useState(false);
   const [beers, setBeers] = useState<DashboardBeer[]>([]);
@@ -169,7 +188,7 @@ export default function RuixenMoonChat() {
   const [charactersError, setCharactersError] = useState<string | null>(null);
   const [genBusy, setGenBusy] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
-  const [photoStyle, setPhotoStyle] = useState<PhotoStyle>("reportage");
+  const [photoStyle, setPhotoStyle] = useState<PhotoStyle>(draft.photoStyle);
   const [runs, setRuns] = useState<CreateRun[]>([]);
   const [activeRunId, setActiveRunId] = useState<string | null>(null);
   const runPayloads = useRef(new Map<string, unknown>());
@@ -178,6 +197,19 @@ export default function RuixenMoonChat() {
     minHeight: 48,
     maxHeight: 150,
   });
+
+  useEffect(() => {
+    Object.assign(draft, { message, activePresetId, aspectRatio, requestQuality, photoStyle });
+  }, [message, activePresetId, aspectRatio, requestQuality, photoStyle]);
+
+  // Wiederhergestellten Entwurf auf die passende Höhe bringen (läuft nach dem Reset im Resize-Hook).
+  useEffect(() => {
+    if (draft.message) adjustHeight();
+  }, [adjustHeight]);
+
+  useEffect(() => {
+    void loadCreateResultStage();
+  }, []);
 
   const quickPresets = sortTemplatesForDate(OCCASION_TEMPLATES, new Date()).map(
     ({ template }) => template,
@@ -464,7 +496,7 @@ export default function RuixenMoonChat() {
       keepLabel: usesProductPhoto,
       photoStyle,
       beerName: beer?.name?.trim() || undefined,
-      zusatzWunsch: intentParts.join(". ").slice(0, 800),
+      zusatzWunsch: intentParts.join(". ").slice(0, PROMPT_MAX),
       characterName: selectedCharacter?.name?.trim() || undefined,
       characterRole: selectedCharacter?.role?.trim() || undefined,
       characterReferenceImages: selectedCharacter
@@ -519,7 +551,7 @@ export default function RuixenMoonChat() {
               hoverText="BrewAI"
               textClassName="text-4xl font-semibold tracking-normal drop-shadow-sm 2xl:text-5xl"
             />
-            <p className="mt-2 text-neutral-600 dark:text-neutral-200">
+            <p className="mt-2 text-muted-foreground">
               Ideen brauen. Bilder zapfen.
             </p>
           </div>
@@ -543,8 +575,10 @@ export default function RuixenMoonChat() {
             <div className="brew-composer__ring" aria-hidden />
             <div
               className={cn(
-                "brew-composer__surface rounded-2xl border",
+                "brew-composer__surface rounded-xl border",
                 "border-border bg-background shadow-sm",
+                // Das Textfeld selbst hat keinen Ring; der Fokus wird an der Composer-Fläche sichtbar.
+                "has-[textarea:focus-visible]:border-ring has-[textarea:focus-visible]:ring-[3px] has-[textarea:focus-visible]:ring-ring/50",
                 "dark:border-sidebar-border dark:bg-sidebar",
               )}
             >
@@ -561,8 +595,8 @@ export default function RuixenMoonChat() {
                   <span
                     className={cn(
                       "inline-flex max-w-full items-center gap-2 rounded-full border px-3 py-1.5",
-                      "border-[#C7691E]/40 bg-[#C7691E]/10 text-[#A85518]",
-                      "dark:border-[#C7691E]/40 dark:bg-[#C7691E]/15 dark:text-[#D4782A]",
+                      "border-acc/40 bg-acc/10 text-acc-deep",
+                      "dark:border-acc/40 dark:bg-acc/15 dark:text-acc-hover",
                     )}
                   >
                     <StudioIcon name={activePreset.icon} size={14} />
@@ -571,9 +605,9 @@ export default function RuixenMoonChat() {
                     </span>
                     <button
                       type="button"
-                      aria-label="Preset entfernen"
+                      aria-label="Vorlage entfernen"
                       onClick={clearPreset}
-                      className="ml-0.5 rounded-full p-0.5 opacity-70 transition-opacity hover:opacity-100"
+                      className="ml-0.5 rounded-full p-0.5 opacity-70 outline-none transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring/60"
                     >
                       <StudioIcon name="x" size={12} />
                     </button>
@@ -602,7 +636,22 @@ export default function RuixenMoonChat() {
                 activePreset && "pt-1",
               )}
               style={{ overflow: "hidden" }}
+              aria-describedby={message.length >= PROMPT_HINT_FROM ? "prompt-length-hint" : undefined}
             />
+            {/* Gesendet werden höchstens 800 Zeichen (zusatzWunsch); ab 80 % zeigen wir den Stand. */}
+            {message.length >= PROMPT_HINT_FROM ? (
+              <p
+                id="prompt-length-hint"
+                aria-live="polite"
+                className={cn(
+                  "px-4 text-xs tabular-nums",
+                  message.length > PROMPT_MAX ? "text-destructive-foreground" : "text-muted-foreground",
+                )}
+              >
+                {message.length.toLocaleString("de-DE")} / {PROMPT_MAX} Zeichen
+                {message.length > PROMPT_MAX ? " · Max. 800 Zeichen, der Rest wird nicht berücksichtigt." : null}
+              </p>
+            ) : null}
 
             <div className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
               <div className="flex min-w-0 items-center gap-0.5 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -980,7 +1029,7 @@ export default function RuixenMoonChat() {
                   <Button
                     type="button"
                     variant="ghost"
-                    aria-label="Preset wählen"
+                    aria-label="Vorlage wählen"
                     className={cn(
                       "h-9 shrink-0 gap-2 bg-transparent px-2 text-foreground hover:bg-transparent",
                       "dark:bg-transparent dark:text-white dark:hover:bg-transparent",
@@ -994,7 +1043,7 @@ export default function RuixenMoonChat() {
                       </span>
                     ) : (
                       <span className="hidden text-xs text-muted-foreground sm:inline dark:text-neutral-400">
-                        Preset
+                        Vorlage
                       </span>
                     )}
                   </Button>
@@ -1006,7 +1055,7 @@ export default function RuixenMoonChat() {
                   onOpenAutoFocus={(event) => event.preventDefault()}
                 >
                   <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-                    Preset wählen
+                    Vorlage wählen
                   </div>
                   <div className="max-h-72 overflow-y-auto">
                     <div className="flex flex-col gap-0.5">
@@ -1027,7 +1076,7 @@ export default function RuixenMoonChat() {
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-sm font-medium">
-                            Kein Preset
+                            Keine Vorlage
                           </span>
                           <span className="block truncate text-xs text-muted-foreground">
                             Freier Prompt ohne Vorlage

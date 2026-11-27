@@ -27,7 +27,7 @@
 - `STRIPE_PRICE_TOKENS_2000=price_...`
 - `STRIPE_ENABLE_AUTOMATIC_TAX=true`
 - `NEXT_PUBLIC_BILLING_CHECKOUT_ENABLED=true`
-- `TOKEN_STATE_SECRET=...`
+- ~~`TOKEN_STATE_SECRET=...`~~ nicht mehr benötigt (der signierte Token-Cookie-Helfer wurde entfernt, Audit A-2)
 - `META_APP_ID=...` und `META_APP_SECRET=...` (Instagram Markenprofil-Scan, siehe [`docs/instagram-oauth-setup.md`](instagram-oauth-setup.md) — Meta Console + Vercel Schritt-für-Schritt)
 - `ADMIN_2FA_SECRET=...` — min. 32 Zeichen, signiert alle 2FA-Cookies
 - `RESEND_API_KEY=...` und `ADMIN_2FA_FROM_EMAIL=kontakt@brewai.de` — **ohne funktionierenden Mailversand kommt niemand mehr in die App**

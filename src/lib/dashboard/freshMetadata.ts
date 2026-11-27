@@ -1,6 +1,6 @@
 import { hydratePrivateAssets } from "@/lib/supabase/privateAssets";
-import { getWorkspace } from "@/lib/dashboard/workspace";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { getWorkspace, orWorkspaceBlockedRedirect } from "@/lib/dashboard/workspace";
+import { getAuthUserById } from "@/lib/supabase/adminUsers";
 import { getDashboardMetadata, type DashboardMetadata } from "@/lib/dashboard/metadata";
 import { readDashboardBeers } from "@/lib/dashboard/beer-store";
 
@@ -15,8 +15,7 @@ export async function getFreshUserMetadataRaw(
   const workspace = await getWorkspace(userId);
   const ownerId = workspace.ownerId;
   try {
-    const admin = createAdminClient();
-    const { data: adminUser } = await admin.auth.admin.getUserById(ownerId);
+    const { data: adminUser } = await getAuthUserById(ownerId);
     if (adminUser?.user?.user_metadata) return adminUser.user.user_metadata;
   } catch {
     /* Fallback auf Session-Metadata */
@@ -29,8 +28,7 @@ export async function getFreshUserMetadata(userId: string, fallbackMetadata: unk
   const workspace = await getWorkspace(userId);
   userId = workspace.ownerId;
   try {
-    const admin = createAdminClient();
-    const { data: adminUser } = await admin.auth.admin.getUserById(userId);
+    const { data: adminUser } = await getAuthUserById(userId);
     if (adminUser?.user?.user_metadata) return hydratePrivateAssets(adminUser.user.user_metadata,userId);
   } catch {
     /* Fallback auf Session-Metadata */
@@ -45,7 +43,7 @@ export async function getShellGateDashboardMetadata(
   userId: string,
   fallbackMetadata: unknown,
 ): Promise<DashboardMetadata> {
-  return getDashboardMetadata(await getFreshUserMetadataRaw(userId, fallbackMetadata));
+  return getDashboardMetadata(await orWorkspaceBlockedRedirect(getFreshUserMetadataRaw(userId, fallbackMetadata)));
 }
 
 /** Liest dashboard-Metadata frisch aus Supabase Auth — nicht aus dem oft veralteten JWT. */

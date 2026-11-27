@@ -183,7 +183,7 @@ export function AdminTeamView({
             Lade Kolleginnen und Kollegen ein, um gemeinsam Motive zu erstellen.
           </p>
         </div>
-        <Badge variant="secondary">{loaded ? `${members.length} Mitglieder` : "…"}</Badge>
+        <Badge variant="secondary">{loaded ? `${members.length} ${members.length === 1 ? "Mitglied" : "Mitglieder"}` : "…"}</Badge>
       </div>
 
       {loadError ? (
@@ -223,13 +223,13 @@ export function AdminTeamView({
               />
             </div>
             <div className="grid gap-2">
-              <Label>Rolle</Label>
+              <Label htmlFor="team-invite-role">Rolle</Label>
               <Select
                 value={inviteRole}
                 onValueChange={(v) => setInviteRole(v as InviteTeamRole)}
                 disabled={inviting}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger id="team-invite-role" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -297,9 +297,10 @@ export function AdminTeamView({
                             <Avatar size="sm">
                               <AvatarFallback>{getInitials(label)}</AvatarFallback>
                             </Avatar>
-                            <div className="flex min-w-0 flex-col">
-                              <span className="truncate font-medium text-sm">{label}</span>
-                              <span className="truncate text-muted-foreground text-xs">
+                            {/* Mobil kürzen, damit Rolle und Status ohne Querscrollen sichtbar bleiben. */}
+                            <div className="flex min-w-0 max-w-[9.5rem] flex-col sm:max-w-none">
+                              <span className="truncate font-medium text-sm" title={label}>{label}</span>
+                              <span className="truncate text-muted-foreground text-xs" title={m.email}>
                                 {m.email}
                               </span>
                             </div>

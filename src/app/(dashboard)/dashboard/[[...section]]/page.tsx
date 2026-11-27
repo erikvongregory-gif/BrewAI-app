@@ -1,7 +1,7 @@
-import { workspaceResourceUser } from "@/lib/dashboard/workspace";
+import { orWorkspaceBlockedRedirect, workspaceResourceUser } from "@/lib/dashboard/workspace";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { getServerUser } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { MARKETING_SITE_URL } from "@/lib/siteConfig";
 import { getDashboardMetadata } from "@/lib/dashboard/metadata";
@@ -39,6 +39,7 @@ export default async function DashboardPage({
   const routeParams = (await params) ?? {};
   const query = (await searchParams) ?? {};
   const section = routeParams.section?.[0]?.toLowerCase();
+  // Unbekannte Abschnitte beantwortet schon ./layout.tsx mit 404.
 
   // Legacy ?tab=… → path-based routes
   const legacyTabRaw = query.tab;
@@ -57,24 +58,21 @@ export default async function DashboardPage({
   if (!isSupabaseConfigured()) {
     return (
       <main className="relative z-10 mx-auto max-w-lg px-4 py-16">
-        <h1 className="font-display text-2xl font-semibold text-zinc-900">Dashboard</h1>
-        <p className="mt-4 text-zinc-600">
+        <h1 className="font-display text-2xl font-semibold text-foreground">Dashboard</h1>
+        <p className="mt-4 text-muted-foreground">
           Supabase ist noch nicht konfiguriert. Lege in Vercel (und lokal in{" "}
-          <code className="rounded bg-zinc-100 px-1">.env.local</code>){" "}
-          <code className="rounded bg-zinc-100 px-1">NEXT_PUBLIC_SUPABASE_URL</code> und{" "}
-          <code className="rounded bg-zinc-100 px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> an.
+          <code className="rounded-sm bg-muted px-1">.env.local</code>){" "}
+          <code className="rounded-sm bg-muted px-1">NEXT_PUBLIC_SUPABASE_URL</code> und{" "}
+          <code className="rounded-sm bg-muted px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> an.
         </p>
-        <a href={MARKETING_SITE_URL} className="mt-6 inline-block text-sm font-medium text-[#c65a20] hover:underline">
+        <a href={MARKETING_SITE_URL} className="mt-6 inline-block text-sm font-medium text-acc-deep hover:underline">
           Zur Startseite
         </a>
       </main>
     );
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getServerUser();
 
   if (!user) {
     const loginQuery = new URLSearchParams();
@@ -87,7 +85,7 @@ export default async function DashboardPage({
     redirect(qs ? `/anmelden?${qs}` : "/anmelden");
   }
 
-  const resourceUser = await workspaceResourceUser(user, false, { hydrate: false });
+  const resourceUser = await orWorkspaceBlockedRedirect(workspaceResourceUser(user, false, { hydrate: false }));
   const onboardingState = sanitizeStudioOnboardingState(
     getDashboardMetadata(resourceUser.user_metadata).onboarding,
   );
@@ -119,16 +117,13 @@ export default async function DashboardPage({
       : "user";
   const isAdmin = userRole === "admin";
 
-  const forcedTab =
-    section && SECTION_TABS.has(section) ? section : section ? "dashboard" : undefined;
-
   return (
     <DashboardRedesignShell
       userEmail={user.email}
       initialProfileName={profileName}
       initialBreweryName={breweryName}
       isAdmin={isAdmin}
-      forcedTab={forcedTab}
+      forcedTab={section}
     />
   );
 }

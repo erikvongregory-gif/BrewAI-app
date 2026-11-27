@@ -8,7 +8,7 @@ import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const cardVariants = cva(
-  "relative flex h-full w-full flex-col justify-between overflow-hidden rounded-2xl p-6 shadow-sm transition-shadow duration-300 hover:shadow-lg sm:p-8",
+  "relative flex h-full w-full flex-col justify-between overflow-hidden rounded-xl p-6 shadow-sm transition-shadow duration-300 hover:shadow-lg sm:p-8",
   {
     variants: {
       gradient: {
