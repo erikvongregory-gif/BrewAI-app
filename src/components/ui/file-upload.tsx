@@ -188,7 +188,7 @@ export default function FileUpload({
         transition={{ duration: 0.2 }}
         className={clsx(
           "relative rounded-xl p-8 md:p-10 text-center cursor-pointer bg-secondary/50 shadow-sm hover:shadow-md backdrop-blur group",
-          isDragging && "ring-4 ring-blue-400/30",
+          isDragging && "ring-4 ring-acc/30",
         )}
       >
         <div className="flex flex-col items-center gap-5">
@@ -211,15 +211,15 @@ export default function FileUpload({
                 repeat: isDragging ? Infinity : 0,
                 ease: "easeInOut",
               }}
-              className="absolute -inset-4 bg-blue-400/10 rounded-full blur-md"
+              className="absolute -inset-4 bg-acc/10 rounded-full blur-md"
               style={{ display: isDragging ? "block" : "none" }}
             />
             <UploadCloud
               className={clsx(
                 "w-16 h-16 md:w-20 md:h-20 drop-shadow-sm",
                 isDragging
-                  ? "text-blue-500"
-                  : "text-muted-foreground group-hover:text-blue-500 transition-colors duration-300",
+                  ? "text-acc-deep"
+                  : "text-muted-foreground group-hover:text-acc-deep transition-colors duration-300",
               )}
             />
           </motion.div>
@@ -234,7 +234,7 @@ export default function FileUpload({
             </h3>
             <p className="text-muted-foreground md:text-lg max-w-md mx-auto">
               {isDragging ? (
-                <span className="font-medium text-blue-500">
+                <span className="font-medium text-acc-deep">
                   {hint || "Loslassen zum Hochladen"}
                 </span>
               ) : (
@@ -334,7 +334,7 @@ export default function FileUpload({
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-col gap-1 w-full">
                     <div className="flex items-center gap-2 min-w-0">
-                      <FileIcon className="w-5 h-5 flex-shrink-0 text-blue-500 dark:text-blue-400" />
+                      <FileIcon className="w-5 h-5 flex-shrink-0 text-acc-deep dark:text-acc-hover" />
                       <h4
                         className="font-medium text-base truncate text-foreground"
                         title={file.name}
@@ -348,7 +348,7 @@ export default function FileUpload({
                       <span className="flex items-center gap-1.5">
                         <span className="font-medium">{Math.round(file.progress)}%</span>
                         {file.progress < 100 ? (
-                          <Loader className="w-4 h-4 animate-spin text-blue-500" />
+                          <Loader className="w-4 h-4 animate-spin text-acc-deep" />
                         ) : (
                           <Trash2
                             className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200"
@@ -383,7 +383,7 @@ export default function FileUpload({
                         file.error
                           ? "bg-red-500"
                           : file.progress < 100
-                            ? "bg-blue-500"
+                            ? "bg-acc"
                             : "bg-emerald-500",
                       )}
                     />
