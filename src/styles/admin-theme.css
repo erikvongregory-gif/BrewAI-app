@@ -148,8 +148,16 @@
   min-height: 100dvh;
 }
 
-/* Kein `.brewai-admin * { border-color }` — das würde border-transparent an Ghost/Link-Buttons
-   (Sidebar-Trigger, Suche) überschreiben und sichtbare Umrandungen erzwingen. */
+/* Standard-Randfarbe wie bei shadcn, aber in @layer base: Utilities wie border-transparent
+   (Ghost/Link-Buttons) gewinnen weiterhin. Ohne diese Regel ist `border` in Tailwind 4 currentColor
+   (schwarze Linien unter Tabellenköpfen). Ungelayert würde sie border-transparent überschreiben. */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border, currentColor);
+  }
+}
 
 /* Template font switching (next-shadcn-admin-dashboard) */
 html[data-font="geist"] body {
