@@ -189,10 +189,10 @@ describe("studio generation contract", () => {
   it.each([
     ["product", product, "reportage", "Candid snapshot photography"],
     ["product", product, "premium", "Natural, high-quality editorial photography"],
-    ["product", product, "campaign", "Art-directed beverage advertising photography"],
+    ["product", product, "campaign", "commissioned brand campaign shoot on location"],
     ["social", social, "reportage", "Candid snapshot photography"],
     ["social", social, "premium", "Natural, high-quality editorial photography"],
-    ["social", social, "campaign", "Art-directed beverage advertising photography"],
+    ["social", social, "campaign", "commissioned brand campaign shoot on location"],
   ] as const)("uses V3 without automatic looks or cultural wardrobe (%s)", async (_mode, route, style, treatment) => {
     vi.stubEnv("IMAGE_PROMPT_VERSION", "v1");
     const response = await route(new Request("https://app.example/api/inhalte-erstellen/create-task", {

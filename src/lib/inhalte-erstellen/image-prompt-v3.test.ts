@@ -13,6 +13,19 @@ function prompt(overrides: Record<string, unknown> = {}) {
 }
 
 describe("independent V3 image direction", () => {
+  it("opens bottles for drinking or toasting, not for an open cooler", () => {
+    const cooler = prompt({ behaelter: "F", zusatzWunsch: "Freunde am Grill, offene Kühlbox mit Flaschen im Vordergrund" });
+    expect(cooler).toContain("sealed unless the customer explicitly depicts opening it");
+    expect(cooler).toContain("in a cooler, crate, bucket, basket or carrier) stay sealed");
+    expect(prompt({ behaelter: "F", zusatzWunsch: "Drei Freunde stoßen mit Flaschen an" })).toContain("crown cap removed");
+    expect(prompt({ behaelter: "F", zusatzWunsch: "Eine offene Flasche auf dem Tisch" })).toContain("crown cap removed");
+  });
+  it("keeps repeated products and labels physically varied", () => {
+    const text = prompt();
+    expect(text).toContain("show exactly that many");
+    expect(text).toContain("never a dry, flat sticker");
+    expect(text).toContain("rather than in a symmetric, camera-facing cluster");
+  });
   it("adds the large-format finishing rule only for the 4K tier", () => {
     expect(prompt({ quality: "ultra" })).toContain("LARGE-FORMAT FINISHING");
     expect(prompt({ quality: "high" })).not.toContain("LARGE-FORMAT FINISHING");
@@ -162,6 +175,23 @@ describe("independent V3 image direction", () => {
     expect(free).not.toContain("LABEL LOCK");
     expect(text).toContain("Customer-defined red jacket");
     expect(text).not.toContain("Invent new, distinct adult identities");
+  });
+
+  it("asks for a real photograph in the opening line", () => {
+    expect(prompt()).toContain("Create one photorealistic, real beverage photograph someone could have taken with a real camera");
+  });
+  it.each(["premium", "campaign"] as const)("keeps %s free of cinematic styling and heavy retouching", (photoStyle) => {
+    expect(V3_PHOTO_PRESETS[photoStyle]).toContain("Avoid cinematic lighting, dramatic color grading or stylized composition. No glamorization and no heavy retouching.");
+  });
+  it("lets location light lead in premium and keeps the studio key only for location-free shots", () => {
+    expect(V3_PHOTO_PRESETS.premium).toContain("At a real location, the existing light of that place leads");
+    expect(V3_PHOTO_PRESETS.premium).toContain("Only when the customer scene is a studio or product shot without a location, use one large soft key");
+  });
+  it("marks locked label words as verbatim and preserves geometry", () => {
+    const input = hyperrealisticSchema.parse({ etikettBild: "https://example.com/product.png", flaschenTyp: "nrw_500", bierstil: "helles", szene: "biergarten_sommer" });
+    const text = buildImagePromptV3({ input, references: [{ index: 1, role: "product" }], labelText: ["ABK"] });
+    expect(text).toContain('Exact label words: "ABK" (EXACT, verbatim, no extra characters).');
+    expect(text).toContain("Preserve product geometry and label legibility exactly.");
   });
 
   it("normalizes product fields without adding scene or personality defaults", () => {
