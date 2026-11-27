@@ -54,13 +54,13 @@ export default function FileUpload({
   multiple = true,
   maxFiles,
   className,
-  titleIdle = "Upload your files",
-  titleDragging = "Drop files here",
-  titleHasFiles = "Add more files",
+  titleIdle = "Dateien hochladen",
+  titleDragging = "Dateien hier ablegen",
+  titleHasFiles = "Weitere Dateien hinzufügen",
   hint,
-  supportHint = "Supports images, documents, videos, and more",
-  clearAllLabel = "Clear all",
-  uploadedLabel = "Uploaded files",
+  supportHint = "Bilder, Dokumente, Videos und mehr",
+  clearAllLabel = "Alle entfernen",
+  uploadedLabel = "Hochgeladene Dateien",
   onUpload,
   onRemove,
   onClearAll,
@@ -181,7 +181,7 @@ export default function FileUpload({
         onClick={() => inputRef.current?.click()}
         initial={false}
         animate={{
-          borderColor: isDragging ? "#3b82f6" : "transparent",
+          borderColor: isDragging ? "var(--color-acc)" : "transparent",
           scale: isDragging ? 1.02 : 1,
         }}
         whileHover={{ scale: 1.01 }}
@@ -235,12 +235,12 @@ export default function FileUpload({
             <p className="text-muted-foreground md:text-lg max-w-md mx-auto">
               {isDragging ? (
                 <span className="font-medium text-blue-500">
-                  {hint || "Release to upload"}
+                  {hint || "Loslassen zum Hochladen"}
                 </span>
               ) : (
                 <>
-                  Drag & drop files here, or{" "}
-                  <span className="text-blue-500 font-medium">browse</span>
+                  Datei hierher ziehen oder{" "}
+                  <span className="font-medium text-acc-deep">auswählen</span>
                 </>
               )}
             </p>
@@ -356,7 +356,7 @@ export default function FileUpload({
                               e.stopPropagation();
                               removeFile(file);
                             }}
-                            aria-label="Remove file"
+                            aria-label="Datei entfernen"
                           />
                         )}
                       </span>
