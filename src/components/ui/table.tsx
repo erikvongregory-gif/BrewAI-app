@@ -8,7 +8,9 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto"
+      // Fokussierbar, damit breite Tabellen mobil per Tastatur scrollbar sind (WCAG scrollable-region-focusable)
+      tabIndex={0}
+      className="relative w-full overflow-x-auto rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
     >
       <table
         data-slot="table"

@@ -183,7 +183,7 @@ export function AdminTeamView({
             Lade Kolleginnen und Kollegen ein, um gemeinsam Motive zu erstellen.
           </p>
         </div>
-        <Badge variant="secondary">{loaded ? `${members.length} Mitglieder` : "…"}</Badge>
+        <Badge variant="secondary">{loaded ? `${members.length} ${members.length === 1 ? "Mitglied" : "Mitglieder"}` : "…"}</Badge>
       </div>
 
       {loadError ? (
@@ -223,13 +223,13 @@ export function AdminTeamView({
               />
             </div>
             <div className="grid gap-2">
-              <Label>Rolle</Label>
+              <Label htmlFor="team-invite-role">Rolle</Label>
               <Select
                 value={inviteRole}
                 onValueChange={(v) => setInviteRole(v as InviteTeamRole)}
                 disabled={inviting}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger id="team-invite-role" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
