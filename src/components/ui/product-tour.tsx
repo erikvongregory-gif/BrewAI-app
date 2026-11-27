@@ -368,7 +368,7 @@ export function Tour({
                   <div className="flex items-start gap-3">
                     {step.icon ? (
                       <motion.span
-                        className="relative mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#F6D2AE] to-acc-light text-[#5A2D08] shadow-[0_6px_16px_-6px_rgba(199,105,30,0.7)] [&_svg]:size-[18px]"
+                        className="relative mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#F6D2AE] to-acc-light text-[#5A2D08] shadow-[0_6px_16px_-6px_color-mix(in_srgb,var(--color-acc)_70%,transparent)] [&_svg]:size-[18px]"
                         initial={reduce ? false : { scale: 0.5, rotate: -12, opacity: 0 }}
                         animate={{ scale: 1, rotate: 0, opacity: 1 }}
                         transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 18, delay: 0.1 }}

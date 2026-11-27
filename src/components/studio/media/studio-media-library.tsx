@@ -84,7 +84,7 @@ function MediaJobRevealThumb({
         className="absolute inset-0"
         style={{
           background: `
-            radial-gradient(120% 90% at 85% 100%, rgba(199, 105, 30, 0.55) 0%, transparent 55%),
+            radial-gradient(120% 90% at 85% 100%, color-mix(in srgb, var(--color-acc) 55%, transparent) 0%, transparent 55%),
             radial-gradient(90% 70% at 15% 20%, rgba(180, 175, 210, 0.55) 0%, transparent 50%),
             radial-gradient(70% 60% at 50% 50%, rgba(230, 228, 235, 0.9) 0%, #d8d6de 100%)
           `,
@@ -115,7 +115,7 @@ function MediaJobRevealThumb({
             backdropFilter: "blur(28px)",
             WebkitBackdropFilter: "blur(28px)",
             background:
-              "linear-gradient(105deg, rgba(245,244,248,0.72) 0%, rgba(232,180,130,0.5) 55%, rgba(199,105,30,0.4) 100%)",
+              "linear-gradient(105deg, rgba(245,244,248,0.72) 0%, rgba(232,180,130,0.5) 55%, color-mix(in srgb, var(--color-acc) 40%, transparent) 100%)",
             maskImage: `linear-gradient(to bottom, transparent ${Math.max(0, wipe - 4)}%, black ${Math.min(100, wipe + 6)}%)`,
             WebkitMaskImage: `linear-gradient(to bottom, transparent ${Math.max(0, wipe - 4)}%, black ${Math.min(100, wipe + 6)}%)`,
           }}

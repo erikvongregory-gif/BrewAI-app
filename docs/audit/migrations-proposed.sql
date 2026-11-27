@@ -1,5 +1,6 @@
 -- Vorgeschlagene Migrationen aus dem Audit vom 26.11.2026. NICHT automatisch ausführen.
--- Jede Migration ist optional: Der Code läuft mit dem heutigen Schema korrekt, sie macht ihn nur schneller.
+-- Der Code läuft mit dem heutigen Schema korrekt. A-4 (Index) macht ihn nur schneller.
+-- ACHTUNG: Abschnitt credits-inactive-subscription ändert eine Geschäftsregel (gekaufte Credits bei inaktivem Abo) und braucht die Freigabe des Gründers.
 
 -- A-4 Mediathek: Sortierung + Seiten in der DB (src/lib/dashboard/media-store.ts).
 -- Der Code sortiert per PostgREST nach `item->>createdAt DESC NULLS LAST, id ASC` und liest nur

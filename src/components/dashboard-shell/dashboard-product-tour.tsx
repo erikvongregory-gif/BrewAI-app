@@ -397,7 +397,7 @@ export function DashboardProductTour({
                       transition={{ duration: 1.2, ease: "easeOut", delay: 0.15 }}
                     />
                     <motion.span
-                      className="relative flex size-16 items-center justify-center rounded-xl bg-gradient-to-br from-acc-light to-acc text-white shadow-[0_12px_36px_-8px_rgba(199,105,30,0.8)]"
+                      className="relative flex size-16 items-center justify-center rounded-xl bg-gradient-to-br from-acc-light to-acc text-white shadow-[0_12px_36px_-8px_color-mix(in_srgb,var(--color-acc)_80%,transparent)]"
                       initial={reduce ? false : { scale: 0.3, rotate: -30 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ type: "spring", stiffness: 380, damping: 14, delay: 0.1 }}
